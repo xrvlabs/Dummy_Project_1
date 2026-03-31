@@ -43,6 +43,7 @@
             text-transform: uppercase;
         }
 
+        /* Hide all scrollbars but keep scrollable */
         *::-webkit-scrollbar { display: none; }
         * { scrollbar-width: none; -ms-overflow-style: none; }
 
@@ -240,43 +241,6 @@
             font-family: var(--font);
             font-size: clamp(0.9rem, 2.5vw, 1.5rem);
             font-weight: 700;
-            display: inline-block;
-            transition: transform 0.1s ease, opacity 0.1s ease;
-        }
-
-        /* JITTER shake animation */
-        .m-value.jitter-active {
-            animation: jitterShake 0.12s infinite alternate;
-        }
-        @keyframes jitterShake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-1.5px, 0.8px) rotate(-0.5deg); }
-            40% { transform: translate(1.2px, -0.6px) rotate(0.4deg); }
-            60% { transform: translate(-0.8px, 1.2px) rotate(-0.3deg); }
-            80% { transform: translate(1px, -1px) rotate(0.5deg); }
-            100% { transform: translate(-0.5px, 0.5px) rotate(-0.2deg); }
-        }
-
-        /* LATENCY pulse/breathe animation - door paas effect */
-        .m-value.latency-active {
-            animation: latencyPulse 1.2s ease-in-out infinite;
-        }
-        @keyframes latencyPulse {
-            0% { transform: scale(1) translateZ(0); opacity: 1; filter: blur(0px); }
-            25% { transform: scale(0.82) translateZ(0); opacity: 0.5; filter: blur(1.5px); }
-            50% { transform: scale(1.12) translateZ(0); opacity: 1; filter: blur(0px); }
-            75% { transform: scale(0.88) translateZ(0); opacity: 0.55; filter: blur(1px); }
-            100% { transform: scale(1) translateZ(0); opacity: 1; filter: blur(0px); }
-        }
-
-        /* Settle animation when scan completes */
-        .m-value.settle {
-            animation: settleDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        @keyframes settleDown {
-            0% { transform: scale(1.1); opacity: 0.7; }
-            50% { transform: scale(0.95); opacity: 0.9; }
-            100% { transform: scale(1); opacity: 1; filter: blur(0); }
         }
 
         .btn {
@@ -326,6 +290,7 @@
             justify-content: center; gap: 12px;
         }
 
+        /* Spinner */
         .spinner {
             display: none;
             width: 18px; height: 18px;
@@ -416,18 +381,9 @@
                 </div>
 
                 <div class="metrics-row">
-                    <div class="m-card">
-                        <div class="m-label">Latency</div>
-                        <div class="m-value" id="vPing">0MS</div>
-                    </div>
-                    <div class="m-card">
-                        <div class="m-label">Jitter</div>
-                        <div class="m-value" id="vJitter">0MS</div>
-                    </div>
-                    <div class="m-card">
-                        <div class="m-label">Load</div>
-                        <div class="m-value" id="vData">0MB</div>
-                    </div>
+                    <div class="m-card"><div class="m-label">Latency</div><div class="m-value" id="vPing">0MS</div></div>
+                    <div class="m-card"><div class="m-label">Jitter</div><div class="m-value" id="vJitter">0MS</div></div>
+                    <div class="m-card"><div class="m-label">Load</div><div class="m-value" id="vData">0MB</div></div>
                 </div>
 
                 <button class="btn" id="startBtn" onclick="runTest()">
@@ -489,7 +445,6 @@
         const CFG = { endpoint: 'https://speed.cloudflare.com/__down', duration: 8000 };
         let S = { running: false, totalData: 0, smoothed: 0 };
         let abortCtrl = null;
-        let jitterAnimFrame = null;
 
         async function fetchMeta() {
             try {
@@ -500,44 +455,6 @@
             } catch (e) {}
         }
         fetchMeta();
-
-        // Jitter random value flicker during scan
-        function startJitterFlicker() {
-            const el = document.getElementById('vJitter');
-            el.classList.add('jitter-active');
-            
-            function flicker() {
-                if (!S.running) return;
-                // Random micro-offset to text for extra glitchy feel
-                const rx = (Math.random() - 0.5) * 2;
-                const ry = (Math.random() - 0.5) * 2;
-                el.style.textShadow = `${rx}px ${ry}px 2px var(--accent-glow)`;
-                jitterAnimFrame = requestAnimationFrame(flicker);
-            }
-            flicker();
-        }
-
-        function stopJitterFlicker() {
-            const el = document.getElementById('vJitter');
-            el.classList.remove('jitter-active');
-            el.classList.add('settle');
-            el.style.textShadow = 'none';
-            if (jitterAnimFrame) cancelAnimationFrame(jitterAnimFrame);
-            setTimeout(() => el.classList.remove('settle'), 600);
-        }
-
-        // Latency depth animation
-        function startLatencyPulse() {
-            const el = document.getElementById('vPing');
-            el.classList.add('latency-active');
-        }
-
-        function stopLatencyPulse() {
-            const el = document.getElementById('vPing');
-            el.classList.remove('latency-active');
-            el.classList.add('settle');
-            setTimeout(() => el.classList.remove('settle'), 600);
-        }
 
         async function runTest() {
             if (S.running) return;
@@ -554,10 +471,6 @@
             card.classList.add('is-testing');
             S.totalData = 0; S.smoothed = 0;
 
-            // Start metric animations
-            startJitterFlicker();
-            startLatencyPulse();
-
             try {
                 let pings = [];
                 for (let i = 0; i < 8; i++) {
@@ -572,10 +485,6 @@
 
                 await startDownload(abortCtrl.signal);
 
-                // Stop metric animations with settle
-                stopJitterFlicker();
-                stopLatencyPulse();
-
                 btnText.textContent = 'Scan Complete';
                 btn.classList.remove('scanning');
 
@@ -587,8 +496,6 @@
             } catch (e) {
                 btnText.textContent = 'Error';
                 btn.classList.remove('scanning');
-                stopJitterFlicker();
-                stopLatencyPulse();
             }
             finally { btn.disabled = false; card.classList.remove('is-testing'); S.running = false; }
         }
