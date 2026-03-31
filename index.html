@@ -54,7 +54,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue, onDisconnect, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    // ✅ Tumhari Firebase Config yahan add kar di gayi hai
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAzgbQjmrXSHWhPn5Iqn422_GauYKQpglY",
       authDomain: "dummyfilego.firebaseapp.com",
@@ -90,10 +90,9 @@
     // STUN aur TURN Servers ka Ultimate Combination
     const peerConfig = {
         iceServers: [
-            // 1. STUN Server (Pehle direct connection try karega - Fast & Free)
+            // 1. STUN Server (Pehle direct connection try karega)
             { urls: 'stun:stun.l.google.com:19302' },
-            
-            // 2. TURN Server (Agar STUN fail hua, toh data iske through bounce hoga)
+            // 2. TURN Server (Strict NAT/Firewall ke liye Relay)
             {
                 urls: 'turn:free.expressturn.com:3478',
                 username: '000000002090310152',
@@ -122,22 +121,19 @@
 
     btnHost.onclick = () => {
         btnHost.disabled = true;
-        roomCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+        roomCode = Math.floor(100000 + Math.random() * 900000).toString(); 
         senderCodeDisplay.innerHTML = `<h2 style="color:var(--accent); letter-spacing:4px;">${roomCode}</h2>`;
         senderStatus.innerText = "Waiting for receiver to join...";
 
         const roomRef = ref(db, `beam_rooms/${roomCode}`);
-        onDisconnect(roomRef).remove(); // Cleanup on close
+        onDisconnect(roomRef).remove(); 
 
-        // Initiator (Sender)
         peer = new SimplePeer({ initiator: true, trickle: false, config: peerConfig });
 
         peer.on('signal', data => {
-            // Write offer to Firebase
             set(ref(db, `beam_rooms/${roomCode}/offer`), JSON.stringify(data));
         });
 
-        // Listen for receiver's answer
         onValue(ref(db, `beam_rooms/${roomCode}/answer`), snapshot => {
             const val = snapshot.val();
             if (val && !peer.connected) {
@@ -158,10 +154,8 @@
         btnJoin.disabled = true;
         receiverStatus.innerText = "Connecting to peer...";
 
-        // Non-initiator (Receiver)
         peer = new SimplePeer({ initiator: false, trickle: false, config: peerConfig });
 
-        // Listen for sender's offer
         onValue(ref(db, `beam_rooms/${roomCode}/offer`), snapshot => {
             const val = snapshot.val();
             if (val && !peer.connected) {
@@ -170,7 +164,6 @@
         });
 
         peer.on('signal', data => {
-            // Write answer back to Firebase
             set(ref(db, `beam_rooms/${roomCode}/answer`), JSON.stringify(data));
         });
 
@@ -178,7 +171,7 @@
     };
 
     // ==========================================
-    // SHARED PEER EVENTS & TRANSFER LOGIC
+    // SHARED PEER EVENTS
     // ==========================================
     function setupPeerEvents(role) {
         peer.on('connect', () => {
@@ -186,7 +179,6 @@
             progressBar.style.display = 'block';
             progressText.style.display = 'block';
             
-            // Delete room from firebase (not needed anymore, we are P2P now)
             remove(ref(db, `beam_rooms/${roomCode}`));
 
             if (role === 'sender') {
@@ -204,11 +196,10 @@
         }
     }
 
-   // ==========================================
-    // CHUNKED FILE SENDING (Updated)
+    // ==========================================
+    // CHUNKED FILE SENDING (With TextDecoder Fix)
     // ==========================================
     function sendFile() {
-        // 1. Send Metadata first
         peer.send(JSON.stringify({
             type: 'meta',
             name: fileToSend.name,
@@ -224,10 +215,9 @@
             const slice = fileToSend.slice(offset, o + chunkSize);
             const reader = new FileReader();
             reader.onload = (e) => {
-                peer.send(e.target.result); // Send ArrayBuffer
+                peer.send(e.target.result); 
                 offset += chunkSize;
                 
-                // Update UI
                 const percent = Math.min(100, Math.round((offset / fileToSend.size) * 100));
                 progressFill.style.width = percent + '%';
                 progressText.innerText = `Sent: ${percent}%`;
@@ -246,17 +236,21 @@
             reader.readAsArrayBuffer(slice);
         };
 
-        // 2. Wait for receiver to say "ready" before sending chunks
         peer.on('data', data => {
-            if (data.toString() === 'ready') {
-                senderStatus.innerText = "Receiver accepted. Sending data...";
-                readSlice(0);
+            try {
+                const str = new TextDecoder().decode(data);
+                if (str === 'ready') {
+                    senderStatus.innerText = "Receiver accepted. Sending data...";
+                    readSlice(0);
+                }
+            } catch (e) {
+                // Ignore parsing errors for binary chunks
             }
         });
     }
 
     // ==========================================
-    // CHUNKED FILE RECEIVING (Updated for Mobile Support)
+    // CHUNKED FILE RECEIVING (With Mobile Fallback & Decoder Fix)
     // ==========================================
     function handleIncomingData() {
         let fileHandle;
@@ -264,16 +258,27 @@
         let receivedSize = 0;
         let totalSize = 0;
         
-        // Variables for Mobile Fallback
         let receiveBuffer = []; 
         let isMobileFallback = false;
         let fileName = "downloaded_file";
 
         peer.on('data', async data => {
-            // Handle JSON Messages (Meta or Done)
-            if (typeof data === 'string') {
-                const msg = JSON.parse(data);
-                
+            
+            let isControlMessage = false;
+            let msg = null;
+
+            // Only attempt to decode small chunks as JSON (Metadata)
+            if (data.byteLength < 2000) { 
+                try {
+                    const str = new TextDecoder().decode(data);
+                    msg = JSON.parse(str);
+                    isControlMessage = true;
+                } catch (e) {
+                    // Not JSON -> It's a binary file chunk
+                }
+            }
+
+            if (isControlMessage && msg) {
                 if (msg.type === 'meta') {
                     totalSize = msg.size;
                     fileName = msg.name;
@@ -290,20 +295,16 @@
                             document.getElementById('btnAccept').style.display = 'none';
                             receiverStatus.innerText = "Preparing storage...";
 
-                            // 1. Check if it's a PC (Supports Direct Disk Writing)
                             if (window.showSaveFilePicker) {
                                 fileHandle = await window.showSaveFilePicker({ suggestedName: msg.name });
                                 writableStream = await fileHandle.createWritable();
-                            } 
-                            // 2. Mobile Fallback (RAM buffering)
-                            else {
+                            } else {
                                 isMobileFallback = true;
-                                // Warning for user
                                 console.warn("Mobile device detected. Using RAM buffer.");
                             }
                             
                             receiverStatus.innerText = "Downloading in progress...";
-                            peer.send('ready'); // Tell sender to start sending
+                            peer.send('ready'); 
                         } catch (e) {
                             console.error(e);
                             receiverStatus.innerText = "❌ Save cancelled by user.";
@@ -311,12 +312,9 @@
                     };
                 } 
                 else if (msg.type === 'done') {
-                    // Download Complete Logic
                     if (!isMobileFallback && writableStream) {
-                        // PC: Close the stream, file is already on disk
                         await writableStream.close();
                     } else if (isMobileFallback) {
-                        // Mobile: Combine chunks from RAM and trigger download
                         receiverStatus.innerText = "Processing file for mobile download... Please wait.";
                         const blob = new Blob(receiveBuffer);
                         const url = URL.createObjectURL(blob);
@@ -330,7 +328,7 @@
                         setTimeout(() => {
                             document.body.removeChild(a);
                             window.URL.revokeObjectURL(url);
-                            receiveBuffer = []; // Free up RAM!
+                            receiveBuffer = []; 
                         }, 100);
                     }
 
@@ -338,18 +336,20 @@
                     progressFill.style.width = '100%';
                     progressText.innerText = "100%";
                 }
-            } 
-            // Handle binary ArrayBuffer (The actual file chunks)
-            else {
-                if (!isMobileFallback && writableStream) {
-                    // PC: Write direct to disk
-                    await writableStream.write(data);
-                } else if (isMobileFallback) {
-                    // Mobile: Push to RAM array
-                    receiveBuffer.push(data); 
-                }
+                
+                return; // EXIT HERE SO META DOESN'T COUNT AS BINARY DATA
+            }
 
-                receivedSize += data.byteLength;
+            // --- Handle Binary ArrayBuffer ---
+            if (!isMobileFallback && writableStream) {
+                await writableStream.write(data);
+            } else if (isMobileFallback) {
+                receiveBuffer.push(data); 
+            }
+
+            receivedSize += data.byteLength;
+            
+            if (totalSize > 0) {
                 const percent = Math.min(100, Math.round((receivedSize / totalSize) * 100));
                 progressFill.style.width = percent + '%';
                 progressText.innerText = `Received: ${percent}%`;
