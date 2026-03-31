@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileGo - Direct Beam (P2P)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>
+    <style>
+        /* FileGo Minimal Neumorphism Theme */
+        :root { --bg: #1e2028; --surface: #1e2028; --text: #e4e6eb; --accent: #00cec9; --out: 6px 6px 14px rgba(0,0,0,0.45), -6px -6px 14px rgba(55,58,64,0.4); --in: inset 4px 4px 8px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(55,58,64,0.3); }
+        body { font-family: 'Quantico', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--surface); padding: 30px; border-radius: 16px; box-shadow: var(--out); width: 100%; max-width: 400px; text-align: center; }
+        .btn { width: 100%; padding: 15px; margin-top: 15px; border: none; border-radius: 8px; background: var(--bg); box-shadow: var(--out); color: var(--accent); font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:active { box-shadow: var(--in); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 15px; margin-top: 15px; border: none; border-radius: 8px; background: var(--bg); box-shadow: var(--in); color: var(--text); box-sizing: border-box; outline: none; text-align: center;}
+        .progress-bar { width: 100%; height: 10px; background: var(--bg); box-shadow: var(--in); border-radius: 5px; margin-top: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s; }
+        .status { margin-top: 15px; font-size: 0.9rem; color: #7f8694; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 style="margin-top:0; letter-spacing: 2px;">⚡ DIRECT BEAM</h2>
+    
+    <div id="modeSelection">
+        <button class="btn" id="btnSenderMode">I WANT TO SEND</button>
+        <button class="btn" id="btnReceiverMode">I WANT TO RECEIVE</button>
+    </div>
+
+    <div id="senderUI" style="display: none;">
+        <h3>Send File</h3>
+        <input type="file" id="fileInput">
+        <button class="btn" id="btnHost" disabled>GENERATE BEAM CODE</button>
+        <div class="status" id="senderCodeDisplay"></div>
+        <div class="status" id="senderStatus">Waiting for file...</div>
+    </div>
+
+    <div id="receiverUI" style="display: none;">
+        <h3>Receive File</h3>
+        <input type="text" id="joinCodeInput" placeholder="Enter 6-digit code">
+        <button class="btn" id="btnJoin">CONNECT & RECEIVE</button>
+        <div class="status" id="receiverStatus">Waiting for code...</div>
+    </div>
+
+    <div class="progress-bar" id="progressBar" style="display: none;">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="status" id="progressText" style="display: none;">0%</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue, onDisconnect, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    // ⚠️ APNI FIREBASE CONFIG YAHAN DAALO
+    const firebaseConfig = {
+        apiKey: "AIzaSy...",
+        authDomain: "your-app.firebaseapp.com",
+        databaseURL: "https://your-app-default-rtdb.firebaseio.com",
+        projectId: "your-app",
+        storageBucket: "your-app.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // UI Elements
+    const modeSelection = document.getElementById('modeSelection');
+    const senderUI = document.getElementById('senderUI');
+    const receiverUI = document.getElementById('receiverUI');
+    const fileInput = document.getElementById('fileInput');
+    const btnHost = document.getElementById('btnHost');
+    const btnJoin = document.getElementById('btnJoin');
+    const joinCodeInput = document.getElementById('joinCodeInput');
+    const senderStatus = document.getElementById('senderStatus');
+    const receiverStatus = document.getElementById('receiverStatus');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const senderCodeDisplay = document.getElementById('senderCodeDisplay');
+
+    let peer;
+    let fileToSend;
+    let roomCode;
+
+    // STUN Servers (Free)
+    const peerConfig = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478' }
+        ]
+    };
+
+    // Mode Switching
+    document.getElementById('btnSenderMode').onclick = () => {
+        modeSelection.style.display = 'none';
+        senderUI.style.display = 'block';
+    };
+    document.getElementById('btnReceiverMode').onclick = () => {
+        modeSelection.style.display = 'none';
+        receiverUI.style.display = 'block';
+    };
+
+    // ==========================================
+    // SENDER LOGIC
+    // ==========================================
+    fileInput.addEventListener('change', (e) => {
+        fileToSend = e.target.files[0];
+        if (fileToSend) btnHost.disabled = false;
+    });
+
+    btnHost.onclick = () => {
+        btnHost.disabled = true;
+        roomCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+        senderCodeDisplay.innerHTML = `<h2 style="color:var(--accent); letter-spacing:4px;">${roomCode}</h2>`;
+        senderStatus.innerText = "Waiting for receiver to join...";
+
+        const roomRef = ref(db, `beam_rooms/${roomCode}`);
+        onDisconnect(roomRef).remove(); // Cleanup on close
+
+        // Initiator (Sender)
+        peer = new SimplePeer({ initiator: true, trickle: false, config: peerConfig });
+
+        peer.on('signal', data => {
+            // Write offer to Firebase
+            set(ref(db, `beam_rooms/${roomCode}/offer`), JSON.stringify(data));
+        });
+
+        // Listen for receiver's answer
+        onValue(ref(db, `beam_rooms/${roomCode}/answer`), snapshot => {
+            const val = snapshot.val();
+            if (val && !peer.connected) {
+                peer.signal(JSON.parse(val));
+            }
+        });
+
+        setupPeerEvents('sender');
+    };
+
+    // ==========================================
+    // RECEIVER LOGIC
+    // ==========================================
+    btnJoin.onclick = () => {
+        roomCode = joinCodeInput.value.trim();
+        if (roomCode.length !== 6) return alert("Enter valid 6-digit code");
+        
+        btnJoin.disabled = true;
+        receiverStatus.innerText = "Connecting to peer...";
+
+        // Non-initiator (Receiver)
+        peer = new SimplePeer({ initiator: false, trickle: false, config: peerConfig });
+
+        // Listen for sender's offer
+        onValue(ref(db, `beam_rooms/${roomCode}/offer`), snapshot => {
+            const val = snapshot.val();
+            if (val && !peer.connected) {
+                peer.signal(JSON.parse(val));
+            }
+        });
+
+        peer.on('signal', data => {
+            // Write answer back to Firebase
+            set(ref(db, `beam_rooms/${roomCode}/answer`), JSON.stringify(data));
+        });
+
+        setupPeerEvents('receiver');
+    };
+
+    // ==========================================
+    // SHARED PEER EVENTS & TRANSFER LOGIC
+    // ==========================================
+    function setupPeerEvents(role) {
+        peer.on('connect', () => {
+            document.getElementById(`${role}Status`).innerText = "🟢 CONNECTED! P2P Tunnel Established.";
+            progressBar.style.display = 'block';
+            progressText.style.display = 'block';
+            
+            // Delete room from firebase (not needed anymore, we are P2P now)
+            remove(ref(db, `beam_rooms/${roomCode}`));
+
+            if (role === 'sender') {
+                sendFile();
+            }
+        });
+
+        peer.on('error', err => {
+            console.error('Peer Error:', err);
+            document.getElementById(`${role}Status`).innerText = "❌ Connection Failed / Lost.";
+        });
+
+        if (role === 'receiver') {
+            handleIncomingData();
+        }
+    }
+
+    // ==========================================
+    // CHUNKED FILE SENDING (Prevents RAM Crash)
+    // ==========================================
+    function sendFile() {
+        // Send Metadata first
+        peer.send(JSON.stringify({
+            type: 'meta',
+            name: fileToSend.name,
+            size: fileToSend.size
+        }));
+
+        const chunkSize = 64 * 1024; // 64KB Chunks
+        let offset = 0;
+
+        const readSlice = (o) => {
+            const slice = fileToSend.slice(offset, o + chunkSize);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                peer.send(e.target.result); // Send ArrayBuffer
+                offset += chunkSize;
+                
+                // Update UI
+                const percent = Math.min(100, Math.round((offset / fileToSend.size) * 100));
+                progressFill.style.width = percent + '%';
+                progressText.innerText = `Sent: ${percent}%`;
+
+                if (offset < fileToSend.size) {
+                    // Check if buffer is full, wait if necessary
+                    if (peer._channel.bufferedAmount > 16 * 1024 * 1024) {
+                        setTimeout(() => readSlice(offset), 50);
+                    } else {
+                        readSlice(offset);
+                    }
+                } else {
+                    peer.send(JSON.stringify({ type: 'done' }));
+                    senderStatus.innerText = "✅ File Sent Successfully!";
+                }
+            };
+            reader.readAsArrayBuffer(slice);
+        };
+
+        readSlice(0);
+    }
+
+    // ==========================================
+    // CHUNKED FILE RECEIVING (Direct to Hard Drive)
+    // ==========================================
+    function handleIncomingData() {
+        let fileHandle;
+        let writableStream;
+        let receivedSize = 0;
+        let totalSize = 0;
+
+        peer.on('data', async data => {
+            // Handle JSON Metadata
+            if (typeof data === 'string') {
+                const msg = JSON.parse(data);
+                if (msg.type === 'meta') {
+                    totalSize = msg.size;
+                    receiverStatus.innerText = `Receiving: ${msg.name}`;
+                    
+                    // Ask user where to save the file (NATIVE OS DIALOG)
+                    try {
+                        fileHandle = await window.showSaveFilePicker({ suggestedName: msg.name });
+                        writableStream = await fileHandle.createWritable();
+                    } catch (e) {
+                        receiverStatus.innerText = "❌ Save cancelled by user.";
+                        peer.destroy();
+                    }
+                } else if (msg.type === 'done') {
+                    await writableStream.close();
+                    receiverStatus.innerText = "✅ File Downloaded & Saved Successfully!";
+                    progressFill.style.width = '100%';
+                    progressText.innerText = "100%";
+                }
+            } 
+            // Handle binary ArrayBuffer
+            else if (writableStream) {
+                await writableStream.write(data);
+                receivedSize += data.byteLength;
+                
+                const percent = Math.min(100, Math.round((receivedSize / totalSize) * 100));
+                progressFill.style.width = percent + '%';
+                progressText.innerText = `Received: ${percent}%`;
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
