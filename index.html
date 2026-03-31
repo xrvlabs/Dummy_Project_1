@@ -204,16 +204,18 @@
         }
     }
 
-    // ==========================================
-    // CHUNKED FILE SENDING (Prevents RAM Crash)
+   // ==========================================
+    // CHUNKED FILE SENDING (Updated)
     // ==========================================
     function sendFile() {
-        // Send Metadata first
+        // 1. Send Metadata first
         peer.send(JSON.stringify({
             type: 'meta',
             name: fileToSend.name,
             size: fileToSend.size
         }));
+
+        senderStatus.innerText = "Waiting for receiver to accept the file...";
 
         const chunkSize = 64 * 1024; // 64KB Chunks
         let offset = 0;
@@ -231,7 +233,6 @@
                 progressText.innerText = `Sent: ${percent}%`;
 
                 if (offset < fileToSend.size) {
-                    // Check if buffer is full, wait if necessary
                     if (peer._channel.bufferedAmount > 16 * 1024 * 1024) {
                         setTimeout(() => readSlice(offset), 50);
                     } else {
@@ -245,11 +246,17 @@
             reader.readAsArrayBuffer(slice);
         };
 
-        readSlice(0);
+        // 2. Wait for receiver to say "ready" before sending chunks
+        peer.on('data', data => {
+            if (data.toString() === 'ready') {
+                senderStatus.innerText = "Receiver accepted. Sending data...";
+                readSlice(0);
+            }
+        });
     }
 
     // ==========================================
-    // CHUNKED FILE RECEIVING (Direct to Hard Drive)
+    // CHUNKED FILE RECEIVING (Updated)
     // ==========================================
     function handleIncomingData() {
         let fileHandle;
@@ -258,23 +265,45 @@
         let totalSize = 0;
 
         peer.on('data', async data => {
-            // Handle JSON Metadata
+            // Handle JSON Messages (Meta or Done)
             if (typeof data === 'string') {
                 const msg = JSON.parse(data);
+                
                 if (msg.type === 'meta') {
                     totalSize = msg.size;
-                    receiverStatus.innerText = `Receiving: ${msg.name}`;
                     
-                    // Ask user where to save the file (NATIVE OS DIALOG)
-                    try {
-                        fileHandle = await window.showSaveFilePicker({ suggestedName: msg.name });
-                        writableStream = await fileHandle.createWritable();
-                    } catch (e) {
-                        receiverStatus.innerText = "❌ Save cancelled by user.";
-                        peer.destroy();
-                    }
-                } else if (msg.type === 'done') {
-                    await writableStream.close();
+                    // Show Accept Button (Crucial for Browser Security)
+                    receiverStatus.innerHTML = `
+                        Receiving: <b>${msg.name}</b><br>
+                        <button id="btnAccept" class="btn" style="margin-top:10px; background:var(--accent); color:var(--bg);">
+                           📥 ACCEPT & CHOOSE SAVE LOCATION
+                        </button>
+                    `;
+                    
+                    document.getElementById('btnAccept').onclick = async () => {
+                        try {
+                            if (!window.showSaveFilePicker) {
+                                alert("Your browser doesn't support direct disk saving. Please use Chrome/Edge on Desktop.");
+                                return;
+                            }
+                            
+                            // User Click opens the Native Save Dialog
+                            fileHandle = await window.showSaveFilePicker({ suggestedName: msg.name });
+                            writableStream = await fileHandle.createWritable();
+                            
+                            document.getElementById('btnAccept').style.display = 'none';
+                            receiverStatus.innerText = "Downloading in progress...";
+                            
+                            // Tell Sender to start pumping data
+                            peer.send('ready');
+                        } catch (e) {
+                            console.error(e);
+                            receiverStatus.innerText = "❌ Save cancelled by user.";
+                        }
+                    };
+                } 
+                else if (msg.type === 'done') {
+                    if (writableStream) await writableStream.close();
                     receiverStatus.innerText = "✅ File Downloaded & Saved Successfully!";
                     progressFill.style.width = '100%';
                     progressText.innerText = "100%";
