@@ -43,7 +43,6 @@
             text-transform: uppercase;
         }
 
-        /* Hide all scrollbars but keep scrollable */
         *::-webkit-scrollbar { display: none; }
         * { scrollbar-width: none; -ms-overflow-style: none; }
 
@@ -53,22 +52,47 @@
             background: var(--bg);
             display: flex;
             font-family: var(--font);
-            cursor: none;
             color: var(--text);
             transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- CURSOR VISIBILITY SYSTEM --- */
+        /* Default: hide cursor elements and use default system cursor */
+        body {
+            cursor: default;
         }
 
         .cursor-element {
             position: fixed; top: 0; left: 0;
             pointer-events: none; will-change: transform;
             z-index: 9999; transition: none !important;
+            /* Hidden by default until mouse detected */
+            opacity: 0;
+            visibility: hidden;
         }
+
+        /* When mouse is detected, hide system cursor and show custom */
+        body.has-mouse {
+            cursor: none;
+        }
+
+        body.has-mouse .cursor-element {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease !important;
+        }
+
+        /* Keep cursor-glow opacity lower */
+        body.has-mouse .cursor-glow {
+            opacity: 0.12;
+        }
+
         .cursor-glow {
             width: 600px; height: 600px;
             margin-left: -300px; margin-top: -300px;
             border-radius: 50%;
             background: radial-gradient(circle, var(--accent) 5%, transparent 60%);
-            opacity: 0.12;
+            opacity: 0;
         }
         .cursor-dot {
             width: 6px; height: 6px;
@@ -82,6 +106,14 @@
             margin-left: -15px; margin-top: -15px;
             border-radius: 50%;
             border: 1px solid var(--text-dim);
+        }
+
+        /* Also hide cursor on all interactive elements when mouse present */
+        body.has-mouse *,
+        body.has-mouse button,
+        body.has-mouse a,
+        body.has-mouse input {
+            cursor: none !important;
         }
 
         #techCanvas { position: fixed; inset: 0; pointer-events: none; opacity: 0.1; filter: blur(2px); z-index: 0; }
@@ -122,7 +154,6 @@
             width: 40px; height: 40px;
             border-radius: 50%;
             color: var(--text);
-            cursor: none;
             display: flex; align-items: center; justify-content: center;
             transition: border-color 0.3s, background 0.3s;
             position: relative; overflow: hidden; flex-shrink: 0;
@@ -254,7 +285,6 @@
             font-weight: 700;
             letter-spacing: 0.4em;
             border-radius: var(--radius);
-            cursor: none;
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 25px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.2);
@@ -290,7 +320,6 @@
             justify-content: center; gap: 12px;
         }
 
-        /* Spinner */
         .spinner {
             display: none;
             width: 18px; height: 18px;
@@ -339,7 +368,7 @@
     <div class="grid-overlay"></div>
     <canvas id="techCanvas"></canvas>
 
-    <div class="wrap">
+    <div class="wrap" id="mainWrap">
         <header class="header">
             <div class="brand"><h1>LiteSpeed</h1></div>
             <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">
@@ -399,12 +428,111 @@
     </div>
 
     <script>
+        // ===== CURSOR DETECTION SYSTEM =====
+        let mouseDetected = false;
+        let touchDetected = false;
+
+        // Detect touch first
+        window.addEventListener('touchstart', function onFirstTouch() {
+            touchDetected = true;
+            // If touch happens first, we know it's a touch device
+            // Don't add has-mouse class
+        }, { passive: true });
+
+        // Detect real mouse movement (not touch-generated)
+        function onMouseDetect(e) {
+            // Skip if this is a touch-generated mouse event
+            if (touchDetected && !mouseDetected) {
+                // Check if it's a real mouse by looking at movement
+                // Touch-emulated mousemove has no persistent movement pattern
+                if (e.movementX === 0 && e.movementY === 0) return;
+            }
+
+            // Additional check: sourceCapabilities (Chrome)
+            if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+
+            if (!mouseDetected) {
+                mouseDetected = true;
+                document.body.classList.add('has-mouse');
+            }
+        }
+
+        document.addEventListener('mousemove', onMouseDetect);
+
+        // If mouse leaves and only touch remains, hide cursor
+        document.addEventListener('mouseleave', () => {
+            if (touchDetected && mouseDetected) {
+                // Optional: could remove has-mouse here if needed
+            }
+        });
+
+
+        // ===== URL BAR AUTO-HIDE (Mobile/Tablet) =====
+        function hideUrlBar() {
+            // Check if it's likely a mobile/tablet device
+            const isMobileOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || ('ontouchstart' in window)
+                || (navigator.maxTouchPoints > 0 && window.innerWidth <= 1366);
+
+            if (!isMobileOrTablet) return;
+
+            // Method 1: Smooth scroll to hide URL bar
+            // Set body height slightly more than viewport to enable scroll
+            const originalHeight = document.body.style.minHeight;
+
+            // Temporarily make document taller than viewport
+            document.documentElement.style.height = '100.1vh';
+            document.body.style.minHeight = '100.1vh';
+
+            // Smooth scroll down to push URL bar up
+            setTimeout(() => {
+                window.scrollTo({
+                    top: 1,
+                    behavior: 'smooth'
+                });
+
+                // After URL bar hides, reset height
+                setTimeout(() => {
+                    document.documentElement.style.height = '100%';
+                    document.body.style.minHeight = '100%';
+
+                    // Final scroll to 0 after bar is hidden
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                    }, 100);
+                }, 600);
+            }, 300);
+        }
+
+        // Run URL bar hide on load
+        window.addEventListener('load', () => {
+            setTimeout(hideUrlBar, 500);
+        });
+
+        // Also try on first touch interaction
+        let urlBarHideAttempted = false;
+        window.addEventListener('touchstart', () => {
+            if (!urlBarHideAttempted) {
+                urlBarHideAttempted = true;
+                hideUrlBar();
+            }
+        }, { once: true, passive: true });
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(hideUrlBar, 500);
+        });
+
+
+        // ===== THEME TOGGLE =====
         function toggleTheme() {
             const html = document.documentElement;
             const isDark = html.getAttribute('data-theme') === 'dark';
             html.setAttribute('data-theme', isDark ? 'light' : 'dark');
         }
 
+
+        // ===== CUSTOM CURSOR ANIMATION =====
         let mX = window.innerWidth / 2, mY = window.innerHeight / 2;
         const dotEl = document.getElementById('dot');
         const ringEl = document.getElementById('ring');
@@ -413,14 +541,18 @@
         document.addEventListener('mousemove', (e) => { mX = e.clientX; mY = e.clientY; });
 
         function animateCursor() {
-            const t = `translate3d(${mX}px,${mY}px,0)`;
-            dotEl.style.transform = t;
-            ringEl.style.transform = t;
-            glowEl.style.transform = t;
+            if (mouseDetected) {
+                const t = `translate3d(${mX}px,${mY}px,0)`;
+                dotEl.style.transform = t;
+                ringEl.style.transform = t;
+                glowEl.style.transform = t;
+            }
             requestAnimationFrame(animateCursor);
         }
         requestAnimationFrame(animateCursor);
 
+
+        // ===== TECH CANVAS =====
         const tCanvas = document.getElementById('techCanvas');
         const tCtx = tCanvas.getContext('2d');
         let cols = [];
@@ -442,6 +574,8 @@
         window.addEventListener('resize', initTech);
         initTech(); setInterval(drawTech, 70);
 
+
+        // ===== SPEED TEST LOGIC =====
         const CFG = { endpoint: 'https://speed.cloudflare.com/__down', duration: 8000 };
         let S = { running: false, totalData: 0, smoothed: 0 };
         let abortCtrl = null;
