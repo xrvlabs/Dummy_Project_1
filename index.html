@@ -33,8 +33,23 @@
     
     <style>
         :root { --safe-bottom: env(safe-area-inset-bottom, 0px); --brand-color: #6a1b9a; }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Quantico', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; background-color: #f8fafc; touch-action: manipulation; }
+        
+        /* Strict Horizontal Scroll Lock */
+        html, body { 
+            width: 100%; 
+            max-width: 100%; 
+            overflow-x: hidden; 
+            overscroll-behavior-x: none; /* Prevents touch-bounce horizontally */
+        }
+
+        body { 
+            font-family: 'Quantico', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            background-color: #f8fafc; 
+            touch-action: manipulation; 
+        }
         .dark body { background-color: #0f172a; }
         body * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
         button, h1, h2, h3, h4, h5, h6 { text-transform: uppercase !important; }
@@ -42,7 +57,7 @@
         /* Project 1 Theme Styles */
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid #e2e8f0; }
         .dark .glass-card { background: rgba(30, 41, 59, 0.85); border-color: #334155; }
-        .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; width: 100%; max-width: 100%; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -57,8 +72,9 @@
         .stat-card { padding: 12px; border: 1px solid #e2e8f0; border-radius: 5px; }
         .dark .stat-card { border-color: #334155; }
         
-        #main-content { padding: 12px; padding-bottom: 80px; }
-        #bottom-nav { padding-bottom: calc(var(--safe-bottom) + 4px); border-top: 1px solid #e2e8f0; height: 60px; }
+        /* Global 10px Mobile Margin */
+        #main-content { padding: 10px; padding-bottom: 80px; width: 100%; overflow-x: hidden; }
+        #bottom-nav { padding-bottom: calc(var(--safe-bottom) + 4px); border-top: 1px solid #e2e8f0; height: 60px; width: 100%; }
         .dark #bottom-nav { border-top-color: #334155; }
         
         @media (min-width: 768px) {
@@ -70,17 +86,13 @@
 
         /* Project 2 Invoice Styles (Responsive Proportional Scaling) */
         .invoice-wrapper { 
-            width: calc(100% + 24px); 
-            margin-left: -12px;
+            width: 100%; 
+            max-width: 100%;
             display: flex; 
             justify-content: center; 
             overflow: hidden; 
             padding: 10px 0; 
             position: relative;
-        }
-        
-        @media (min-width: 768px) {
-            .invoice-wrapper { width: 100%; margin-left: 0; }
         }
 
         .invoice-card { 
@@ -119,6 +131,7 @@
         
         /* Printing Overrides */
         @media print {
+            html, body { width: auto; max-width: none; overflow: visible; }
             body, .app-container, #view-main, #main-content { height: auto !important; overflow: visible !important; display: block !important; background: white !important; padding: 0 !important; }
             #desktop-sidebar, #main-header, #bottom-nav, .editor-dashboard, .no-print { display: none !important; }
             .invoice-wrapper { overflow: visible; padding: 0; display: block; height: auto !important; width: 100%; margin-left: 0; }
@@ -129,7 +142,7 @@
 <body class="text-slate-900 dark:text-slate-100">
 
 <div id="app" class="app-container">
-    <section id="view-main" class="flex-1 flex flex-col overflow-hidden w-full">
+    <section id="view-main" class="flex-1 flex flex-col overflow-hidden w-full max-w-full">
         
         <aside id="desktop-sidebar" class="hidden w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col flex-shrink-0">
             <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
@@ -157,8 +170,8 @@
             </div>
         </aside>
 
-        <div class="flex-1 flex flex-col overflow-hidden w-full">
-            <header id="main-header" class="flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 z-10 relative">
+        <div class="flex-1 flex flex-col overflow-hidden w-full max-w-full">
+            <header id="main-header" class="flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-[10px] py-3 z-10 relative w-full">
                 <h2 id="app-title" class="font-black text-base tracking-wide text-purple-600 dark:text-purple-400 truncate flex-1 pr-2">DASHBOARD</h2>
                 <div class="flex items-center gap-3 flex-shrink-0">
                     <button onclick="toggleTheme()" class="w-9 h-9 rounded-[5px] border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
@@ -170,7 +183,7 @@
                 </div>
             </header>
             
-            <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar relative w-full"></main>
+            <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar relative w-full max-w-full"></main>
         </div>
 
         <nav id="bottom-nav" class="flex justify-around items-center bg-white dark:bg-slate-900 z-50 md:hidden w-full relative">
@@ -271,17 +284,17 @@
         
         if (!wrapper || !card) return;
         
-        // Subtract 20 to ensure exactly 10px margin on left and 10px on right
-        const wrapperWidth = wrapper.clientWidth - 20; 
+        // The wrapper width naturally fills the exact available space left by the 10px global padding.
+        const wrapperWidth = wrapper.clientWidth; 
         const originalWidth = 800; 
         
         if (wrapperWidth < originalWidth) {
             const scale = wrapperWidth / originalWidth;
             card.style.transform = `scale(${scale})`;
-            wrapper.style.height = `${card.offsetHeight * scale + 20}px`; 
+            wrapper.style.height = `${card.offsetHeight * scale}px`; 
         } else {
             card.style.transform = 'scale(1)';
-            wrapper.style.height = `${card.offsetHeight + 20}px`;
+            wrapper.style.height = `${card.offsetHeight}px`;
         }
     }
 
@@ -422,7 +435,7 @@
             const nextId = 'INV-' + String(invoices.length + 1).padStart(3, '0');
             
             return `
-            <div class="editor-dashboard glass-card rounded-[5px] p-4 mb-5">
+            <div class="editor-dashboard glass-card rounded-[5px] p-4 mb-5 w-full">
                 <h3 class="font-black text-sm text-purple-600 tracking-widest mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">INVOICE PARAMETERS</h3>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
