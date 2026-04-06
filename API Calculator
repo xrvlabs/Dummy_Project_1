@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Billing Pro: Clean Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .master-card { background: white; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; height: 100%; }
+        .input-group { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 16px; transition: all 0.2s; }
+        .input-group:focus-within { border-color: #3b82f6; background: white; ring: 4px solid rgba(59, 130, 246, 0.1); }
+        .mode-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        input[type="radio"]:checked + label { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .token-badge-special { background: #1e293b; color: #f8fafc; padding: 6px 14px; border-radius: 10px; font-size: 13px; font-weight: 800; border: 2px solid #334155; }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight italic">Gemini <span class="text-blue-600 underline">Cost Estimator</span></h1>
+            <p class="text-slate-500 font-bold mt-2">1 Char = 0.25 Tokens | 1 Image = 258 Tokens | 18% GST</p>
+        </div>
+
+        <div class="flex justify-center mb-12">
+            <div class="bg-white p-2 rounded-2xl border-2 border-slate-200 flex gap-2 shadow-sm">
+                <input type="radio" id="modeImage" name="ratioMode" value="image" class="hidden" checked>
+                <label for="modeImage" class="mode-btn block px-8 py-3 rounded-xl font-extrabold text-xs uppercase cursor-pointer border-2 border-transparent text-slate-400 hover:bg-slate-50">
+                    📸 Image Mode
+                </label>
+                <input type="radio" id="modeWord" name="ratioMode" value="word" class="hidden">
+                <label for="modeWord" class="mode-btn block px-8 py-3 rounded-xl font-extrabold text-xs uppercase cursor-pointer border-2 border-transparent text-slate-400 hover:bg-slate-50">
+                    🔤 Character Mode
+                </label>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 space-y-6">
+                <div class="master-card p-8">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 italic">Configuration</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label id="inputLabel" class="block text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Input Image Count</label>
+                            <div class="input-group p-4">
+                                <input type="number" id="inValue" value="1" class="w-full bg-transparent text-2xl font-black outline-none text-blue-600">
+                                <div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase">
+                                    <span id="labelInRatio">Tokens (Fixed: 258)</span>
+                                    <span id="displayInTokens" class="text-slate-600 font-black">258</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide italic">Output Characters</label>
+                            <div class="input-group p-4">
+                                <input type="number" id="outChars" value="600" class="w-full bg-transparent text-2xl font-black outline-none text-emerald-600">
+                                <div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase">
+                                    <span>Tokens (Ratio: 0.25)</span>
+                                    <span id="displayOutTokens" class="text-slate-600 font-black">236</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="master-card p-8 border-t-8 border-t-emerald-500 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <h3 class="font-black text-slate-800 text-lg uppercase tracking-tight">2.5 Flash-Lite</h3>
+                            <span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest italic">18% GST</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Final Amount (INR)</p>
+                        <div id="minTotal" class="text-4xl font-black text-slate-900 mb-1">0.00 Paise</div>
+                        <div id="minUSD" class="text-xs font-bold text-slate-400 mb-6">$0.000000</div>
+
+                        <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 font-bold text-xs uppercase tracking-tighter">
+                            <div class="flex justify-between"><span>Subtotal</span> <span id="minSub">₹0.00</span></div>
+                            <div class="flex justify-between"><span>GST (18%)</span> <span id="minTax">₹0.00</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] font-black text-slate-400 uppercase italic">Used Tokens</span>
+                        <span id="minTotalTokens" class="font-bold text-slate-600">0</span>
+                    </div>
+                </div>
+
+                <div class="master-card p-8 border-t-8 border-t-rose-500 flex flex-col justify-between bg-rose-50/5">
+                    <div>
+                        <div class="flex justify-between items-center mb-10">
+                            <h3 class="font-black text-slate-800 text-lg uppercase tracking-tight">3.1 Flash-Lite</h3>
+                            <span class="bg-rose-100 text-rose-700 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest italic">18% GST</span>
+                        </div>
+
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Final Amount (INR)</p>
+                        <div id="maxTotal" class="text-4xl font-black text-slate-900 mb-1">0.00 Paise</div>
+                        <div id="maxUSD" class="text-xs font-bold text-slate-400 mb-6">$0.000000</div>
+
+                        <div class="space-y-3 bg-white p-4 rounded-xl border border-rose-100 font-bold text-xs shadow-sm uppercase tracking-tighter">
+                            <div class="flex justify-between"><span>Subtotal</span> <span id="maxSub">₹0.00</span></div>
+                            <div class="flex justify-between"><span>GST (18%)</span> <span id="maxTax" class="text-blue-600">₹0.00</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-rose-100 flex justify-between items-center">
+                        <span class="text-[11px] font-black text-slate-400 uppercase italic">Used Tokens</span>
+                        <div id="maxTotalTokens" class="token-badge-special">1000 + 0</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pricing = {
+            min: { in: 0.10, out: 0.40 },
+            max: { in: 0.25, out: 1.50 }
+        };
+        const INR_VAL = 93.00;
+        const GST_VAL = 0.18;
+        const RATIO_C = 0.25;
+        const RATIO_I = 258;
+
+        function formatDisplay(rs) {
+            if (rs === 0) return "0.00 Paise";
+            if (rs < 1) return (rs * 100).toFixed(2) + " Paise";
+            return "₹" + rs.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+        }
+
+        function calculate() {
+            const inVal = parseFloat(document.getElementById('inValue').value) || 0;
+            const outChars = parseFloat(document.getElementById('outChars').value) || 0;
+            const isImg = document.getElementById('modeImage').checked;
+            
+            document.getElementById('inputLabel').innerText = isImg ? "Input Image Count" : "Input Character Count";
+            document.getElementById('labelInRatio').innerText = isImg ? "Tokens (Fixed: 258/Img)" : "Tokens (Ratio: 0.25)";
+
+            const inT = isImg ? inVal * RATIO_I : inVal * RATIO_C;
+            const outT = outChars * RATIO_C;
+            const totalT = Math.round(inT + outT);
+
+            document.getElementById('displayInTokens').innerText = Math.round(inT);
+            document.getElementById('displayOutTokens').innerText = Math.round(outT);
+
+            document.getElementById('minTotalTokens').innerText = totalT.toLocaleString();
+            document.getElementById('maxTotalTokens').innerText = "1000 + " + totalT.toLocaleString();
+
+            ['min', 'max'].forEach(type => {
+    // 3.1 Model (max) ke liye 1000 thinking tokens output mein jodna zaroori hai
+    let billableOutTokens = outT;
+    if (type === 'max') {
+        billableOutTokens = outT + 1000; 
+    }
+
+    const usd = ((inT * pricing[type].in) / 1000000) + ((billableOutTokens * pricing[type].out) / 1000000);
+    const subINR = usd * INR_VAL;
+    const tax = subINR * GST_VAL;
+    const total = subINR + tax;
+
+    document.getElementById(`${type}Total`).innerText = formatDisplay(total);
+    document.getElementById(`${type}USD`).innerText = "$" + usd.toFixed(6);
+    document.getElementById(`${type}Sub`).innerText = "₹" + subINR.toFixed(4);
+    document.getElementById(`${type}Tax`).innerText = "+₹" + tax.toFixed(4);
+
+    const disp = document.getElementById(`${type}Total`);
+    total < 1 ? disp.classList.add('text-indigo-600') : disp.classList.remove('text-indigo-600');
+});
+        }
+
+        function resetValues(){
+            const isImg = document.getElementById('modeImage').checked;
+
+            if(isImg){
+                document.getElementById('inValue').value = 1;
+            }else{
+                 document.getElementById('inValue').value = 600;
+            }
+
+            document.getElementById('outChars').value = 600;
+        }
+
+        document.getElementById('inValue').oninput = calculate;
+        document.getElementById('outChars').oninput = calculate;
+        document.getElementsByName('ratioMode').forEach(r => r.onchange = () => {
+            resetValues();
+            calculate();
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
