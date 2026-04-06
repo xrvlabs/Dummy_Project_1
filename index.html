@@ -70,20 +70,25 @@
 
         /* Project 2 Invoice Styles (Responsive Proportional Scaling) */
         .invoice-wrapper { 
-            width: 100%; 
+            width: calc(100% + 24px); 
+            margin-left: -12px;
             display: flex; 
             justify-content: center; 
             overflow: hidden; 
             padding: 10px 0; 
             position: relative;
         }
+        
+        @media (min-width: 768px) {
+            .invoice-wrapper { width: 100%; margin-left: 0; }
+        }
+
         .invoice-card { 
             width: 800px; 
             min-height: 1131px; 
             flex-shrink: 0; 
             background: white !important; 
             color: black !important; 
-            /* REDUCED SIDE MARGINS/PADDING HERE */
             padding: 40px 20px; 
             box-sizing: border-box; 
             box-shadow: 0 0 20px rgba(0,0,0,0.1); 
@@ -116,7 +121,7 @@
         @media print {
             body, .app-container, #view-main, #main-content { height: auto !important; overflow: visible !important; display: block !important; background: white !important; padding: 0 !important; }
             #desktop-sidebar, #main-header, #bottom-nav, .editor-dashboard, .no-print { display: none !important; }
-            .invoice-wrapper { overflow: visible; padding: 0; display: block; height: auto !important; }
+            .invoice-wrapper { overflow: visible; padding: 0; display: block; height: auto !important; width: 100%; margin-left: 0; }
             .invoice-card { box-shadow: none; border: none; margin: 0; width: 100%; padding: 0; min-height: auto; transform: none !important; }
         }
     </style>
@@ -266,20 +271,15 @@
         
         if (!wrapper || !card) return;
         
-        // Target width of the wrapper accounting for some visual padding on mobile
-        const wrapperWidth = wrapper.clientWidth - 20; // 10px buffer on each side
-        const originalWidth = 800; // Original fixed A4 width defined in CSS
+        // Subtract 10 to ensure exactly 5px margin on left and 5px on right
+        const wrapperWidth = wrapper.clientWidth - 10; 
+        const originalWidth = 800; 
         
         if (wrapperWidth < originalWidth) {
-            // Shrink down proportionally
             const scale = wrapperWidth / originalWidth;
             card.style.transform = `scale(${scale})`;
-            
-            // Adjust the wrapper's height to match the scaled down invoice
-            // so we don't have empty whitespace at the bottom
             wrapper.style.height = `${card.offsetHeight * scale + 20}px`; 
         } else {
-            // Screen is large enough, reset to original size
             card.style.transform = 'scale(1)';
             wrapper.style.height = `${card.offsetHeight + 20}px`;
         }
