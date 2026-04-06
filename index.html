@@ -2,302 +2,702 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Invoice - SMS GROUP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OmniInvoice | SMS GROUP</title>
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    screens: { 'xs': '380px' },
+                    fontFamily: { 
+                        'sans': ['Quantico', 'sans-serif'],
+                        'signature': ['Dancing Script', 'cursive']
+                    },
+                    animation: { 'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards' },
+                    keyframes: { slideUp: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(0)' } } }
+                }
+            }
+        }
+        if (!localStorage.getItem('inv_theme')) localStorage.setItem('inv_theme', 'light');
+        if (localStorage.getItem('inv_theme') === 'dark') document.documentElement.classList.add('dark');
+    </script>
+    
     <style>
-        :root {
-            --brand-color: #6a1b9a;
-            --border-strong: #222;
-            --bg-soft: #fcfcfc;
+        :root { --safe-bottom: env(safe-area-inset-bottom, 0px); --brand-color: #6a1b9a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Quantico', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; background-color: #f8fafc; touch-action: manipulation; }
+        .dark body { background-color: #0f172a; }
+        body * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+        button, h1, h2, h3, h4, h5, h6 { text-transform: uppercase !important; }
+        
+        /* Project 1 Theme Styles */
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid #e2e8f0; }
+        .dark .glass-card { background: rgba(30, 41, 59, 0.85); border-color: #334155; }
+        .app-container { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .field-input { padding: 10px 12px; border: 2px solid #cbd5e1; outline: none; border-radius: 5px; font-size: 14px; width: 100%; }
+        .field-input:focus { border-color: #6a1b9a; }
+        .dark .field-input { border-color: #475569; background: #1e293b; color: #f1f5f9; }
+        .dark .field-input:focus { border-color: #a855f7; }
+        
+        .btn-primary { padding: 10px 16px; font-weight: 700; border-radius: 5px; font-size: 14px; transition: transform 0.1s; }
+        .btn-primary:active { transform: translateY(2px); }
+        .badge { padding: 4px 8px; font-size: 11px !important; font-weight: 700; text-transform: uppercase; white-space: nowrap; border-radius: 4px; }
+        .stat-card { padding: 12px; border: 1px solid #e2e8f0; border-radius: 5px; }
+        .dark .stat-card { border-color: #334155; }
+        
+        #main-content { padding: 12px; padding-bottom: 80px; }
+        #bottom-nav { padding-bottom: calc(var(--safe-bottom) + 4px); border-top: 1px solid #e2e8f0; height: 60px; }
+        .dark #bottom-nav { border-top-color: #334155; }
+        
+        @media (min-width: 768px) {
+            #main-content { padding: 20px; padding-bottom: 24px; }
+            #bottom-nav { display: none !important; }
+            #desktop-sidebar { display: flex !important; }
+            #view-main { flex-direction: row !important; }
         }
 
-        body {
-            font-family: 'Quantico', sans-serif;
-            background: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Project 2 Invoice Styles (Responsive Proportional Scaling) */
+        .invoice-wrapper { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            overflow: hidden; 
+            padding: 10px 0; 
+            position: relative;
         }
-
-        .editor-dashboard {
-            width: 100%;
-            max-width: 1000px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .editor-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .input-box { display: flex; flex-direction: column; gap: 5px; }
-        .input-box label { font-size: 10px; font-weight: bold; color: #555; text-transform: uppercase; }
-        input, select { 
-            padding: 8px; 
+        .invoice-card { 
+            width: 800px; 
+            min-height: 1131px; 
+            flex-shrink: 0; 
+            background: white !important; 
+            color: black !important; 
+            /* REDUCED SIDE MARGINS/PADDING HERE */
+            padding: 40px 20px; 
+            box-sizing: border-box; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); 
             border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-family: 'Quantico', sans-serif; 
-            font-size: 13px;
+            transform-origin: top center; 
+            margin: 0 auto;
         }
-
-        .invoice-card {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-            padding: 50px;
-            box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            border: 1px solid #999;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 4px solid var(--brand-color);
-            padding-bottom: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo-box img { width: 140px; height: 100px; object-fit: cover; border: 1px solid #eee; }
-        .owner-text { color: var(--brand-color); font-size: 32px; margin: 0; font-weight: 700; text-transform: uppercase; }
-
-        .invoice-label-middle {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-        }
-
+        .invoice-card * { transition: none !important; border-color: #222 !important; color: black !important; }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid var(--brand-color) !important; padding-bottom: 15px; margin-bottom: 10px; }
+        .owner-text { color: var(--brand-color) !important; font-size: 32px; margin: 0; font-weight: 700; text-transform: uppercase; }
+        .inv-label-middle { text-align: center; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; width: 100%; margin-bottom: 20px; }
-        .box-left { border: 1.5px solid var(--border-strong); border-right: none; padding: 15px; }
-        .box-right { border: 1.5px solid var(--border-strong); padding: 15px; }
-
-        .label-tag {
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            background: #eee;
-            padding: 2px 8px;
-            display: inline-block;
-            margin-bottom: 8px;
-            border: 1px solid #ccc;
-        }
-
-        .table-box { border: 1.5px solid var(--border-strong); width: 100%; border-collapse: collapse; margin-bottom: 20px; text-transform: uppercase; }
-        .table-box th { background: #f0f0f0; border-bottom: 1.5px solid var(--border-strong); padding: 12px 10px; font-size: 12px; }
+        .box-left { border: 1.5px solid #222; border-right: none; padding: 15px; }
+        .box-right { border: 1.5px solid #222; padding: 15px; }
+        .label-tag { font-size: 11px; font-weight: bold; text-transform: uppercase; background: #eee !important; padding: 2px 8px; display: inline-block; margin-bottom: 8px; border: 1px solid #ccc; }
+        
+        .table-box { border: 1.5px solid #222; width: 100%; border-collapse: collapse; margin-bottom: 20px; text-transform: uppercase; }
+        .table-box th { background: #f0f0f0 !important; border-bottom: 1.5px solid #222; padding: 12px 10px; font-size: 12px; }
         .table-box td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: 400; line-height: 1.4; }
         .table-box th:not(:last-child), .table-box td:not(:last-child) { border-right: 1px solid #ddd; }
-
-        .text-left { text-align: left; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-
+        
         .footer-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0; }
-        
-        .terms-box { 
-            border: 1.5px solid var(--border-strong); 
-            border-right: none; 
-            padding: 15px; 
-            font-size: 10px; 
-            line-height: 1.8; 
-        }
-        .term-line { display: block; white-space: nowrap; }
-
-        .totals-box { border: 1.5px solid var(--border-strong); padding: 15px; background: var(--bg-soft); }
-
+        .terms-box { border: 1.5px solid #222; border-right: none; padding: 15px; font-size: 10px; line-height: 1.8; }
+        .totals-box { border: 1.5px solid #222; padding: 15px; background: #fcfcfc !important; }
         .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; border-bottom: 1px dashed #ccc; }
+        .highlight-total { margin-top: 5px; font-weight: 700; font-size: 20px; color: var(--brand-color) !important; border-bottom: none !important; }
         
-        .highlight-total { 
-            margin-top: 5px; 
-            font-weight: 700; 
-            font-size: 20px; 
-            color: var(--brand-color); 
-            border-bottom: none !important; /* Horizontal line removed */
-            padding-bottom: 0px; /* Padding adjusted */
-        }
-
-        .handwritten-signature {
-            font-family: 'Dancing Script', cursive;
-            font-size: 32px;
-            color: #000;
-            display: block;
-            margin-bottom: 5px;
-            text-transform: none;
-        }
-
-        .print-btn {
-            background: var(--brand-color); color: white; padding: 12px 40px;
-            border-radius: 50px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 20px;
-            font-family: 'Quantico', sans-serif;
-        }
-
+        /* Printing Overrides */
         @media print {
-            .editor-dashboard, .print-btn { display: none; }
-            body { padding: 0; background: white; }
-            .invoice-card { box-shadow: none; border: none; margin: 0; width: 100%; }
+            body, .app-container, #view-main, #main-content { height: auto !important; overflow: visible !important; display: block !important; background: white !important; padding: 0 !important; }
+            #desktop-sidebar, #main-header, #bottom-nav, .editor-dashboard, .no-print { display: none !important; }
+            .invoice-wrapper { overflow: visible; padding: 0; display: block; height: auto !important; }
+            .invoice-card { box-shadow: none; border: none; margin: 0; width: 100%; padding: 0; min-height: auto; transform: none !important; }
         }
     </style>
 </head>
-<body>
+<body class="text-slate-900 dark:text-slate-100">
 
-    <div class="editor-dashboard">
-        <div class="editor-row">
-            <div class="input-box"><label>Company</label><select id="iBiz" oninput="run()"><option value="sms">SMS GROUP</option></select></div>
-            <div class="input-box">
-                <label>Shift Selection</label>
-                <select id="iDesc" oninput="updateShiftDefaults(); run()">
-                    <option value="PACKAGE 45000 (B SHIFT)">B SHIFT</option>
-                    <option value="PACKAGE 55000 (C SHIFT)">C SHIFT</option>
-                </select>
-            </div>
-            <div class="input-box"><label>Date</label><input type="date" id="iDate" value="2026-04-06" oninput="run()"></div>
-            <div class="input-box"><label>Veh. Name</label><input type="text" id="iVehName" value="TOYOTA RUMION" oninput="run()"></div>
-            <div class="input-box"><label>Veh. Type</label><input type="text" id="iVehType" value="SUV" oninput="run()"></div>
-        </div>
-        <div class="editor-row">
-            <div class="input-box"><label>KM</label><input type="number" id="iKm" value="1280" oninput="run()"></div>
-            <div class="input-box"><label>Days</label><input type="number" id="iDays" value="16" oninput="run()"></div>
-            <div class="input-box"><label>Sundays</label><input type="number" id="iOff" value="2" oninput="run()"></div>
-            <div class="input-box"><label>Pkg Rate</label><input type="number" id="iRate" value="24740" oninput="run()"></div>
-        </div>
-    </div>
-
-    <button class="print-btn" onclick="window.print()">PRINT INVOICE</button>
-
-    <div class="invoice-card">
-        <div class="header-section">
-            <div class="logo-box">
-                <img id="vLogo" src="http://googleusercontent.com/image_collection/image_retrieval/8564286994582804978_0">
-            </div>
-            <div style="text-align: right;">
-                <h1 class="owner-text">Gaurav D.K.</h1>
-                <p style="margin: 5px 0; color: #444; font-weight: 700;">+91-9537755955</p>
-                <div class="label-tag">INV #001</div>
-            </div>
-        </div>
-
-        <div class="invoice-label-middle">INVOICE</div>
-
-        <div class="grid-2">
-            <div class="box-left">
-                <span class="label-tag">Bill To</span><br>
-                <strong id="vBillToComp" style="font-size: 22px; color: var(--brand-color);">SMS GROUP</strong>
-            </div>
-            <div class="box-right">
-                <span class="label-tag">Trip Details</span><br>
-                <strong id="vVehDisplay">TOYOTA RUMION (SUV)</strong><br>
-                VEHICLE NO: GJ-01-LT-5558<br>
-                DATE: <span id="vDate">06/04/2026</span>
-            </div>
-        </div>
-
-        <table class="table-box">
-            <thead>
-                <tr>
-                    <th class="text-left" style="width: 45%;">Description</th>
-                    <th class="text-center">KM</th>
-                    <th class="text-center">DAYS</th>
-                    <th class="text-center">SUNDAYS</th>
-                    <th class="text-center">RATE</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-left" id="vDesc">
-                        PACKAGE 45000<br>
-                        <span style="font-size: 14px; font-weight: bold; color: #222;">(B SHIFT)</span>
-                    </td>
-                    <td class="text-center" id="vKm">1280</td>
-                    <td class="text-center" id="vDays">16</td>
-                    <td class="text-center" id="vOff">2</td>
-                    <td class="text-center" id="vAmount">24,740</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="footer-grid">
-            <div class="terms-box">
-                <strong style="display:block; margin-bottom:5px;">TERMS & CONDITIONS:</strong>
-                <span class="term-line">1. TOLL, PARKING & BORDER TAXES EXTRA AS PER ACTUALS.</span>
-                <span class="term-line">2. DRIVER FOOD & ACCOMMODATION BY CLIENT IF OUTSTATION.</span>
-                <span class="term-line">3. VEHICLE USAGE MUST BE WITHIN THE SPECIFIED KM LIMIT.</span>
-                <span class="term-line">4. ALL DISPUTES ARE SUBJECT TO LOCAL JURISDICTION ONLY.</span>
-            </div>
-            <div class="totals-box">
-                <div class="total-row"><span>PACKAGE BASE</span><span id="vPkgBase">₹ 24,740</span></div>
-                <div class="total-row"><span>SUNDAYS TOTAL (<span id="vSunRate">1730</span> X <span id="vSunCount">2</span>)</span><span id="vSunTotal">₹ 3,460</span></div>
-                
-                <div class="total-row highlight-total"><span>SUB TOTAL</span><span id="vSub">₹ 28,200</span></div>
-            </div>
-        </div>
-
-        <div style="margin-top: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div style="font-size: 11px; color: #777;">SYSTEM GENERATED INVOICE</div>
-            <div style="text-align: center; width: 250px;">
-                <span class="handwritten-signature">Gaurav D.K.</span>
-                <div style="border-top: 1.5px solid #000; padding-top: 5px;">
-                    <small style="font-size: 10px; text-transform: uppercase; color: #555; font-weight: 700;">Authorized Signatory</small>
+<div id="app" class="app-container">
+    <section id="view-main" class="flex-1 flex flex-col overflow-hidden w-full">
+        
+        <aside id="desktop-sidebar" class="hidden w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col flex-shrink-0">
+            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-600 rounded-[5px] flex items-center justify-center text-white"><i data-lucide="receipt" class="w-5 h-5"></i></div>
+                <div class="min-w-0">
+                    <h1 class="font-black text-base leading-tight truncate" id="side-company-name">SMS GROUP</h1>
+                    <p class="text-slate-500 text-xs truncate">Invoicing System</p>
                 </div>
             </div>
+            <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto text-sm">
+                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-2 p-3 rounded-[5px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </button>
+                <button onclick="switchTab('invoices')" id="side-invoices" class="w-full flex items-center gap-2 p-3 rounded-[5px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="file-text" class="w-5 h-5"></i> All Invoices
+                </button>
+                <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-2 p-3 rounded-[5px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i> Reports
+                </button>
+            </nav>
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 text-sm">
+                <button onclick="switchTab('profile')" id="side-profile" class="w-full flex items-center gap-2 p-3 rounded-[5px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="settings" class="w-5 h-5"></i> Settings
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden w-full">
+            <header id="main-header" class="flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 z-10 relative">
+                <h2 id="app-title" class="font-black text-base tracking-wide text-purple-600 dark:text-purple-400 truncate flex-1 pr-2">DASHBOARD</h2>
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <button onclick="toggleTheme()" class="w-9 h-9 rounded-[5px] border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        <i id="theme-icon" data-lucide="sun" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="switchTab('profile')" class="w-9 h-9 rounded-[5px] border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gaurav" class="w-full h-full">
+                    </button>
+                </div>
+            </header>
+            
+            <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar relative w-full"></main>
         </div>
-    </div>
 
-    <script>
-        function updateShiftDefaults() {
-            const desc = document.getElementById('iDesc').value;
-            document.getElementById('iKm').value = (desc.includes("B SHIFT")) ? 1280 : 2240;
+        <nav id="bottom-nav" class="flex justify-around items-center bg-white dark:bg-slate-900 z-50 md:hidden w-full relative">
+            <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-1 text-slate-400 p-2 w-16">
+                <i data-lucide="home" class="w-6 h-6"></i>
+                <span class="text-[11px] font-bold">Home</span>
+            </button>
+            
+            <button onclick="switchTab('add-invoice')" class="flex flex-col items-center -mt-6 relative z-10 p-2">
+                <div class="w-14 h-14 bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-slate-900 transition-transform active:scale-95">
+                    <i data-lucide="plus" class="w-6 h-6"></i>
+                </div>
+            </button>
+            
+            <button onclick="switchTab('reports')" class="flex flex-col items-center gap-1 text-slate-400 p-2 w-16">
+                <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+                <span class="text-[11px] font-bold">Reports</span>
+            </button>
+        </nav>
+    </section>
+</div>
+
+<script>
+    // System Helpers
+    const today = () => new Date().toISOString().split('T')[0];
+    const fmt = n => '₹ ' + parseFloat(n).toLocaleString('en-IN');
+    
+    // Local DB Emulation
+    const db = {
+        get: k => { try { return JSON.parse(localStorage.getItem('inv_' + k)) || []; } catch(e) { return []; } },
+        set: (k, v) => localStorage.setItem('inv_' + k, JSON.stringify(v)),
+        push(k, item) { const d = this.get(k); d.push(item); this.set(k, d); },
+        delete(k, id) { this.set(k, this.get(k).filter(x => x.id !== id)); }
+    };
+
+    // Seed Initial Data
+    function seedDB() {
+        if (!localStorage.getItem('inv_seeded')) {
+            localStorage.setItem('inv_profile', JSON.stringify({ name: 'Gaurav D.K.', phone: '+91-9537755955', company: 'SMS GROUP' }));
+            db.set('invoices', [
+                { id: 'INV-001', date: '2026-03-01', client: 'SMS GROUP', shift: 'PACKAGE 45000 (B SHIFT)', vehName: 'TOYOTA RUMION', vehType: 'SUV', km: 1280, days: 16, sundays: 2, rate: 24740, sunTotal: 3460, subTotal: 28200 },
+                { id: 'INV-002', date: '2026-03-15', client: 'SMS GROUP', shift: 'PACKAGE 55000 (C SHIFT)', vehName: 'INNOVA CRYSTA', vehType: 'SUV', km: 2240, days: 15, sundays: 1, rate: 27500, sunTotal: 2115, subTotal: 29615 }
+            ]);
+            localStorage.setItem('inv_seeded', '1');
+        }
+    }
+    seedDB();
+
+    // App Navigation & Rendering Logic
+    let chartInstance = null;
+
+    function switchTab(tab) {
+        // Handle Sidebar UI
+        document.querySelectorAll('#desktop-sidebar button').forEach(b => b.classList.remove('bg-purple-50', 'dark:bg-purple-900/30', 'text-purple-600', 'dark:text-purple-400'));
+        const activeNav = document.getElementById('side-' + tab);
+        if(activeNav) activeNav.classList.add('bg-purple-50', 'dark:bg-purple-900/30', 'text-purple-600', 'dark:text-purple-400');
+        
+        // Handle Title
+        const titles = { dashboard: 'Dashboard', invoices: 'All Invoices', reports: 'Financial Reports', profile: 'Settings', 'add-invoice': 'Create Invoice' };
+        document.getElementById('app-title').innerText = titles[tab] || 'OmniInvoice';
+        
+        // Render Content
+        document.getElementById('main-content').innerHTML = renderPage(tab);
+        lucide.createIcons();
+        
+        // Post Render Actions
+        if (tab === 'reports') setTimeout(initChart, 50);
+        if (tab === 'add-invoice') {
+            updateShiftDefaults(); 
+            runInvoiceCalculation();
+            setTimeout(applyInvoiceScaling, 50); // Apply visual scaling after render
+        }
+        
+        // Update Theme Icon
+        updateThemeIcon();
+        window.scrollTo(0,0);
+    }
+
+    function toggleTheme() { 
+        const isDark = document.documentElement.classList.toggle('dark'); 
+        localStorage.setItem('inv_theme', isDark ? 'dark' : 'light'); 
+        updateThemeIcon(); 
+        if(chartInstance) initChart();
+    }
+    
+    function updateThemeIcon() { 
+        const i = document.getElementById('theme-icon'); 
+        if (i) { 
+            i.setAttribute('data-lucide', document.documentElement.classList.contains('dark') ? 'sun' : 'moon'); 
+            lucide.createIcons(); 
+        } 
+    }
+
+    // Proportional Scaling Function
+    function applyInvoiceScaling() {
+        const wrapper = document.querySelector('.invoice-wrapper');
+        const card = document.getElementById('printable-invoice');
+        
+        if (!wrapper || !card) return;
+        
+        // Target width of the wrapper accounting for some visual padding on mobile
+        const wrapperWidth = wrapper.clientWidth - 20; // 10px buffer on each side
+        const originalWidth = 800; // Original fixed A4 width defined in CSS
+        
+        if (wrapperWidth < originalWidth) {
+            // Shrink down proportionally
+            const scale = wrapperWidth / originalWidth;
+            card.style.transform = `scale(${scale})`;
+            
+            // Adjust the wrapper's height to match the scaled down invoice
+            // so we don't have empty whitespace at the bottom
+            wrapper.style.height = `${card.offsetHeight * scale + 20}px`; 
+        } else {
+            // Screen is large enough, reset to original size
+            card.style.transform = 'scale(1)';
+            wrapper.style.height = `${card.offsetHeight + 20}px`;
+        }
+    }
+
+    // Recalculate scaling on window resize
+    window.addEventListener('resize', () => {
+        if (document.getElementById('printable-invoice')) {
+            applyInvoiceScaling();
+        }
+    });
+
+    // Page Renderers
+    function renderPage(tab) {
+        const invoices = db.get('invoices');
+        const profile = JSON.parse(localStorage.getItem('inv_profile'));
+        
+        if (tab === 'dashboard') {
+            const currentMonth = today().slice(0, 7);
+            const thisMonthRevs = invoices.filter(i => i.date.startsWith(currentMonth)).reduce((sum, i) => sum + i.subTotal, 0);
+            const totalRevs = invoices.reduce((sum, i) => sum + i.subTotal, 0);
+            
+            let html = `
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="stat-card bg-purple-600 text-white rounded-[5px] border-none shadow-md">
+                        <p class="font-bold opacity-80 text-[11px] truncate">THIS MONTH</p>
+                        <h3 class="font-black text-lg truncate">${fmt(thisMonthRevs)}</h3>
+                    </div>
+                    <div class="stat-card glass-card rounded-[5px]">
+                        <p class="font-bold text-slate-500 text-[11px] truncate">TOTAL INVOICES</p>
+                        <h3 class="font-black text-lg text-slate-800 dark:text-white truncate">${invoices.length}</h3>
+                    </div>
+                    <div class="stat-card glass-card rounded-[5px] col-span-2">
+                        <p class="font-bold text-slate-500 text-[11px] truncate">LIFETIME REVENUE</p>
+                        <h3 class="font-black text-2xl text-emerald-600 truncate">${fmt(totalRevs)}</h3>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-end mb-3 px-1">
+                    <h3 class="font-black text-sm text-slate-400 truncate">RECENT INVOICES</h3>
+                    <button onclick="switchTab('invoices')" class="text-xs font-bold text-purple-600">View All</button>
+                </div>
+                <div class="space-y-3">
+            `;
+            
+            if (invoices.length === 0) {
+                html += `<div class="text-center py-10 glass-card rounded-[5px]"><i data-lucide="receipt" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i><p class="text-sm font-bold text-slate-500">No invoices yet.</p></div>`;
+            } else {
+                invoices.slice(-4).reverse().forEach(inv => {
+                    html += `
+                    <div class="glass-card p-4 rounded-[5px] flex justify-between items-center gap-2">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-black text-base truncate">${inv.client}</h4>
+                            <p class="font-bold text-sm text-purple-600 mt-1 truncate">${inv.id} • ${inv.date}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <h3 class="font-black text-base text-emerald-600">${fmt(inv.subTotal)}</h3>
+                        </div>
+                    </div>`;
+                });
+            }
+            html += `</div>`;
+            return html;
         }
 
-        function run() {
-            const desc = document.getElementById('iDesc').value;
-            const km = document.getElementById('iKm').value;
-            const days = document.getElementById('iDays').value;
-            const sundays = parseInt(document.getElementById('iOff').value) || 0;
-            const rate = parseFloat(document.getElementById('iRate').value) || 0;
-            const vName = document.getElementById('iVehName').value;
-            const vType = document.getElementById('iVehType').value;
-
-            const sunPrice = (desc.includes("B SHIFT")) ? 1730 : 2115;
-            const sunTotal = sundays * sunPrice;
-            const subTotal = rate + sunTotal;
-
-            const descParts = desc.split(' (');
-            const pkgName = descParts[0];
-            const shiftName = descParts[1] ? '(' + descParts[1] : '';
-            
-            document.getElementById('vDesc').innerHTML = `${pkgName}<br><span style="font-size: 14px; font-weight: bold; color: #222;">${shiftName}</span>`;
-            
-            document.getElementById('vVehDisplay').innerText = `${vName} (${vType})`;
-            document.getElementById('vDate').innerText = document.getElementById('iDate').value.split('-').reverse().join('/');
-            document.getElementById('vKm').innerText = km;
-            document.getElementById('vDays').innerText = days;
-            document.getElementById('vOff').innerText = sundays;
-            
-            document.getElementById('vAmount').innerText = Math.round(rate).toLocaleString('en-IN');
-            document.getElementById('vPkgBase').innerText = "₹ " + Math.round(rate).toLocaleString('en-IN');
-            document.getElementById('vSunRate').innerText = sunPrice;
-            document.getElementById('vSunCount').innerText = sundays;
-            document.getElementById('vSunTotal').innerText = "₹ " + Math.round(sunTotal).toLocaleString('en-IN');
-            document.getElementById('vSub').innerText = "₹ " + Math.round(subTotal).toLocaleString('en-IN');
+        if (tab === 'invoices') {
+            let html = `
+                <div class="mb-4">
+                    <input type="text" placeholder="Search Invoices..." onkeyup="filterInvoices(this.value)" class="field-input bg-white dark:bg-slate-800">
+                </div>
+                <div class="space-y-3" id="invoice-list-container">
+            `;
+            if (invoices.length === 0) {
+                html += `<div class="text-center py-10"><p class="text-sm font-bold text-slate-500">No records found.</p></div>`;
+            } else {
+                [...invoices].reverse().forEach(inv => {
+                    html += `
+                    <div class="glass-card inv-item p-4 rounded-[5px]">
+                        <div class="flex justify-between items-start mb-2 gap-2">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-black text-base truncate search-target">${inv.client}</h4>
+                                <p class="font-bold text-xs text-slate-500 mt-0.5 truncate search-target">${inv.shift} • ${inv.vehName}</p>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <h3 class="font-black text-lg text-emerald-600">${fmt(inv.subTotal)}</h3>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                            <span class="font-bold text-[11px] text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded search-target">${inv.id}</span>
+                            <span class="font-bold text-[11px] text-slate-500">${inv.date}</span>
+                        </div>
+                    </div>`;
+                });
+            }
+            html += `</div>`;
+            return html;
         }
-        run();
-    </script>
+
+        if (tab === 'reports') {
+            return `
+                <div class="glass-card p-4 rounded-[5px] mb-4">
+                    <h3 class="font-black text-[11px] text-slate-400 mb-4 text-center tracking-widest">LAST 6 MONTHS REVENUE</h3>
+                    <div style="height:250px"><canvas id="financeChart"></canvas></div>
+                </div>
+            `;
+        }
+
+        if (tab === 'profile') {
+            return `
+                <div class="space-y-4">
+                    <div class="glass-card rounded-[5px] p-6 text-center border border-slate-200 dark:border-slate-700">
+                        <div class="w-20 h-20 mx-auto bg-purple-100 rounded-full border-[3px] border-purple-500 overflow-hidden mb-3">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gaurav" class="w-full h-full">
+                        </div>
+                        <h2 class="font-black text-base uppercase truncate">Settings</h2>
+                    </div>
+                    <div class="glass-card rounded-[5px] p-4 border border-slate-200 dark:border-slate-700 space-y-4">
+                        <h3 class="font-black text-xs text-slate-400 tracking-widest mb-2">INVOICE DETAILS</h3>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-500 uppercase">Owner Name (Signature)</label>
+                            <input type="text" id="p-name" value="${profile.name}" class="field-input mt-1.5" oninput="updateProfile()">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-500 uppercase">Phone Number</label>
+                            <input type="text" id="p-phone" value="${profile.phone}" class="field-input mt-1.5" oninput="updateProfile()">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-500 uppercase">Default Client Company</label>
+                            <input type="text" id="p-company" value="${profile.company}" class="field-input mt-1.5" oninput="updateProfile()">
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-[5px] p-4 text-center">
+                         <button onclick="if(confirm('Delete all data?')){localStorage.clear();location.reload()}" class="text-red-500 font-bold text-sm uppercase"><i data-lucide="trash-2" class="w-4 h-4 inline mr-1"></i> Erase All Data</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (tab === 'add-invoice') {
+            const nextId = 'INV-' + String(invoices.length + 1).padStart(3, '0');
+            
+            return `
+            <div class="editor-dashboard glass-card rounded-[5px] p-4 mb-5">
+                <h3 class="font-black text-sm text-purple-600 tracking-widest mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">INVOICE PARAMETERS</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Company</label>
+                        <select id="iBiz" oninput="runInvoiceCalculation()" class="field-input text-xs"><option value="${profile.company}">${profile.company}</option></select>
+                    </div>
+                    <div class="flex flex-col col-span-2 md:col-span-1">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Shift Selection</label>
+                        <select id="iDesc" oninput="updateShiftDefaults(); runInvoiceCalculation()" class="field-input text-xs">
+                            <option value="PACKAGE 45000 (B SHIFT)">B SHIFT</option>
+                            <option value="PACKAGE 55000 (C SHIFT)">C SHIFT</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label>
+                        <input type="date" id="iDate" value="${today()}" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Veh. Name</label>
+                        <input type="text" id="iVehName" value="TOYOTA RUMION" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Veh. Type</label>
+                        <input type="text" id="iVehType" value="SUV" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">KM Limit</label>
+                        <input type="number" id="iKm" value="1280" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Days worked</label>
+                        <input type="number" id="iDays" value="16" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Sundays</label>
+                        <input type="number" id="iOff" value="2" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">Pkg Rate (₹)</label>
+                        <input type="number" id="iRate" value="24740" oninput="runInvoiceCalculation()" class="field-input text-xs">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-5 border-t border-slate-100 dark:border-slate-700 pt-4">
+                    <button onclick="saveAndPrintInvoice('${nextId}')" class="flex-1 btn-primary bg-purple-600 text-white flex items-center justify-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Save & Print A4
+                    </button>
+                </div>
+            </div>
+            
+            <h3 class="font-black text-sm text-slate-400 tracking-widest mb-3 text-center uppercase no-print">Live Preview</h3>
+            
+            <div class="invoice-wrapper">
+                <div class="invoice-card" id="printable-invoice">
+                    <div class="header-section">
+                        <div class="logo-box">
+                            <img src="http://googleusercontent.com/image_collection/image_retrieval/8564286994582804978_0" style="width: 140px; height: 100px; object-fit: cover; border: 1px solid #eee;">
+                        </div>
+                        <div style="text-align: right;">
+                            <h1 class="owner-text" id="vOwnerName">${profile.name}</h1>
+                            <p style="margin: 5px 0; color: #444; font-weight: 700;" id="vPhone">${profile.phone}</p>
+                            <div class="label-tag">INV <span id="vInvId">${nextId}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="inv-label-middle">INVOICE</div>
+
+                    <div class="grid-2">
+                        <div class="box-left">
+                            <span class="label-tag">Bill To</span><br>
+                            <strong id="vBillToComp" style="font-size: 22px; color: var(--brand-color);">${profile.company}</strong>
+                        </div>
+                        <div class="box-right">
+                            <span class="label-tag">Trip Details</span><br>
+                            <strong id="vVehDisplay">TOYOTA RUMION (SUV)</strong><br>
+                            VEHICLE NO: GJ-01-LT-5558<br>
+                            DATE: <span id="vDate">06/04/2026</span>
+                        </div>
+                    </div>
+
+                    <table class="table-box">
+                        <thead>
+                            <tr>
+                                <th class="text-left" style="width: 45%;">Description</th>
+                                <th class="text-center">KM</th>
+                                <th class="text-center">DAYS</th>
+                                <th class="text-center">SUNDAYS</th>
+                                <th class="text-center">RATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left" id="vDesc">
+                                    PACKAGE 45000<br>
+                                    <span style="font-size: 14px; font-weight: bold; color: #222;">(B SHIFT)</span>
+                                </td>
+                                <td class="text-center" id="vKm">1280</td>
+                                <td class="text-center" id="vDays">16</td>
+                                <td class="text-center" id="vOff">2</td>
+                                <td class="text-center" id="vAmount">24,740</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="footer-grid">
+                        <div class="terms-box">
+                            <strong style="display:block; margin-bottom:5px;">TERMS & CONDITIONS:</strong>
+                            <span style="display: block;">1. TOLL, PARKING & BORDER TAXES EXTRA AS PER ACTUALS.</span>
+                            <span style="display: block;">2. DRIVER FOOD & ACCOMMODATION BY CLIENT IF OUTSTATION.</span>
+                            <span style="display: block;">3. VEHICLE USAGE MUST BE WITHIN THE SPECIFIED KM LIMIT.</span>
+                            <span style="display: block;">4. ALL DISPUTES ARE SUBJECT TO LOCAL JURISDICTION ONLY.</span>
+                        </div>
+                        <div class="totals-box">
+                            <div class="total-row"><span>PACKAGE BASE</span><span id="vPkgBase">₹ 24,740</span></div>
+                            <div class="total-row"><span>SUNDAYS TOTAL (<span id="vSunRate">1730</span> X <span id="vSunCount">2</span>)</span><span id="vSunTotal">₹ 3,460</span></div>
+                            <div class="total-row highlight-total"><span>SUB TOTAL</span><span id="vSub">₹ 28,200</span></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div style="font-size: 11px; color: #777; font-weight:bold;">SYSTEM GENERATED INVOICE</div>
+                        <div style="text-align: center; width: 250px;">
+                            <span class="font-signature" style="font-size: 32px; color: #000; display: block; margin-bottom: 5px; text-transform:none;" id="vSignName">${profile.name}</span>
+                            <div style="border-top: 1.5px solid #000; padding-top: 5px;">
+                                <small style="font-size: 10px; text-transform: uppercase; color: #555; font-weight: 700;">Authorized Signatory</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        
+        return '';
+    }
+
+    // Interactive Logic Functions
+    function filterInvoices(val) {
+        const term = val.toLowerCase();
+        document.querySelectorAll('.inv-item').forEach(el => {
+            const text = Array.from(el.querySelectorAll('.search-target')).map(e => e.innerText).join(' ').toLowerCase();
+            el.style.display = text.includes(term) ? '' : 'none';
+        });
+    }
+
+    function updateProfile() {
+        const p = {
+            name: document.getElementById('p-name').value,
+            phone: document.getElementById('p-phone').value,
+            company: document.getElementById('p-company').value
+        };
+        localStorage.setItem('inv_profile', JSON.stringify(p));
+    }
+
+    function updateShiftDefaults() {
+        const desc = document.getElementById('iDesc').value;
+        document.getElementById('iKm').value = (desc.includes("B SHIFT")) ? 1280 : 2240;
+    }
+
+    function runInvoiceCalculation() {
+        const desc = document.getElementById('iDesc').value;
+        const km = document.getElementById('iKm').value;
+        const days = document.getElementById('iDays').value;
+        const sundays = parseInt(document.getElementById('iOff').value) || 0;
+        const rate = parseFloat(document.getElementById('iRate').value) || 0;
+        const vName = document.getElementById('iVehName').value;
+        const vType = document.getElementById('iVehType').value;
+        const dDate = document.getElementById('iDate').value;
+
+        const sunPrice = (desc.includes("B SHIFT")) ? 1730 : 2115;
+        const sunTotal = sundays * sunPrice;
+        const subTotal = rate + sunTotal;
+
+        const descParts = desc.split(' (');
+        const pkgName = descParts[0];
+        const shiftName = descParts[1] ? '(' + descParts[1] : '';
+        
+        // Update DOM (Live Preview)
+        document.getElementById('vDesc').innerHTML = `${pkgName}<br><span style="font-size: 14px; font-weight: bold; color: #222;">${shiftName}</span>`;
+        document.getElementById('vVehDisplay').innerText = `${vName} (${vType})`;
+        document.getElementById('vDate').innerText = dDate.split('-').reverse().join('/');
+        document.getElementById('vKm').innerText = km;
+        document.getElementById('vDays').innerText = days;
+        document.getElementById('vOff').innerText = sundays;
+        
+        document.getElementById('vAmount').innerText = Math.round(rate).toLocaleString('en-IN');
+        document.getElementById('vPkgBase').innerText = "₹ " + Math.round(rate).toLocaleString('en-IN');
+        document.getElementById('vSunRate').innerText = sunPrice;
+        document.getElementById('vSunCount').innerText = sundays;
+        document.getElementById('vSunTotal').innerText = "₹ " + Math.round(sunTotal).toLocaleString('en-IN');
+        document.getElementById('vSub').innerText = "₹ " + Math.round(subTotal).toLocaleString('en-IN');
+        
+        // Ensure scale is maintained after height/DOM updates
+        applyInvoiceScaling();
+    }
+
+    function saveAndPrintInvoice(nextId) {
+        const desc = document.getElementById('iDesc').value;
+        const sundays = parseInt(document.getElementById('iOff').value) || 0;
+        const rate = parseFloat(document.getElementById('iRate').value) || 0;
+        const sunPrice = (desc.includes("B SHIFT")) ? 1730 : 2115;
+        
+        const invoiceData = {
+            id: nextId,
+            date: document.getElementById('iDate').value,
+            client: document.getElementById('iBiz').value,
+            shift: desc,
+            vehName: document.getElementById('iVehName').value,
+            vehType: document.getElementById('iVehType').value,
+            km: document.getElementById('iKm').value,
+            days: document.getElementById('iDays').value,
+            sundays: sundays,
+            rate: rate,
+            sunTotal: sundays * sunPrice,
+            subTotal: rate + (sundays * sunPrice)
+        };
+        
+        db.push('invoices', invoiceData);
+        
+        // Trigger Print Native Dialog
+        setTimeout(() => { 
+            window.print(); 
+            // Return to dashboard after saving/printing
+            setTimeout(() => switchTab('dashboard'), 500);
+        }, 300);
+    }
+
+    function initChart() {
+        const ctx = document.getElementById('financeChart');
+        if (!ctx) return;
+        if (chartInstance) chartInstance.destroy();
+        
+        const invoices = db.get('invoices');
+        const labels = [];
+        const revData = [];
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        
+        for(let i=5; i>=0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const ym = d.toISOString().slice(0,7); 
+            labels.push(d.toLocaleString('en-US', { month: 'short' }));
+            revData.push(invoices.filter(inv => inv.date.startsWith(ym)).reduce((s,inv)=>s+inv.subTotal, 0));
+        }
+
+        chartInstance = new Chart(ctx, { 
+            type: 'bar', 
+            data: { 
+                labels: labels, 
+                datasets: [{ label: 'Revenue (₹)', data: revData, backgroundColor: '#9333ea', borderRadius: 4 }] 
+            }, 
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { 
+                    x: { grid: { display: false }, ticks: { color: textColor, font: {family: 'Quantico', size: 11} } }, 
+                    y: { border: {display: false}, grid: { color: isDark ? '#334155' : '#e2e8f0' }, ticks: { color: textColor, font: {family: 'Quantico', size: 11} } } 
+                }
+            } 
+        });
+    }
+
+    // Init App
+    document.addEventListener('DOMContentLoaded', () => { 
+        switchTab('dashboard');
+    });
+
+</script>
 </body>
 </html>
