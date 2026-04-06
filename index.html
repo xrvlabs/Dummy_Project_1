@@ -311,23 +311,17 @@
         const profile = JSON.parse(localStorage.getItem('inv_profile'));
         
         if (tab === 'dashboard') {
-            const currentMonth = today().slice(0, 7);
-            const thisMonthRevs = invoices.filter(i => i.date.startsWith(currentMonth)).reduce((sum, i) => sum + i.subTotal, 0);
             const totalRevs = invoices.reduce((sum, i) => sum + i.subTotal, 0);
             
             let html = `
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="stat-card bg-purple-600 text-white rounded-[5px] border-none shadow-md">
-                        <p class="font-bold opacity-80 text-[11px] truncate">THIS MONTH</p>
-                        <h3 class="font-black text-lg truncate">${fmt(thisMonthRevs)}</h3>
-                    </div>
-                    <div class="stat-card glass-card rounded-[5px]">
+                    <div class="stat-card glass-card rounded-[5px] flex flex-col justify-center py-4">
                         <p class="font-bold text-slate-500 text-[11px] truncate">TOTAL INVOICES</p>
-                        <h3 class="font-black text-lg text-slate-800 dark:text-white truncate">${invoices.length}</h3>
+                        <h3 class="font-black text-2xl text-slate-800 dark:text-white truncate">${invoices.length}</h3>
                     </div>
-                    <div class="stat-card glass-card rounded-[5px] col-span-2">
-                        <p class="font-bold text-slate-500 text-[11px] truncate">LIFETIME REVENUE</p>
-                        <h3 class="font-black text-2xl text-emerald-600 truncate">${fmt(totalRevs)}</h3>
+                    <div class="stat-card bg-purple-600 text-white rounded-[5px] border-none shadow-md flex flex-col justify-center py-4">
+                        <p class="font-bold opacity-80 text-[11px] truncate">TOTAL REVENUE</p>
+                        <h3 class="font-black text-2xl truncate">${fmt(totalRevs)}</h3>
                     </div>
                 </div>
                 
