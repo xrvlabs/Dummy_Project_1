@@ -519,11 +519,38 @@
             gap: 24px; padding: 40px 24px; max-width: 1600px; margin: 0 auto;
         }
         
+        /* Centered Copyright styling */
+        .copyright-text {
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        
+        /* Mobile Trust Badge */
+        .fbb-mobile-trust {
+            display: none;
+            font-weight: 700;
+            color: var(--text-dark);
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .fbb-mobile-trust i { color: var(--green-accent); font-size: 16px; }
+
         /* Hide Specific Footer Sections & Adjust Top Bar on Mobile/Tablet */
         @media(max-width: 1023px) {
             .hide-on-mobile-tablet { display: none !important; }
             .fm-address-col { border-left: none !important; padding-left: 0 !important; border-top: none !important; padding-top: 0 !important;}
             
+            /* Center copyright specifically on mobile */
+            .copyright-text { text-align: center; width: 100%; margin-top: 30px; }
+            
+            /* Swap payments for trust badge */
+            .fbb-payments { display: none !important; }
+            .fbb-mobile-trust { display: flex; }
+            .footer-bottom-bar { justify-content: center; flex-direction: column; gap: 12px; }
+
             /* Footer Top Bar Adjustments for Mobile */
             .footer-top-bar { flex-direction: column; padding: 16px 10px; gap: 16px;}
             .ftb-left { width: 100%; justify-content: center; }
@@ -902,26 +929,26 @@
                     </ul>
                 </div>
                 <div class="fm-col fm-address-col">
-                    <h4>REGISTERED OFFICE ADDRESS</h4>
-                    <div class="address-item">
+                    <h4 class="hide-on-mobile-tablet">REGISTERED OFFICE ADDRESS</h4>
+                    <div class="address-item hide-on-mobile-tablet">
                         <i class="fa-solid fa-location-dot"></i>
                         <span>Celebration city center, A-452, Gala Gymkhana Rd, South Bopal, Bopal, Ahmedabad, Gujarat 380058</span>
                     </div>
-                    <div class="address-item">
+                    <div class="address-item hide-on-mobile-tablet">
                         <i class="fa-solid fa-phone"></i>
                         <span>+91-123-4567-890</span>
                     </div>
-                    <div class="address-item">
+                    <div class="address-item hide-on-mobile-tablet">
                         <i class="fa-solid fa-envelope"></i>
                         <span>support@oracodentalinnovation.com</span>
                     </div>
-                    <div class="address-item">
+                    <div class="address-item hide-on-mobile-tablet">
                         <i class="fa-solid fa-calendar-days"></i>
                         <span>Mon-Sun (9:00 AM - 9:00 PM)</span>
                     </div>
-                    <div style="margin-top:24px; font-size:11px; color:var(--text-muted); text-align:right;">
+                    <div class="copyright-text">
                         2024-2026, ORACO DENTAL INNOVATION PVT. LTD.<br>
-                        Crafted with <i class="fa-solid fa-heart" style="color:var(--red-accent);"></i> in India
+                        CRAFTED WITH <i class="fa-solid fa-heart" style="color:var(--red-accent);"></i> IN INDIA BY XRV LABS PROD.
                     </div>
                 </div>
             </div>
@@ -936,6 +963,11 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard">
                 </div>
+                
+                <div class="fbb-mobile-trust">
+                    <i class="fa-solid fa-shield-halved"></i> 100% Safe & Secure Checkout
+                </div>
+
                 <div class="fbb-right">
                     <div class="rating">
                         4.5 <i class="fa-regular fa-star"></i> Average online rating
