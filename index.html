@@ -60,7 +60,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Skeletons */
+        /* Skeletons & Shimmer Animation */
         .skeleton {
             background: #f6f7f8; background-image: linear-gradient(90deg, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
             background-size: 200% 100%; animation: shimmer 1.5s infinite linear; border-radius: var(--card-radius);
@@ -346,11 +346,11 @@
             .drag-handle { display: none; }
         }
 
-        /* Mobile Mode: Bottom Sheet FIX */
+        /* Mobile Mode: Bottom Sheet */
         @media (max-width: 1023px) {
             #profileComponent {
                 width: 100%; bottom: 0; left: 0; 
-                height: 85dvh; /* Rigid constraint ensures full popup on mobile */
+                height: 85dvh; 
                 border-radius: 20px 20px 0 0;
                 transform: translateY(100%);
                 padding-bottom: env(safe-area-inset-bottom);
@@ -545,6 +545,7 @@
         </div>
 
         <div id="skeletonContainer" class="skel-grid"></div>
+        
         <div id="productGrid" class="product-grid" style="display: none;"></div>
 
     </div>
@@ -641,14 +642,14 @@
 
             <div class="auth-mobile-slider-wrapper">
                 <div class="auth-slider-track">
-                    <img src="https://placehold.co/400x300/fce7f3/db2777?text=Consumables" alt="1">
-                    <img src="https://placehold.co/400x300/fef3c7/d97706?text=Instruments" alt="2">
-                    <img src="https://placehold.co/400x300/dcfce7/16a34a?text=Materials" alt="3">
-                    <img src="https://placehold.co/400x300/e0f2fe/0284c7?text=Equipments" alt="4">
-                    <img src="https://placehold.co/400x300/fce7f3/db2777?text=Consumables" alt="1">
-                    <img src="https://placehold.co/400x300/fef3c7/d97706?text=Instruments" alt="2">
-                    <img src="https://placehold.co/400x300/dcfce7/16a34a?text=Materials" alt="3">
-                    <img src="https://placehold.co/400x300/e0f2fe/0284c7?text=Equipments" alt="4">
+                    <img src="pro_1.jpg" alt="1">
+                    <img src="pro_2.jpg" alt="2">
+                    <img src="pro_1.jpg" alt="3">
+                    <img src="pro_2.jpg" alt="4">
+                    <img src="pro_1.jpg" alt="1">
+                    <img src="pro_2.jpg" alt="2">
+                    <img src="pro_1.jpg" alt="3">
+                    <img src="pro_2.jpg" alt="4">
                 </div>
                 <div class="slider-fade-bottom"></div>
             </div>
@@ -889,31 +890,33 @@
 
 <script>
     // --- Data ---
+    // UPDATED to use local images for megamenu subcategories
     const categoriesData = [
         {
             id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag',
             items: [
-                { name: 'WALDENT', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=Waldent' },
-                { name: '3M ESPE', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=3M+ESPE' },
-                { name: 'DENTSPLY', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=Dentsply' },
-                { name: 'GC', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=GC' }
+                { name: 'WALDENT', img: 'pro_1.jpg' },
+                { name: '3M ESPE', img: 'pro_2.jpg' },
+                { name: 'DENTSPLY', img: 'pro_1.jpg' },
+                { name: 'GC', img: 'pro_2.jpg' }
             ]
         },
         {
             id: 'cat_endo', title: 'ENDODONTICS', icon: 'fa-syringe',
             items: [
-                { name: 'ROTARY FILES', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=Files' },
-                { name: 'APEX LOCATORS', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=Apex' },
-                { name: 'ENDO MOTORS', img: 'https://placehold.co/200x200/f8fafc/0284c7?text=Motor' }
+                { name: 'ROTARY FILES', img: 'pro_1.jpg' },
+                { name: 'APEX LOCATORS', img: 'pro_2.jpg' },
+                { name: 'ENDO MOTORS', img: 'pro_1.jpg' }
             ]
         }
     ];
 
+    // UPDATED to use local images for products
     const mockProducts = [
-        { id: 1, title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', img: 'https://placehold.co/400x400/e0f2fe/0284c7?text=RVG+Sensor', priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true },
-        { id: 2, title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', img: 'https://placehold.co/400x400/e0f2fe/0284c7?text=Driver+Kit', priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false },
-        { id: 3, title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', img: 'https://placehold.co/400x400/e0f2fe/0284c7?text=RCTcal', priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false },
-        { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', img: 'https://placehold.co/400x400/e0f2fe/0284c7?text=3D+Resin', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false }
+        { id: 1, title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', img: 'pro_1.jpg', priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true },
+        { id: 2, title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', img: 'pro_2.jpg', priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false },
+        { id: 3, title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', img: 'pro_1.jpg', priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false },
+        { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', img: 'pro_2.jpg', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false }
     ];
 
     // --- State ---
@@ -1382,13 +1385,17 @@
 
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
+        // Ensure skeleton is visible immediately on load
+        document.getElementById('skeletonContainer').style.display = 'grid';
+        document.getElementById('productGrid').style.display = 'none';
+
         renderCategories(); 
         renderSkeletons();
         renderProducts();
         typeWriterEffect(); 
         updateUIForAuth();
 
-        // Shimmer delay sequence
+        // Shimmer delay sequence - hide skeletons, show actual products
         setTimeout(() => {
             document.getElementById('skeletonContainer').style.display = 'none';
             document.getElementById('productGrid').style.display = 'grid';
