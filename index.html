@@ -76,6 +76,9 @@
         .skel-price { height: 20px; width: 50%; margin-top: auto; }
         .skel-btn { height: 32px; width: 100%; border-radius: var(--card-radius); }
 
+        .tab-skel-row { height: 60px; margin-bottom: 12px; border-radius: 8px; width: 100%; }
+        .tab-skel-box { height: 120px; margin-bottom: 16px; border-radius: 8px; width: 100%; }
+
         /* Header */
         .sticky-header-container { position: sticky; top: 0; z-index: 500; background: white; }
         .header-master { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 10px; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
@@ -288,74 +291,6 @@
         .auth-footer-text { text-align: center; margin-top: 32px; font-size: 10px; font-weight: 700; color: var(--text-muted); line-height: 1.6; text-transform: uppercase; padding-bottom: 20px;}
         .auth-footer-text a { color: var(--blue-accent); text-decoration: none; }
 
-        /* Profile View Updates - EDGE TO EDGE WIDE LAYOUT */
-        .profile-header-bar { display: flex; align-items: center; padding: 16px 10px; background: white; border-bottom: 1px solid var(--border-color); font-size: 16px; font-weight: 700; gap: 16px; text-transform: uppercase;}
-        
-        /* Changed to 100% width with 10px margins mapping requested */
-        .profile-wrapper-wide { width: 100%; padding: 0 10px 40px; margin: 0 auto; display: flex; flex-direction: column; }
-
-        /* Complex 7-column grid layout for desktop mapping the screenshot */
-        .profile-dashboard-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-            gap: 12px; 
-            margin-bottom: 24px;
-        }
-        @media (min-width: 1400px) {
-            .profile-dashboard-grid { grid-template-columns: repeat(7, 1fr); }
-        }
-
-        .profile-feat-card { 
-            background: white; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--card-radius); 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        .profile-feat-card:hover { border-color: var(--blue-accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        
-        .feat-card-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            padding: 12px 16px; 
-            border-bottom: 1px solid var(--border-color);
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-dark);
-            background: #fafafa;
-        }
-        .feat-card-header i { font-size: 20px; color: var(--blue-accent); }
-        .feat-card-body { padding: 16px; flex: 1; font-size: 12px; color: var(--text-dark); line-height: 1.5; }
-        .feat-card-body p { margin-bottom: 6px; }
-        .feat-card-body strong { font-weight: 700; }
-        .feat-card-body ul { list-style: none; padding: 0; }
-        .feat-card-body ul li { margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .feat-card-body ul li::before { content: '•'; color: var(--text-muted); }
-
-        .profile-action-center { display: flex; justify-content: center; margin: 24px 0; }
-        .btn-signout { background: white; color: var(--red-accent); border: 1px solid var(--red-accent); padding: 12px 48px; border-radius: var(--card-radius); font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: var(--transition); font-family: 'Quantico', sans-serif;}
-        .btn-signout:hover { background: var(--red-accent); color: white; }
-
-        /* Detailed Recent Orders List */
-        .profile-section { background: white; border-radius: var(--card-radius); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 24px;}
-        .section-header-bar { background: #f8fafc; padding: 12px 16px; font-size: 13px; font-weight: 800; color: var(--text-dark); text-transform: uppercase; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;}
-        .section-header-bar i { color: var(--blue-accent); font-size: 16px; }
-        .section-content { padding: 16px; }
-        
-        .wide-order-row { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; align-items: center; font-size: 13px; }
-        @media(min-width: 768px) {
-            .wide-order-row { grid-template-columns: 2fr 1fr 1fr; gap: 24px; }
-        }
-        .wide-order-row:last-child { border-bottom: none; }
-        .wo-title { font-weight: 700; color: var(--text-dark); display: flex; flex-direction: column; gap: 4px; }
-        .wo-title span { font-weight: 400; color: var(--text-muted); font-size: 11px; }
-        .wo-status { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
-        .wo-status-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-
         /* Cart View */
         .cart-wrapper-main { max-width: 800px; margin: 0 auto; width: 100%; padding: 10px; display: flex; flex-direction: column; gap: 12px; min-height: 80vh;}
         .cart-item { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 12px; display: flex; gap: 12px; align-items: center;}
@@ -380,6 +315,96 @@
         @keyframes scaleUp { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes rainFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
         .rain-drop { position: absolute; font-size: 28px; z-index: 5; animation: rainFall linear forwards; pointer-events: none; }
+
+        /* PROFILE MODAL / BOTTOM SHEET SYSTEM */
+        #profileOverlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 2000; 
+            display: none; opacity: 0; transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        #profileComponent {
+            position: fixed; z-index: 2001; background: white;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+            display: flex; flex-direction: column;
+            will-change: transform, opacity;
+        }
+
+        /* Desktop Mode: Dialog */
+        @media (min-width: 1024px) {
+            #profileComponent {
+                width: 900px; max-height: 85vh;
+                top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95);
+                border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                padding: 24px; opacity: 0; pointer-events: none;
+            }
+            #profileComponent.active {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1; pointer-events: auto;
+            }
+            .drag-handle { display: none; }
+        }
+
+        /* Mobile Mode: Bottom Sheet FIX */
+        @media (max-width: 1023px) {
+            #profileComponent {
+                width: 100%; bottom: 0; left: 0; 
+                height: 85dvh; /* Rigid constraint ensures full popup on mobile */
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            #profileComponent.active { transform: translateY(0); }
+            
+            .drag-handle {
+                width: 40px; height: 4px; background: #ddd; border-radius: 2px;
+                margin: 12px auto; flex-shrink: 0;
+            }
+        }
+
+        .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 10px 16px; border-bottom: 1px solid var(--border-color); }
+        .profile-header h2 { font-size: 16px; font-weight: 800; text-transform: uppercase; margin: 0;}
+        .close-profile { font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .back-profile { font-size: 20px; cursor: pointer; color: var(--blue-accent); margin-right: 12px; transition: transform 0.2s;}
+        .back-profile:hover { transform: translateX(-3px); }
+
+        .profile-scroll-content { overflow-y: auto; flex: 1; padding: 10px 16px 24px; }
+
+        /* Dashboard Grid */
+        .dash-grid { 
+            display: grid; gap: 12px; margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        }
+        @media (min-width: 1024px) { .dash-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .dash-card { 
+            border: 1px solid var(--border-color); border-radius: 8px; 
+            padding: 16px; background: #fafafa; text-align: center;
+            cursor: pointer; transition: var(--transition);
+        }
+        .dash-card:hover { border-color: var(--blue-accent); background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateY(-2px);}
+        .dash-card i { font-size: 24px; color: var(--blue-accent); margin-bottom: 10px; display: block;}
+        .dash-card span { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dark); }
+
+        .recent-orders { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 24px; }
+        .ro-head { background: #f1f5f9; padding: 12px; font-size: 13px; font-weight: 800; border-bottom: 1px solid var(--border-color); text-transform: uppercase;}
+        .order-row { display: flex; justify-content: space-between; padding: 16px; border-bottom: 1px solid #eee; font-size: 13px;}
+        .order-row:last-child { border-bottom: none; }
+
+        .signout-btn { 
+            width: 100%; padding: 16px; border: 1px solid var(--red-accent); 
+            color: var(--red-accent); background: white; font-weight: 800; 
+            border-radius: 8px; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s; margin-top: 16px;
+        }
+        .signout-btn:hover { background: var(--red-accent); color: white; }
+
+        /* Tab Content Styles */
+        .tab-content-box { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 12px; font-size: 13px;}
+        .tab-content-box h4 { margin-bottom: 8px; font-size: 14px; text-transform: uppercase; color: var(--blue-accent); }
+        .tab-content-box p { color: var(--text-muted); margin-bottom: 4px; }
+
 
         /* HUGE FOOTER SETTINGS */
         .mega-footer { 
@@ -588,7 +613,7 @@
 
 
     <div id="cartView" class="view-section">
-        <div class="profile-header-bar">
+        <div class="profile-header-bar" style="display: flex; align-items: center; padding: 16px 10px; background: white; border-bottom: 1px solid var(--border-color); font-size: 16px; font-weight: 700; gap: 16px; text-transform: uppercase;">
             <i class="fa-solid fa-chevron-left" style="cursor: pointer;" onclick="switchView('homeView')"></i>
             <span>MY CART</span>
         </div>
@@ -616,6 +641,10 @@
 
             <div class="auth-mobile-slider-wrapper">
                 <div class="auth-slider-track">
+                    <img src="https://placehold.co/400x300/fce7f3/db2777?text=Consumables" alt="1">
+                    <img src="https://placehold.co/400x300/fef3c7/d97706?text=Instruments" alt="2">
+                    <img src="https://placehold.co/400x300/dcfce7/16a34a?text=Materials" alt="3">
+                    <img src="https://placehold.co/400x300/e0f2fe/0284c7?text=Equipments" alt="4">
                     <img src="https://placehold.co/400x300/fce7f3/db2777?text=Consumables" alt="1">
                     <img src="https://placehold.co/400x300/fef3c7/d97706?text=Instruments" alt="2">
                     <img src="https://placehold.co/400x300/dcfce7/16a34a?text=Materials" alt="3">
@@ -677,146 +706,6 @@
         </div>
     </div>
 
-    <div id="profileView" class="view-section">
-        
-        <div class="sticky-header-container">
-            <div class="profile-header-bar">
-                <i class="fa-solid fa-chevron-left" style="cursor: pointer;" onclick="switchView('homeView')"></i>
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span>YOUR ACCOUNT</span>
-                    <div style="display:flex; align-items:center; gap:12px; color:var(--blue-accent);">
-                        <i class="fa-regular fa-circle-user" style="font-size:24px;"></i>
-                        <div style="display:flex; flex-direction:column; line-height:1.2;">
-                            <span style="font-size:12px; color:var(--text-dark);">Welcome,</span>
-                            <span id="profileName" style="font-size:14px; font-weight:800;">Dr. Demo User</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-wrapper-wide">
-            
-            <div class="section-header" style="padding: 0;">
-                <h3 style="background:transparent; padding: 16px 0;">PROFILE DASHBOARD</h3>
-            </div>
-
-            <div class="profile-dashboard-grid">
-                
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-solid fa-users-gear"></i> ACCOUNT DETAILS</div>
-                    <div class="feat-card-body">
-                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                            <i class="fa-solid fa-tooth" style="font-size:24px; color:#ccc;"></i>
-                            <div>
-                                <strong style="font-size:14px; display:block;" id="dashName">Dr. Demo User</strong>
-                                <span style="color:var(--text-muted);">Clinic Info</span>
-                            </div>
-                        </div>
-                        <p>Primary Address, New Delhi,<br>India, 110074.</p>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card" onclick="document.getElementById('recentOrdersBlock').scrollIntoView({behavior: 'smooth'})" style="cursor:pointer;">
-                    <div class="feat-card-header"><i class="fa-solid fa-box-open"></i> MY ORDERS</div>
-                    <div class="feat-card-body">
-                        <ul>
-                            <li>Order #12345 &nbsp;&nbsp;<span style="color:var(--text-muted);">23 June</span></li>
-                            <li>Order #12344 &nbsp;&nbsp;<span style="color:var(--text-muted);">05 June</span></li>
-                        </ul>
-                        <div style="margin-top:auto; padding-top:12px; border-top:1px dashed #eee; display:flex; justify-content:space-between;">
-                            <strong>Total Counts</strong>
-                            <strong>27 Counts</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-solid fa-heart"></i> WISHLISTS & PLANS</div>
-                    <div class="feat-card-body">
-                        <ul>
-                            <li>WishLists</li>
-                            <li>Wishlists & Plans</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-solid fa-location-dot"></i> SHIPPING ADDRESSES</div>
-                    <div class="feat-card-body">
-                        <strong>Manage Addresses</strong>
-                        <p style="margin-top:6px;"><strong>Clinic Building</strong><br>Primary Address, New Delhi,<br>India, 110074.</p>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-regular fa-credit-card"></i> PAYMENT METHODS</div>
-                    <div class="feat-card-body">
-                        <strong>Manage Saved Cards</strong>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-solid fa-coins"></i> DENTALKART REWARDS</div>
-                    <div class="feat-card-body">
-                        <p>Current Tier: <strong style="color:#d4af37;">Gold</strong></p>
-                        <p>Points balance: <strong>1,500</strong></p>
-                        <p style="text-decoration:underline; cursor:pointer; margin-top:8px;">Rewards History</p>
-                    </div>
-                </div>
-
-                <div class="profile-feat-card">
-                    <div class="feat-card-header"><i class="fa-solid fa-shield-halved"></i> ACCOUNT SECURITY</div>
-                    <div class="feat-card-body">
-                        <p><strong>Manage Password</strong></p>
-                        <p>2FA Status: No</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="profile-section" id="recentOrdersBlock">
-                <div class="section-header-bar"><i class="fa-solid fa-box"></i> RECENT ORDERS</div>
-                <div class="section-content" id="orderHistoryList">
-                    
-                    <div class="wide-order-row">
-                        <div class="wo-title">
-                            Order #12345 Waldent Handpiece <span>[Date]</span>
-                        </div>
-                        <div class="wo-status">
-                            <span class="wo-status-lbl">Status Overview</span>
-                            Working Completed
-                        </div>
-                        <div class="wo-status" style="text-align:right;">
-                            <span class="wo-status-lbl">Status Overview</span>
-                            Delivery: 95% Completed
-                        </div>
-                    </div>
-
-                    <div class="wide-order-row">
-                        <div class="wo-title">
-                            Order #12344 3M Composite <span>[Date]</span>
-                        </div>
-                        <div class="wo-status">
-                            <span class="wo-status-lbl">Status Overview</span>
-                            Working Completed
-                        </div>
-                        <div class="wo-status" style="text-align:right;">
-                            <span class="wo-status-lbl">Status Overview</span>
-                            Delivery: 95% Completed
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="profile-action-center">
-                <button class="btn-signout" onclick="logoutUser()">SIGN OUT</button>
-            </div>
-            
-        </div>
-    </div>
-    
     <footer class="mega-footer">
         <div class="mega-footer-content">
             
@@ -937,6 +826,60 @@
 
 </div>
 
+
+<div id="profileOverlay" onclick="closeProfile()"></div>
+<div id="profileComponent">
+    <div class="drag-handle"></div>
+    
+    <div class="profile-header">
+        <div style="display:flex; align-items:center;">
+            <i class="fa-solid fa-arrow-left back-profile" id="profileBackBtn" style="display:none;" onclick="closeProfileTab()"></i>
+            <h2 id="profileModalTitle">Profile Dashboard</h2>
+        </div>
+        <i class="fa-solid fa-xmark close-profile" onclick="closeProfile()"></i>
+    </div>
+    
+    <div class="profile-scroll-content" id="profileMainContent">
+        <div class="dash-grid">
+            <div class="dash-card" onclick="openProfileTab('Account Info')"><i class="fa-solid fa-id-card"></i><span>Account Info</span></div>
+            <div class="dash-card" onclick="openProfileTab('Orders')"><i class="fa-solid fa-box"></i><span>Orders</span></div>
+            <div class="dash-card" onclick="openProfileTab('Wishlist')"><i class="fa-solid fa-heart"></i><span>Wishlist</span></div>
+            <div class="dash-card" onclick="openProfileTab('Addresses')"><i class="fa-solid fa-map-location-dot"></i><span>Addresses</span></div>
+            <div class="dash-card" onclick="openProfileTab('Payments')"><i class="fa-solid fa-credit-card"></i><span>Payments</span></div>
+            <div class="dash-card" onclick="openProfileTab('Rewards')"><i class="fa-solid fa-coins"></i><span>Rewards</span></div>
+            <div class="dash-card" onclick="openProfileTab('Security')"><i class="fa-solid fa-user-shield"></i><span>Security</span></div>
+        </div>
+
+        <div class="recent-orders">
+            <div class="ro-head"><i class="fa-solid fa-clock-rotate-left"></i> Recent Orders</div>
+            <div id="profileOrderHistoryList">
+                <div class="order-row">
+                    <div><strong>#ORD-9921</strong><br><small>23 June 2026</small></div>
+                    <div style="text-align:right; color:var(--green-accent);"><strong>Delivered</strong><br>₹4,500</div>
+                </div>
+                <div class="order-row">
+                    <div><strong>#ORD-8812</strong><br><small>10 June 2026</small></div>
+                    <div style="text-align:right; color:var(--orange-accent);"><strong>Processing</strong><br>₹1,200</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="signout-btn" onclick="logoutUser()">Sign Out</button>
+    </div>
+
+    <div class="profile-scroll-content" id="profileTabContent" style="display:none;">
+        <div id="profileShimmer">
+            <div class="skeleton tab-skel-box"></div>
+            <div class="skeleton tab-skel-row"></div>
+            <div class="skeleton tab-skel-row"></div>
+        </div>
+        
+        <div id="profileActualContent" style="display:none;">
+            </div>
+    </div>
+</div>
+
+
 <div id="successOverlay">
     <div class="success-box">
         <i class="fa-solid fa-circle-check"></i>
@@ -984,7 +927,6 @@
         homeView: document.getElementById('homeView'),
         productView: document.getElementById('productView'),
         authView: document.getElementById('authView'),
-        profileView: document.getElementById('profileView'),
         cartView: document.getElementById('cartView')
     };
 
@@ -992,23 +934,49 @@
     function switchView(targetViewId) {
         closeMegamenu(); 
         
-        if (!currentUser && (targetViewId === 'cartView' || targetViewId === 'profileView')) {
+        if (!currentUser && (targetViewId === 'cartView')) {
             targetViewId = 'authView';
         }
 
         Object.values(views).forEach(view => { if(view) view.classList.remove('active'); });
         if(views[targetViewId]) views[targetViewId].classList.add('active');
         
-        document.getElementById('homeFab') ? document.getElementById('homeFab').style.display = (targetViewId === 'homeView') ? 'flex' : 'none' : null;
+        let fab = document.getElementById('homeFab');
+        if(fab) fab.style.display = (targetViewId === 'homeView') ? 'flex' : 'none';
         window.scrollTo(0, 0);
 
         if(targetViewId === 'cartView') renderCart();
-        if(targetViewId === 'profileView') renderProfileOrders();
+    }
+
+    // --- Search Typewriter Animation ---
+    function typeWriterEffect() {
+        const searchInput = document.getElementById('mainSearchInput');
+        if (!searchInput) return;
+        const searchPrefix = "SEARCH ";
+        const searchTerms = ["COMPOSITES...", "RVG SENSORS...", "ENDOMOTORS...", "DENTAL CHAIRS..."];
+        let termIndex = 0; let charIndex = 0; let isDeleting = false;
+
+        function type() {
+            const currentTerm = searchTerms[termIndex];
+            if (isDeleting) {
+                searchInput.setAttribute('placeholder', searchPrefix + currentTerm.substring(0, charIndex));
+                charIndex--;
+                if (charIndex < 0) { isDeleting = false; termIndex = (termIndex + 1) % searchTerms.length; setTimeout(type, 100); } 
+                else { setTimeout(type, 15); }
+            } else {
+                searchInput.setAttribute('placeholder', searchPrefix + currentTerm.substring(0, charIndex));
+                charIndex++;
+                if (charIndex > currentTerm.length) { isDeleting = true; setTimeout(type, 1200); } 
+                else { setTimeout(type, 35); }
+            }
+        }
+        type();
     }
 
     // --- Mega Menu ---
     function renderCategories() {
         const catList = document.getElementById('mmCatList');
+        if(!catList) return;
         catList.innerHTML = categoriesData.map((cat, index) => `
             <li class="${index === 0 ? 'active' : ''}" 
                 onmouseenter="if(window.innerWidth >= 1024) handleCatInteraction('${cat.id}', this)" 
@@ -1053,13 +1021,16 @@
     }
 
     function closeMegamenu() {
-        document.getElementById('megamenu').classList.remove('active');
-        document.getElementById('catDropdownBtn').classList.remove('active');
-        document.getElementById('megamenuOverlay').classList.remove('active');
+        const megamenu = document.getElementById('megamenu');
+        if(megamenu) megamenu.classList.remove('active');
+        const btn = document.getElementById('catDropdownBtn');
+        if(btn) btn.classList.remove('active');
+        const over = document.getElementById('megamenuOverlay');
+        if(over) over.classList.remove('active');
         document.body.classList.remove('no-scroll'); 
     }
 
-    // --- Products ---
+    // --- Products & Shimmers ---
     function renderSkeletons() {
         let skelHTML = '';
         for(let i=0; i<4; i++) skelHTML += `<div class="skel-card"><div class="skeleton skel-img"></div><div class="skeleton skel-text-1"></div><div class="skeleton skel-text-2"></div><div class="skeleton skel-price"></div><div class="skeleton skel-btn"></div></div>`;
@@ -1178,7 +1149,7 @@
         let total = cart.reduce((sum, item) => sum + item.priceNum, 0);
         
         orderHistory.unshift({
-            id: 'ORD' + Math.floor(Math.random() * 1000000),
+            id: 'ORD-' + Math.floor(Math.random() * 10000),
             date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
             items: [...cart],
             total: total
@@ -1189,34 +1160,20 @@
         triggerRain();
     }
 
+    // Update orders inside Profile Component
     function renderProfileOrders() {
-        const container = document.getElementById('orderHistoryList');
-        if(orderHistory.length === 0) {
-            // Keep the static placeholders shown in screenshot if no real orders, 
-            // but normally we'd show empty state or inject the new orders here.
-            return;
-        }
+        const container = document.getElementById('profileOrderHistoryList');
+        if(orderHistory.length === 0) return; // Keep static placeholders
 
         let html = '';
         orderHistory.forEach(order => {
             html += `
-                <div class="wide-order-row">
-                    <div class="wo-title">
-                        Order #${order.id} <span>${order.date}</span>
-                    </div>
-                    <div class="wo-status">
-                        <span class="wo-status-lbl">Items</span>
-                        ${order.items.length} ITEM(S) - ₹${order.total.toLocaleString()}
-                    </div>
-                    <div class="wo-status" style="text-align:right;">
-                        <span class="wo-status-lbl">Status Overview</span>
-                        Processing...
-                    </div>
+                <div class="order-row">
+                    <div><strong>#${order.id}</strong><br><small>${order.date}</small></div>
+                    <div style="text-align:right; color:var(--orange-accent);"><strong>Processing</strong><br>₹${order.total.toLocaleString()}</div>
                 </div>
             `;
         });
-        
-        // Append to existing placeholders so it looks full for the demo
         const existing = container.innerHTML;
         container.innerHTML = html + existing;
     }
@@ -1240,43 +1197,41 @@
 
         setTimeout(() => {
             overlay.style.display = 'none';
-            switchView('profileView'); 
+            switchView('homeView'); 
+            openProfile(); // Open profile bottom sheet automatically after order
+            renderProfileOrders();
         }, 3500);
     }
 
-    // --- Search ---
-    function typeWriterEffect() {
-        const searchInput = document.getElementById('mainSearchInput');
-        if (!searchInput) return;
-        const searchPrefix = "SEARCH ";
-        const searchTerms = ["COMPOSITES...", "RVG SENSORS...", "ENDOMOTORS...", "DENTAL CHAIRS..."];
-        let termIndex = 0; let charIndex = 0; let isDeleting = false;
-
-        function type() {
-            const currentTerm = searchTerms[termIndex];
-            if (isDeleting) {
-                searchInput.setAttribute('placeholder', searchPrefix + currentTerm.substring(0, charIndex));
-                charIndex--;
-                if (charIndex < 0) { isDeleting = false; termIndex = (termIndex + 1) % searchTerms.length; setTimeout(type, 100); } 
-                else { setTimeout(type, 15); }
-            } else {
-                searchInput.setAttribute('placeholder', searchPrefix + currentTerm.substring(0, charIndex));
-                charIndex++;
-                if (charIndex > currentTerm.length) { isDeleting = true; setTimeout(type, 1200); } 
-                else { setTimeout(type, 35); }
-            }
-        }
-        type();
-    }
-
-    // --- Auth Logic ---
+    // --- AUTH & PROFILE MODAL LOGIC ---
     function handleAuthClick() {
         if (currentUser) {
-            switchView('profileView');
+            openProfile(); // Opens Modal/Bottom Sheet
         } else {
             switchView('authView');
             toggleAuthMode('login');
         }
+    }
+
+    function openProfile() {
+        document.getElementById('profileOverlay').style.display = 'block';
+        closeProfileTab(true); // Reset view to main grid
+        
+        // Small delay to allow display block to render before opacity transition
+        setTimeout(() => {
+            document.getElementById('profileOverlay').style.opacity = '1';
+            document.getElementById('profileComponent').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }, 10);
+    }
+
+    function closeProfile() {
+        document.getElementById('profileComponent').classList.remove('active');
+        document.getElementById('profileOverlay').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('profileOverlay').style.display = 'none';
+            document.body.classList.remove('no-scroll');
+        }, 300);
     }
 
     function toggleAuthMode(mode) {
@@ -1299,10 +1254,10 @@
         const password = document.getElementById('authPassword').value;
         const errorMsg = document.getElementById('authErrorMsg');
 
-        // Dummy Login Validation
+        // Dummy Validation
         if (!isSignup) {
             if(email === 'demo@xrvlabs.com' && password === 'demo123') {
-                currentUser = { name: "Dr. Demo User", email: email, initial: "D" };
+                currentUser = { name: "Dr. Demo User", email: email, phone: "+91-9876543210" };
                 errorMsg.style.display = 'none';
                 updateUIForAuth();
                 switchView('homeView');
@@ -1311,7 +1266,7 @@
             }
         } else {
             let name = "Dr. " + email.split('@')[0];
-            currentUser = { name: name, email: email, initial: name.charAt(4).toUpperCase() || 'U' };
+            currentUser = { name: name, email: email, phone: "+91-9876543210" };
             errorMsg.style.display = 'none';
             updateUIForAuth();
             switchView('homeView');
@@ -1324,6 +1279,7 @@
         orderHistory = []; 
         updateCartBadges();
         updateUIForAuth();
+        closeProfile();
         switchView('homeView');
     }
 
@@ -1332,15 +1288,96 @@
 
         if (currentUser) {
             document.getElementById('topBarAuthText').innerText = "HI, " + currentUser.name.split(' ')[0].toUpperCase();
-            
-            document.getElementById('profileName').innerText = currentUser.name;
-            document.getElementById('dashName').innerText = currentUser.name;
             document.getElementById('authForm').reset();
-            
             mainCartIcon.style.display = 'block';
         } else {
             document.getElementById('topBarAuthText').innerText = "LOGIN";
             mainCartIcon.style.display = 'none';
+        }
+    }
+
+    // --- Dynamic Profile Tabs (Shimmer Logic) ---
+    function openProfileTab(tabName) {
+        document.getElementById('profileMainContent').style.display = 'none';
+        document.getElementById('profileTabContent').style.display = 'block';
+        
+        document.getElementById('profileBackBtn').style.display = 'block';
+        document.getElementById('profileModalTitle').innerText = tabName;
+
+        // Reset visibility to show shimmer
+        document.getElementById('profileShimmer').style.display = 'block';
+        document.getElementById('profileActualContent').style.display = 'none';
+
+        // Simulate network request loading time
+        setTimeout(() => {
+            document.getElementById('profileShimmer').style.display = 'none';
+            document.getElementById('profileActualContent').innerHTML = getTabContentHTML(tabName);
+            document.getElementById('profileActualContent').style.display = 'block';
+        }, 800);
+    }
+
+    function closeProfileTab(instant = false) {
+        document.getElementById('profileTabContent').style.display = 'none';
+        document.getElementById('profileMainContent').style.display = 'block';
+        
+        document.getElementById('profileBackBtn').style.display = 'none';
+        document.getElementById('profileModalTitle').innerText = 'Profile Dashboard';
+    }
+
+    function getTabContentHTML(tabName) {
+        switch(tabName) {
+            case 'Account Info':
+                return `
+                    <div class="tab-content-box">
+                        <h4>Personal Details</h4>
+                        <p><strong>Name:</strong> ${currentUser.name}</p>
+                        <p><strong>Email:</strong> ${currentUser.email}</p>
+                        <p><strong>Phone:</strong> ${currentUser.phone}</p>
+                    </div>
+                    <button class="signout-btn" style="border-color:var(--blue-accent); color:var(--blue-accent); margin-top:12px;">Edit Details</button>
+                `;
+            case 'Orders':
+                return `
+                    <div class="tab-content-box">
+                        <h4>Order #ORD-9921</h4>
+                        <p>Placed on 23 June 2026</p>
+                        <p style="color:var(--green-accent); font-weight:700;">Status: Delivered</p>
+                        <p><strong>Total: ₹4,500</strong></p>
+                    </div>
+                    <div class="tab-content-box">
+                        <h4>Order #ORD-8812</h4>
+                        <p>Placed on 10 June 2026</p>
+                        <p style="color:var(--orange-accent); font-weight:700;">Status: Processing</p>
+                        <p><strong>Total: ₹1,200</strong></p>
+                    </div>
+                `;
+            case 'Addresses':
+                return `
+                    <div class="tab-content-box" style="border-left: 4px solid var(--blue-accent);">
+                        <h4>Clinic Address (Default)</h4>
+                        <p>Oraco Dental Clinic</p>
+                        <p>123 Health Street, Sector 4</p>
+                        <p>New Delhi, India - 110074</p>
+                    </div>
+                    <button class="signout-btn" style="border-color:var(--blue-accent); color:var(--blue-accent); margin-top:12px;">+ Add New Address</button>
+                `;
+            case 'Rewards':
+                return `
+                    <div class="tab-content-box" style="text-align:center; padding: 32px 16px;">
+                        <i class="fa-solid fa-medal" style="font-size:48px; color:#d4af37; margin-bottom:16px;"></i>
+                        <h4>Gold Tier Member</h4>
+                        <p style="font-size:24px; font-weight:800; color:var(--text-dark); margin:12px 0;">1,500 Points</p>
+                        <p>Equivalent to ₹150 discount on your next purchase.</p>
+                    </div>
+                `;
+            default:
+                return `
+                    <div class="tab-content-box" style="text-align:center; padding: 40px 16px;">
+                        <i class="fa-solid fa-screwdriver-wrench" style="font-size:40px; color:#ccc; margin-bottom:16px;"></i>
+                        <h4>Under Construction</h4>
+                        <p>This section is currently being updated.</p>
+                    </div>
+                `;
         }
     }
 
@@ -1352,6 +1389,7 @@
         typeWriterEffect(); 
         updateUIForAuth();
 
+        // Shimmer delay sequence
         setTimeout(() => {
             document.getElementById('skeletonContainer').style.display = 'none';
             document.getElementById('productGrid').style.display = 'grid';
