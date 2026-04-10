@@ -149,10 +149,21 @@
 
         @media (min-width: 1024px) { 
             .megamenu-overlay { display: block; }
-            .megamenu { position: fixed; top: 135px; left: 50%; right: auto; bottom: auto; transform: translateX(-50%); width: calc(100% - 40px); max-width: 1000px; border-radius: var(--card-radius); box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid var(--border-color); max-height: 75vh; z-index: 1001; opacity: 0; visibility: hidden; display: flex; flex-direction: column; transition: opacity 0.3s ease, visibility 0.3s; } 
+            /* Static Size for Category Sheet */
+            .megamenu { 
+                position: fixed; top: 135px; left: 50%; right: auto; bottom: auto; 
+                transform: translateX(-50%); 
+                width: 1000px; height: 500px; /* Static Height and Width */
+                border-radius: var(--card-radius); box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
+                border: 1px solid var(--border-color); 
+                z-index: 1001; opacity: 0; visibility: hidden; 
+                display: flex; flex-direction: column; transition: opacity 0.3s ease, visibility 0.3s; 
+                overflow: hidden; 
+            } 
             .megamenu.active { opacity: 1; visibility: visible; animation: none; }
             .mm-body { flex-direction: row; flex: 1; overflow: hidden; }
-            .mm-sidebar { width: 280px; flex-shrink: 0; flex: unset; border-right: 1px solid var(--border-color); border-bottom: none; display: flex; flex-direction: column; background: #fbfbfb; padding: 0;}
+            /* Enabling scrolling internally */
+            .mm-sidebar { width: 280px; flex-shrink: 0; flex: unset; border-right: 1px solid var(--border-color); border-bottom: none; display: flex; flex-direction: column; background: #fbfbfb; padding: 0; overflow-y: auto;}
             .mm-sidebar-title { display: block; padding: 16px 20px 8px; font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
             .mm-cat-list { display: block; padding: 0; overflow: visible; }
             .mm-cat-list li { border-radius: 0; border: none; background: transparent; padding: 12px 20px; font-size: 14px; color: var(--text-dark); border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; white-space: normal; }
@@ -160,6 +171,7 @@
             .mm-cat-list li i.arrow { display: inline-block; margin-left: auto; font-size: 10px; color: var(--text-muted); }
             .mm-cat-list li.active { background: var(--blue-light); color: var(--blue-accent); border-left-color: var(--blue-accent); }
             .mm-cat-list li.active i.icon { color: var(--blue-accent); }
+            /* Enabling scrolling internally */
             .mm-content { flex: 1; padding: 24px; max-height: none; background: white; overflow-y: auto;}
             .mm-content-header { font-size: 16px; margin-bottom: 20px; }
             .mm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; overflow-x: visible; padding-bottom: 0;}
@@ -379,13 +391,14 @@
             will-change: transform, opacity;
         }
 
-        /* Desktop Mode: Dialog */
+        /* Desktop Mode: Dialog - NOW STATIC SIZE */
         @media (min-width: 1024px) {
             #profileComponent {
-                width: 900px; max-height: 85vh;
+                width: 900px; height: 600px; /* Static Width and Height */
                 top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95);
                 border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
                 padding: 24px; opacity: 0; pointer-events: none;
+                overflow: hidden; /* Ensures scrollable content stays inside bounds */
             }
             #profileComponent.active {
                 transform: translate(-50%, -50%) scale(1);
@@ -670,8 +683,7 @@
             </div>
         </div>
 
-        <div class="section-header">
-        </div>
+
 
         <div id="skeletonContainer" class="skel-grid"></div>
         
@@ -942,6 +954,7 @@
                 </div>
             </div>
 
+            
 
         </div>
     </footer>
