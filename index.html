@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Oraco Dental Innovations - Responsive UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #f8f9fa;
+            --text-dark: #1a1a1a;
+            --text-muted: #666666;
+            --border-color: #e0e0e0;
+            --blue-accent: #0284c7; 
+            --blue-dark: #223f6a;
+            --blue-light: #eaf3f8;
+            --blue-hover: #0369a1;
+            --green-accent: #2e7d32;
+            --green-light: #e8f5e9;
+            --red-accent: #d32f2f;
+            --orange-accent: #f97316;
+            --card-radius: 5px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quantico', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background-color: #ffffff; display: block; margin: 0; color: var(--text-dark); overflow-x: hidden; }
+        body.no-scroll { overflow: hidden; }
+
+        .app-container {
+            width: 100%; max-width: 100%; background-color: #ffffff; min-height: 100vh;
+            position: relative; overflow-x: hidden; display: flex; flex-direction: column; contain: paint;
+        }
+
+        /* Scrollbar */
+        @media (max-width: 1023px) {
+            ::-webkit-scrollbar { display: none; }
+            * { -ms-overflow-style: none; scrollbar-width: none; }
+        }
+        @media (min-width: 1024px) {
+            ::-webkit-scrollbar { width: 8px; height: 8px; }
+            ::-webkit-scrollbar-track { background: #f8f9fa; }
+            ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        }
+
+        .view-section { display: none; flex-direction: column; padding-bottom: 90px; animation: fadeIn 0.3s ease-in-out; min-height: 100vh; background: var(--primary-bg); }
+        .view-section.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Styles */
+        .sticky-header-container { position: sticky; top: 0; z-index: 500; background: white; }
+        .header-master { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 10px; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .header-logo { display: none; align-items: center; gap: 6px; cursor: pointer; }
+        .header-logo i { color: var(--orange-accent); font-size: 28px; }
+        .header-logo-text .main { font-size: 20px; font-weight: 800; color: var(--blue-accent); }
+        .header-logo-text .sub { font-size: 9px; font-weight: 700; color: var(--orange-accent); letter-spacing: 1px; display: block; margin-top: -4px;}
+        
+        .search-container { flex: 1 1 100%; order: 3; display: flex; align-items: center; gap: 10px; }
+        .search-input-box { flex: 1; display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 8px 12px; background: white; }
+        .search-input-box input { flex: 1; border: none; outline: none; font-size: 14px; margin-left: 8px; width: 100%; }
+        
+        .header-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; order: 2; }
+        .auth-trigger { font-size: 14px; font-weight: 700; display:flex; gap:6px; align-items:center; cursor: pointer; color: var(--text-dark); background: #f1f5f9; padding: 6px 12px; border-radius: var(--card-radius); text-transform: uppercase;}
+        
+        .nav-pills { display: flex; gap: 10px; padding: 12px 10px; overflow-x: auto; background: white; white-space: nowrap; border-bottom: 1px solid var(--border-color); }
+        .pill { padding: 8px 16px; border: 1px solid var(--border-color); border-radius: var(--card-radius); font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase;}
+
+        @media (min-width: 1024px) {
+            .header-master { flex-wrap: nowrap; padding: 16px 10px; }
+            .header-logo { display: flex; order: 1; margin-right: 20px; }
+            .search-container { flex: 1; order: 3; margin: 0 10px; }
+            .header-actions { order: 4; }
+            .nav-pills { justify-content: center; }
+        }
+
+        /* Products Grid */
+        .section-header { padding: 16px 10px; }
+        .section-header h3 { font-size: 16px; font-weight: 800; border: 1px solid var(--border-color); padding: 12px; border-radius: var(--card-radius); background: white; text-transform: uppercase; display: flex; justify-content: space-between;}
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 10px; }
+        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+        .product-card { border: 1px solid var(--border-color); border-radius: var(--card-radius); background: white; padding: 10px; position: relative; cursor: pointer;}
+        .product-card img { width: 100%; height: 160px; object-fit: contain; }
+
+        /* PROFILE MODAL / BOTTOM SHEET SYSTEM */
+        #profileOverlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 2000; 
+            display: none; opacity: 0; transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        #profileComponent {
+            position: fixed; z-index: 2001; background: white;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+        }
+
+        /* Desktop Mode: Dialog */
+        @media (min-width: 1024px) {
+            #profileComponent {
+                width: 900px; height: auto; max-height: 85vh;
+                top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95);
+                border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                padding: 24px; opacity: 0; pointer-events: none;
+            }
+            #profileComponent.active {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1; pointer-events: auto;
+            }
+        }
+
+        /* Mobile Mode: Bottom Sheet */
+        @media (max-width: 1023px) {
+            #profileComponent {
+                width: 100%; bottom: 0; left: 0; height: 80vh;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+            }
+            #profileComponent.active { transform: translateY(0); }
+            
+            /* Drag Handle for mobile */
+            .drag-handle {
+                width: 40px; height: 4px; background: #ddd; border-radius: 2px;
+                margin: 12px auto; flex-shrink: 0;
+            }
+        }
+
+        .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 10px; }
+        .profile-header h2 { font-size: 18px; font-weight: 800; text-transform: uppercase; }
+        .close-profile { font-size: 24px; cursor: pointer; color: var(--text-muted); }
+
+        .profile-scroll-content { overflow-y: auto; flex: 1; padding: 0 10px 20px; }
+
+        /* Dashboard Grid 7 Columns (Desktop) */
+        .dash-grid { 
+            display: grid; gap: 12px; margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+        @media (min-width: 1200px) { .dash-grid { grid-template-columns: repeat(7, 1fr); } }
+
+        .dash-card { 
+            border: 1px solid var(--border-color); border-radius: 8px; 
+            padding: 16px; background: #fafafa; text-align: center;
+        }
+        .dash-card i { font-size: 24px; color: var(--blue-accent); margin-bottom: 10px; display: block;}
+        .dash-card span { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dark); }
+
+        .recent-orders { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 24px; }
+        .ro-head { background: #f1f5f9; padding: 12px; font-size: 13px; font-weight: 800; border-bottom: 1px solid var(--border-color); text-transform: uppercase;}
+        .order-row { display: flex; justify-content: space-between; padding: 16px; border-bottom: 1px solid #eee; font-size: 13px;}
+        .order-row:last-child { border-bottom: none; }
+
+        .signout-btn { 
+            width: 100%; padding: 16px; border: 1px solid var(--red-accent); 
+            color: var(--red-accent); background: white; font-weight: 800; 
+            border-radius: 8px; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .signout-btn:hover { background: var(--red-accent); color: white; }
+
+        /* Footer */
+        .footer-main { background: #fff; border-top: 1px solid var(--border-color); padding: 40px 20px; margin-top: auto;}
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .footer-col h4 { font-size: 14px; margin-bottom: 20px; text-transform: uppercase; }
+        .footer-col p, .footer-col li { font-size: 13px; color: var(--text-muted); list-style: none; margin-bottom: 10px; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div id="homeView" class="view-section active">
+        <div class="sticky-header-container">
+            <div class="header-master">
+                <div class="header-logo">
+                    <i class="fa-solid fa-tooth"></i>
+                    <div class="header-logo-text">
+                        <span class="main">ORACO DENTAL</span>
+                        <span class="sub">INNOVATIONS</span>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <div class="search-input-box">
+                        <i class="fa-solid fa-tooth" style="color: var(--blue-accent);"></i>
+                        <input type="text" id="mainSearchInput" placeholder="SEARCH PRODUCTS...">
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <div class="auth-trigger" onclick="handleAuthClick()">
+                        <i class="fa-regular fa-circle-user"></i> <span id="topBarAuthText">LOGIN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-pills">
+                <div class="pill active">CATEGORY</div>
+                <div class="pill">FREEBIES</div>
+                <div class="pill">OFFERS</div>
+                <div class="pill">CONTACT</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>TRENDING PRODUCTS <i class="fa-solid fa-bolt"></i></h3>
+        </div>
+
+        <div id="productGrid" class="product-grid">
+            </div>
+    </div>
+
+    <div id="profileOverlay" onclick="closeProfile()"></div>
+    <div id="profileComponent">
+        <div class="drag-handle"></div>
+        <div class="profile-header">
+            <h2>Profile Dashboard</h2>
+            <i class="fa-solid fa-xmark close-profile" onclick="closeProfile()"></i>
+        </div>
+        
+        <div class="profile-scroll-content">
+            <div class="dash-grid">
+                <div class="dash-card"><i class="fa-solid fa-id-card"></i><span>Account Info</span></div>
+                <div class="dash-card"><i class="fa-solid fa-box"></i><span>Orders</span></div>
+                <div class="dash-card"><i class="fa-solid fa-heart"></i><span>Wishlist</span></div>
+                <div class="dash-card"><i class="fa-solid fa-map-location-dot"></i><span>Addresses</span></div>
+                <div class="dash-card"><i class="fa-solid fa-credit-card"></i><span>Payments</span></div>
+                <div class="dash-card"><i class="fa-solid fa-coins"></i><span>Rewards</span></div>
+                <div class="dash-card"><i class="fa-solid fa-user-shield"></i><span>Security</span></div>
+            </div>
+
+            <div class="recent-orders">
+                <div class="ro-head"><i class="fa-solid fa-clock-rotate-left"></i> Recent Orders</div>
+                <div class="order-row">
+                    <div><strong>#ORD-9921</strong><br><small>23 June 2026</small></div>
+                    <div style="text-align:right; color:var(--green-accent);"><strong>Delivered</strong><br>₹4,500</div>
+                </div>
+                <div class="order-row">
+                    <div><strong>#ORD-8812</strong><br><small>10 June 2026</small></div>
+                    <div style="text-align:right; color:var(--orange-accent);"><strong>Processing</strong><br>₹1,200</div>
+                </div>
+            </div>
+
+            <button class="signout-btn" onclick="logoutUser()">Sign Out</button>
+        </div>
+    </div>
+
+    <footer class="footer-main">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>About Us</h4>
+                <p>Oraco Dental is the leading innovation hub for professional dental supplies in India. Serving 2 Lakh+ Dentists.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <ul>
+                    <li>Order Tracking</li>
+                    <li>Refund Policy</li>
+                    <li>Payment Methods</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p><i class="fa-solid fa-envelope"></i> support@oraco.com</p>
+                <p><i class="fa-solid fa-phone"></i> +91 728-999-456</p>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+    let currentUser = null;
+    const mockProducts = [
+        { id: 1, title: 'WOODPECKER RVG SENSOR SIZE 1.5', price: '55,000', img: 'https://placehold.co/400x400/eef2ff/0284c7?text=RVG' },
+        { id: 2, title: 'WALDENT RCT ECONOMY PACK', price: '360', img: 'https://placehold.co/400x400/eef2ff/0284c7?text=Files' },
+        { id: 3, title: 'LED LIGHT CURE UNIT', price: '1,990', img: 'https://placehold.co/400x400/eef2ff/0284c7?text=LED' },
+        { id: 4, title: 'PROSTHETIC DRIVER KIT', price: '3,490', img: 'https://placehold.co/400x400/eef2ff/0284c7?text=Kit' }
+    ];
+
+    function renderProducts() {
+        document.getElementById('productGrid').innerHTML = mockProducts.map(p => `
+            <div class="product-card">
+                <img src="${p.img}">
+                <div style="padding:10px 0;">
+                    <p style="font-size:12px; font-weight:800; height:34px; overflow:hidden;">${p.title}</p>
+                    <p style="color:var(--blue-accent); font-weight:800; margin-top:5px;">₹${p.price}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // AUTH & MODAL LOGIC
+    function handleAuthClick() {
+        if (!currentUser) {
+            // Simulated Login
+            currentUser = { name: "Dr. Demo" };
+            updateUI();
+            alert("Logged in as Dr. Demo");
+        } else {
+            openProfile();
+        }
+    }
+
+    function openProfile() {
+        document.getElementById('profileOverlay').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('profileOverlay').style.opacity = '1';
+            document.getElementById('profileComponent').classList.add('active');
+            document.body.classList.add('no-scroll');
+        }, 10);
+    }
+
+    function closeProfile() {
+        document.getElementById('profileComponent').classList.remove('active');
+        document.getElementById('profileOverlay').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('profileOverlay').style.display = 'none';
+            document.body.classList.remove('no-scroll');
+        }, 400);
+    }
+
+    function logoutUser() {
+        currentUser = null;
+        updateUI();
+        closeProfile();
+    }
+
+    function updateUI() {
+        document.getElementById('topBarAuthText').innerText = currentUser ? "MY PROFILE" : "LOGIN";
+    }
+
+    window.onload = () => {
+        renderProducts();
+    };
+</script>
+
+</body>
+</html>
