@@ -192,6 +192,7 @@
             position: relative;
             min-height: 220px;
             display: flex;
+            overflow: hidden; /* Ensures image stays contained */
         }
         @media (min-width: 768px) {
             .hero-slide { min-height: 350px; }
@@ -205,7 +206,7 @@
             object-fit: cover;
             z-index: 0;
             opacity: 0.65; /* Darkened slightly to make text pop */
-            transition: opacity 0.3s;
+            display: block; /* Fixes any inline spacing bugs */
         }
         
         .hero-content {
@@ -485,10 +486,21 @@
             gap: 24px; padding: 40px 24px; max-width: 1600px; margin: 0 auto;
         }
         
-        /* Hide Specific Footer Sections on Mobile/Tablet */
+/* Hide Specific Footer Sections & Adjust Top Bar on Mobile/Tablet */
         @media(max-width: 1023px) {
             .hide-on-mobile-tablet { display: none !important; }
             .fm-address-col { border-left: none !important; padding-left: 0 !important; border-top: none !important; padding-top: 0 !important;}
+            
+            /* Footer Top Bar Adjustments for Mobile */
+            .footer-top-bar { flex-direction: column; padding: 16px 10px; gap: 16px;}
+            .ftb-left { width: 100%; justify-content: center; }
+            
+            /* Put app buttons in a single row taking equal width */
+            .ftb-right { width: 100%; flex-direction: row; justify-content: center; gap: 10px; }
+            .app-btn { flex: 1; justify-content: center; padding: 8px 4px; gap: 6px; }
+            .app-btn i { font-size: 22px; }
+            .app-btn .texts { font-size: 8px; }
+            .app-btn .texts strong { font-size: 11px; }
         }
 
         .fm-col h4 { font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-dark); margin-bottom: 16px; letter-spacing: 0.5px;}
@@ -775,7 +787,7 @@
             
             <div class="footer-top-bar">
                 <div class="ftb-left">
-                    <span>STAY CONNECTED</span>
+                    <span class="hide-on-mobile-tablet">STAY CONNECTED</span>
                     <div class="social-icons">
                         <div class="social-icon si-fb"><i class="fa-brands fa-facebook-f"></i></div>
                         <div class="social-icon si-ig"><i class="fa-brands fa-instagram"></i></div>
@@ -783,10 +795,10 @@
                         <div class="social-icon si-yt"><i class="fa-brands fa-youtube"></i></div>
                         <div class="social-icon si-in"><i class="fa-brands fa-linkedin-in"></i></div>
                     </div>
-                    <span>240K+ <span style="font-weight:400; text-transform:none;">Followers</span></span>
+                    <span class="hide-on-mobile-tablet">240K+ <span style="font-weight:400; text-transform:none;">Followers</span></span>
                 </div>
                 <div class="ftb-right">
-                    <span><i class="fa-solid fa-mobile-screen-button"></i> EXPERIENCE THE MOBILE APP</span>
+                    <span class="hide-on-mobile-tablet"><i class="fa-solid fa-mobile-screen-button"></i> EXPERIENCE THE MOBILE APP</span>
                     <div class="app-btn">
                         <i class="fa-brands fa-google-play" style="color:#0f9d58;"></i>
                         <div class="texts"><span>GET IT ON</span><strong>GOOGLE PLAY</strong></div>
@@ -795,7 +807,7 @@
                         <i class="fa-brands fa-apple"></i>
                         <div class="texts"><span>DOWNLOAD ON THE</span><strong>APPLE STORE</strong></div>
                     </div>
-                    <span style="display:flex; align-items:center; gap:8px;">
+                    <span class="hide-on-mobile-tablet" style="display:flex; align-items:center; gap:8px;">
                         <img src="https://placehold.co/40x40/ccc/fff?text=U" style="border-radius:50%; width:30px; height:30px;">
                         <span style="font-weight:400; text-transform:none;">500K+ Users</span>
                     </span>
