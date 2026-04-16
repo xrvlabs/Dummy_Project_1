@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oraco Dental Innovations - Responsive UI</title>
+    <title>GridLabs - Oraco Dental Innovations</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -12,16 +12,15 @@
         :root {
             --primary-bg: #f8f9fa;
             --text-dark: #2b2b2b;
-            --text-muted: #757575; /* Matched to the 'DENTAL INNOVATION' text in logo */
+            --text-muted: #757575;
             --border-color: #e0e0e0;
-            --blue-accent: #68c6d9; /* Matched to the primary cyan logo color */
-            --blue-dark: #4daebf; /* Slightly darker shade of the logo color for contrast */
-            --blue-light: #eef9fb; /* Very light tint of the logo color for backgrounds */
-            --blue-hover: #55b6c9; /* Hover state for the cyan color */
+            --blue-accent: #68c6d9;
+            --blue-dark: #4daebf;
+            --blue-light: #eef9fb;
+            --blue-hover: #55b6c9;
             --green-accent: #2e7d32;
             --green-light: #e8f5e9;
             --red-accent: #d32f2f;
-            --orange-accent: #757575; /* Replaced orange with the logo's dark grey */
             --card-radius: 5px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -149,11 +148,10 @@
 
         @media (min-width: 1024px) { 
             .megamenu-overlay { display: block; }
-            /* Static Size for Category Sheet */
             .megamenu { 
                 position: fixed; top: 135px; left: 50%; right: auto; bottom: auto; 
                 transform: translateX(-50%); 
-                width: 1000px; height: 500px; /* Static Height and Width */
+                width: 1000px; height: 500px; 
                 border-radius: var(--card-radius); box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
                 border: 1px solid var(--border-color); 
                 z-index: 1001; opacity: 0; visibility: hidden; 
@@ -162,7 +160,6 @@
             } 
             .megamenu.active { opacity: 1; visibility: visible; animation: none; }
             .mm-body { flex-direction: row; flex: 1; overflow: hidden; }
-            /* Enabling scrolling internally */
             .mm-sidebar { width: 280px; flex-shrink: 0; flex: unset; border-right: 1px solid var(--border-color); border-bottom: none; display: flex; flex-direction: column; background: #fbfbfb; padding: 0; overflow-y: auto;}
             .mm-sidebar-title { display: block; padding: 16px 20px 8px; font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
             .mm-cat-list { display: block; padding: 0; overflow: visible; }
@@ -171,7 +168,6 @@
             .mm-cat-list li i.arrow { display: inline-block; margin-left: auto; font-size: 10px; color: var(--text-muted); }
             .mm-cat-list li.active { background: var(--blue-light); color: var(--blue-accent); border-left-color: var(--blue-accent); }
             .mm-cat-list li.active i.icon { color: var(--blue-accent); }
-            /* Enabling scrolling internally */
             .mm-content { flex: 1; padding: 24px; max-height: none; background: white; overflow-y: auto;}
             .mm-content-header { font-size: 16px; margin-bottom: 20px; }
             .mm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; overflow-x: visible; padding-bottom: 0;}
@@ -180,57 +176,55 @@
             .subcat-title { font-size: 12px; padding: 12px 8px; }
         }
 
-        /* Scrollable Banner Area */
-        .hero-slider {
+        /* NEW FULL-WIDTH WRAPPER FOR SLIDER */
+        .hero-wrapper-full {
+            width: 100%;
+            background-color: #f0f2f5; /* Subtle background color bleeding to edges */
+            display: flex;
+            justify-content: center;
+            padding: 16px 10px; /* Provides top/bottom breathing room and mobile side padding */
+        }
+        @media (min-width: 768px) {
+            .hero-wrapper-full { padding: 24px 10px; }
+        }
+
+        /* UPDATED CONTAINED SLIDER */
+        .hero-slider.contained {
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            margin: 16px 10px;
+            margin: 0; /* Reset margin since padding is on the wrapper now */
+            width: 100%;
+            max-width: 1400px; /* Constrains the image from becoming too wide */
             border-radius: var(--card-radius);
-            background: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Adds depth */
+            background: #000; /* Dark background behind image just in case */
         }
-        .hero-slider::-webkit-scrollbar {
+        .hero-slider.contained::-webkit-scrollbar {
             display: none;
-        }
-        @media (min-width: 768px) {
-            .hero-slider { margin: 20px 10px; }
         }
         
         .hero-slide {
             flex: 0 0 100%;
             scroll-snap-align: start;
-            position: relative;
-            min-height: 220px;
             display: flex;
-            overflow: hidden; 
-        }
-        @media (min-width: 768px) {
-            .hero-slide { min-height: 350px; }
+            position: relative;
         }
         
+        /* Image scales naturally, keeping baked-in text readable */
         .hero-slide img {
-            position: absolute;
-            top: 0; left: 0;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-            opacity: 0.65; 
-            display: block; 
+            height: auto;
+            object-fit: contain; /* Ensures the whole banner is visible */
+            display: block;
         }
-        
+
+        /* Retained old hero-content CSS just in case needed for other banners, though unused in current HTML */
         .hero-content {
-            position: relative;
-            z-index: 1;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 100%);
-            color: white;
+            position: absolute; z-index: 1; padding: 24px; display: flex; flex-direction: column; justify-content: center; width: 100%; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 100%); color: white;
         }
         .hero-content .hero-brand { font-size: clamp(12px, 2vw, 18px); font-weight: 800; margin-bottom: 4px; text-transform: uppercase; color: var(--blue-accent); letter-spacing: 1px;}
         .hero-content h2 { font-size: clamp(22px, 5vw, 42px); margin-bottom: 8px; line-height: 1.1; font-weight: 800; text-transform: uppercase;}
@@ -662,27 +656,13 @@
             </div>
         </div>
 
-        <div class="hero-slider">
-            <div class="hero-slide">
-                <img src="banner_1.jpg" alt="Banner 1">
-                <div class="hero-content">
-                    <p class="hero-brand">ORACO DENTAL INNOVATION</p>
-                    <h2>EMPOWERING<br>DENTISTRY<br>WORLDWIDE</h2>
-                    <p class="hero-desc">PREMIUM EQUIPMENTS & SUPPLIES.</p>
-                    <div class="hero-btn">EXPLORE NOW</div>
-                </div>
-            </div>
-            <div class="hero-slide">
-                <img src="banner_2.jpg" alt="Banner 2">
-                <div class="hero-content">
-                    <p class="hero-brand">ORACO DENTAL INNOVATION</p>
-                    <h2>QUALITY &<br>PRECISION<br>GUARANTEED</h2>
-                    <p class="hero-desc">TRUSTED BY 2 LAKH+ INDIAN DENTISTS.</p>
-                    <div class="hero-btn">SHOP NOW</div>
+        <div class="hero-wrapper-full">
+            <div class="hero-slider contained">
+                <div class="hero-slide">
+                    <img src="banner_1.png" alt="Waldent ShadePro Digital Shade Determination Device">
                 </div>
             </div>
         </div>
-
 
 
         <div id="skeletonContainer" class="skel-grid"></div>
@@ -949,7 +929,7 @@
                     </div>
                     <div class="copyright-text">
                         2024-2026, ORACO DENTAL INNOVATION PVT. LTD.<br>
-                        CRAFTED WITH <i class="fa-solid fa-heart" style="color:var(--red-accent);"></i> IN INDIA BY XRV LABS PROD.
+                        CRAFTED WITH <i class="fa-solid fa-heart" style="color:var(--red-accent);"></i> IN INDIA BY GRIDLABS PROD.
                     </div>
                 </div>
             </div>
