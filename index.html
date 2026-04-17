@@ -227,7 +227,6 @@
            CLEAN, ALIGNED & UNIFORM PRODUCT DETAIL UI 
            ------------------------------------------- */
         
-        /* Removed max-width to allow fluid layout mimicking the home page grid margins */
         .pd-wrapper { 
             display: flex; flex-direction: column; 
             gap: 10px; 
@@ -243,7 +242,6 @@
         .pd-back-btn:hover { color: var(--blue-accent); }
 
         .pd-grid-layout { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; width: 100%; }
-        /* YAHAN DESKTOP VIEW KE LIYE GAP 24px SE 10px KIYA GAYA HAI */
         @media (min-width: 1024px) { .pd-grid-layout { grid-template-columns: 480px 1fr; gap: 10px; } }
 
         /* Left Column (Image Area) */
@@ -263,19 +261,18 @@
             position: absolute;
             border: 1px solid rgba(51, 102, 136, 0.8);
             background: rgba(104, 198, 217, 0.3);
-            width: 250px; 
-            height: 250px; 
+            width: 250px; height: 250px; 
             display: none;
             pointer-events: none;
             z-index: 10;
         }
         
         .zoom-result {
-            position: absolute; /* Keeps it attached to the image box */
-            top: 0; /* Aligns to the top corner */
-            left: calc(100% + 10px); /* Positions it just to the right of the image, at the left edge of the content column */
-            width: 500px; /* Restored smaller width */
-            height: 500px; /* Restored smaller height */
+            position: absolute; 
+            top: 0; 
+            left: calc(100% + 10px); 
+            width: 500px; 
+            height: 500px; 
             background-color: white;
             background-repeat: no-repeat;
             display: none;
@@ -295,7 +292,7 @@
             z-index: 900;
             display: none;
             border-radius: var(--card-radius);
-            pointer-events: none; /* So mouse doesn't interact with it */
+            pointer-events: none; 
         }
         
         @media (max-width: 1023px) {
@@ -334,21 +331,73 @@
         .pd-pincode-check-btn:hover { background: var(--blue-accent); }
         .pd-pincode-result { margin-top: 10px; font-size: 12px; }
 
-        /* Cleaned Variant Cards - Now using Grid for Desktop 2-column layout */
+        /* Cleaned Variant Cards - Grid layout & Hover Preview */
         .pd-variants-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
         @media (min-width: 1024px) {
             .pd-variants-area { grid-template-columns: repeat(2, 1fr); }
             .pd-variant-card:only-child { grid-column: span 2; }
         }
         
-        .pd-variant-card { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 16px; display: flex; flex-direction: column; gap: 16px; transition: box-shadow 0.2s; width: 100%; box-sizing: border-box;}
-        .pd-variant-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #cbd5e1; }
+        .pd-variant-card { position: relative; z-index: 1; background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 16px; display: flex; flex-direction: column; gap: 16px; transition: box-shadow 0.2s; width: 100%; box-sizing: border-box;}
+        .pd-variant-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #cbd5e1; z-index: 50; }
         
-        /* Top portion of variant card */
         .pd-vc-top { display: flex; gap: 16px; align-items: flex-start; width: 100%; }
-        .pd-vc-img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 4px; border: 1px solid #e2e8f0; flex-shrink: 0;}
+        
+        /* Image Wrapper for Hover Trigger */
+        .pd-vc-img-wrapper { position: relative; flex-shrink: 0; cursor: pointer; }
+        .pd-vc-img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 4px; border: 1px solid #e2e8f0; }
         @media (min-width: 768px) { .pd-vc-img { width: 100px; height: 100px; } }
         
+        /* VARIANT HOVER PREVIEW POPUP */
+        .variant-preview-popup {
+            position: absolute;
+            top: -40px;
+            left: 90px;
+            width: 240px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            pointer-events: none;
+            animation: fadeInScale 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        /* Reverses position for items in the right column on Desktop */
+        .pd-variant-card:nth-child(even) .variant-preview-popup {
+            left: auto;
+            right: 90px;
+            transform-origin: right center;
+        }
+        
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .variant-preview-popup img {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .vp-title { font-size: 13px; font-weight: 800; color: var(--text-dark); line-height: 1.4; word-wrap: break-word; }
+        .vp-price { font-size: 16px; font-weight: 800; color: var(--text-dark); display: flex; align-items: baseline; gap: 6px;}
+        .vp-mrp { font-size: 12px; color: var(--text-muted); text-decoration: line-through; font-weight: 400; }
+        
+        @media (min-width: 1024px) {
+            .pd-vc-img-wrapper:hover .variant-preview-popup { display: flex; }
+        }
+        @media (max-width: 1023px) {
+            .variant-preview-popup { display: none !important; }
+        }
+        /* ------------------------------- */
+
         .pd-vc-details { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
         .pd-vc-title { font-size: 14px; font-weight: 800; color: var(--text-dark); line-height: 1.4; word-wrap: break-word;}
         @media (min-width: 768px) { .pd-vc-title { font-size: 16px; } }
@@ -853,7 +902,14 @@
                         
                         <div class="pd-variant-card">
                             <div class="pd-vc-top">
-                                <img src="pro_1.jpg" class="pd-vc-img" alt="Grey Resin">
+                                <div class="pd-vc-img-wrapper">
+                                    <img src="pro_1.jpg" class="pd-vc-img" alt="Grey Resin">
+                                    <div class="variant-preview-popup">
+                                        <img src="pro_1.jpg" alt="Grey Resin">
+                                        <div class="vp-title">Labodent DentWERK HD Model Resin - Grey 1Kg</div>
+                                        <div class="vp-price">₹1,499 <span class="vp-mrp">₹6,500</span></div>
+                                    </div>
+                                </div>
                                 <div class="pd-vc-details">
                                     <div class="pd-vc-title">Labodent DentWERK HD Model Resin - Grey 1Kg</div>
                                     <div class="pd-vc-delivery">
@@ -873,7 +929,14 @@
 
                         <div class="pd-variant-card">
                             <div class="pd-vc-top">
-                                <img src="pro_2.jpg" class="pd-vc-img" alt="Almond Resin">
+                                <div class="pd-vc-img-wrapper">
+                                    <img src="pro_2.jpg" class="pd-vc-img" alt="Almond Resin">
+                                    <div class="variant-preview-popup">
+                                        <img src="pro_2.jpg" alt="Almond Resin">
+                                        <div class="vp-title">Labodent DentWERK HD Model Resin - Almond 1Kg</div>
+                                        <div class="vp-price">₹1,499 <span class="vp-mrp">₹6,500</span></div>
+                                    </div>
+                                </div>
                                 <div class="pd-vc-details">
                                     <div class="pd-vc-title">Labodent DentWERK HD Model Resin - Almond 1Kg</div>
                                     <div class="pd-vc-delivery">
