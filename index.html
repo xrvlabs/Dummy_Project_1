@@ -450,6 +450,12 @@
         }
         .pd-vc-add-btn:hover { background: #1a4d6a; }
 
+        /* Clean Column Layout for Variants & Details (Bonus Fix) */
+        .pd-masonry-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 0;}
+        @media (min-width: 1024px) { 
+            .pd-masonry-grid { flex-direction: row; align-items: flex-start; } 
+            .pd-masonry-col { flex: 1; display: flex; flex-direction: column; gap: 10px; width: 50%; min-width: 0; }
+        }
 
         /* -------------------------------------------
            NEW LAYOUT COMPONENTS (DISCOUNT, REVIEWS, BENEFITS)
@@ -464,10 +470,6 @@
         .pd-discount-table th { padding: 10px; font-weight: 800; color: var(--text-dark); border-bottom: 1px solid #eee; background: #f8fafc;}
         .pd-discount-table td { padding: 12px 10px; text-align: center; color: var(--text-dark); border-bottom: 1px solid #eee; font-weight: 700; }
         .pd-discount-table tr:last-child td { border-bottom: none; }
-
-        /* EXTRA INFO AREA (REVIEWS + BENEFITS) */
-        .pd-extra-info-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-top: 0;}
-        @media (min-width: 1024px) { .pd-extra-info-area { grid-template-columns: repeat(2, 1fr); } }
 
         /* REVIEWS SLIDER STYLES */
         .pd-review-slider-card {
@@ -883,7 +885,9 @@
         
         .event-card { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); cursor: pointer;}
         .event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        
         .event-img-wrap { position: relative; width: 100%; height: 180px; background: #f1f5f9; }
+        
         /* SMOOTH IMAGE CROSS-FADE EFFECT */
         @keyframes imageFade {
             from { opacity: 0; }
@@ -897,6 +901,7 @@
             opacity: 0; /* Starts hidden */
             animation: imageFade 0.8s ease-in-out forwards; /* Smooth fade in */
         }
+        
         .event-badge { position: absolute; top: 10px; right: 10px; background: var(--green-accent); color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
         .event-content { padding: 16px; display: flex; flex-direction: column; flex: 1; }
         .event-title { font-size: 15px; font-weight: 800; color: var(--text-dark); line-height: 1.4; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
@@ -1070,10 +1075,8 @@
                         <div id="pdPincodeResult" class="pd-pincode-result"></div>
                     </div>
 
-                    <div class="pd-variants-area" id="pd-variants-container">
+                    <div class="pd-masonry-grid" id="pd-masonry-container">
                         </div>
-                    
-                    <div class="pd-extra-info-area" id="pd-extra-info-container"></div>
 
                     <div class="pd-tabs-container">
                         <div class="pd-tabs-header">
@@ -1871,14 +1874,24 @@
         
         // Handle Header & Footer Visibility dynamically based on View
         const header = document.getElementById('globalHeader');
+        const headerMaster = document.querySelector('.header-master'); 
         const footer = document.getElementById('globalFooter');
         
-        if (targetViewId === 'homeView' || targetViewId === 'eventsView' || targetViewId === 'contactView') {
+        if (targetViewId === 'homeView' || targetViewId === 'eventsView' || targetViewId === 'contactView' || targetViewId === 'offersView') {
             header.style.display = 'block';
             footer.style.display = 'block';
+            
+            // SPECIFIC PAGES PAR SEARCH/LOGO AREA HIDE KARO
+            if (targetViewId === 'eventsView' || targetViewId === 'contactView' || targetViewId === 'offersView') {
+                headerMaster.style.display = 'none';
+            } else {
+                headerMaster.style.display = 'flex';
+            }
+            
         } else if (targetViewId === 'productView') {
             header.style.display = 'block';
-            footer.style.display = 'none'; // REMOVE FOOTER ON PRODUCT PAGE
+            headerMaster.style.display = 'flex';
+            footer.style.display = 'none'; 
         } else {
             header.style.display = 'none';
             footer.style.display = 'none';
@@ -2201,15 +2214,14 @@
             deliveryHtml = `<span class="dynamic-delivery-date" style="color: var(--text-dark); display: inline-block;"><i class="fa-solid fa-truck"></i> Arrives By ${dateStr}</span>`;
         }
 
-        // Dynamically Render Variants
-        const variantsContainer = document.getElementById('pd-variants-container');
-        const extraInfoContainer = document.getElementById('pd-extra-info-container');
+        // Dynamically Render Variants in a masonry style grid
+        const masonryContainer = document.getElementById('pd-masonry-container');
         
-        let variantsHTML = '';
-        let extraInfoHTML = '';
+        let leftColHTML = `<div class="pd-masonry-col">`;
+        let rightColHTML = `<div class="pd-masonry-col">`;
         
         currentSelectedProduct.variants.forEach((variant) => {
-            variantsHTML += `
+            leftColHTML += `
                 <div class="pd-variant-card">
                     <div class="pd-vc-top">
                         <div class="pd-vc-img-wrapper">
@@ -2246,9 +2258,9 @@
             `;
         });
 
-        // IF ONLY ONE VARIANT, SHOW DISCOUNT TABLE NEXT TO IT, AND REVIEWS + BENEFITS BELOW
+        // IF ONLY ONE VARIANT, DISTRIBUTE WIDGETS PROPERLY TO ELIMINATE EMPTY GAPS
         if(currentSelectedProduct.variants.length === 1) {
-            variantsHTML += `
+            rightColHTML += `
                 <div class="pd-discount-card">
                     <table class="pd-discount-table">
                         <thead>
@@ -2262,7 +2274,7 @@
                 </div>
             `;
             
-            extraInfoHTML = `
+            leftColHTML += `
                 <div class="pd-review-slider-card">
                     <div class="pd-rs-header">
                         <span>Customer Reviews</span>
@@ -2292,6 +2304,9 @@
                         `).join('')}
                     </div>
                 </div>
+            `;
+
+            rightColHTML += `
                 <div class="pd-benefits-card">
                     <div class="pd-benefits-header">ORACO BENEFITS</div>
                     <div class="pd-benefits-grid">
@@ -2316,8 +2331,10 @@
             `;
         }
 
-        variantsContainer.innerHTML = variantsHTML;
-        extraInfoContainer.innerHTML = extraInfoHTML;
+        leftColHTML += `</div>`;
+        rightColHTML += `</div>`;
+
+        masonryContainer.innerHTML = leftColHTML + rightColHTML;
 
         // Refresh pincode result if already checked
         const pinInput = document.getElementById('pdPincodeInput').value;
