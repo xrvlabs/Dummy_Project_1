@@ -209,7 +209,7 @@
         .coin-reward { font-size: 11px; color: #d97706; display: flex; align-items: center; gap: 4px; margin-top: 6px; font-weight: 700; text-transform: uppercase;}
         .coin-icon { background: #fef3c7; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #d97706; font-weight: 700;}
 
-        /* -------------------------------------------
+       /* -------------------------------------------
            CLEAN, ALIGNED & UNIFORM PRODUCT DETAIL UI 
            ------------------------------------------- */
         
@@ -229,7 +229,8 @@
         .pd-back-btn:hover { color: var(--blue-accent); }
 
         .pd-grid-layout { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; width: 100%; }
-        @media (min-width: 1024px) { .pd-grid-layout { grid-template-columns: 480px 1fr; gap: 24px; } }
+        /* YAHAN DESKTOP VIEW KE LIYE GAP 24px SE 10px KIYA GAYA HAI */
+        @media (min-width: 1024px) { .pd-grid-layout { grid-template-columns: 480px 1fr; gap: 10px; } }
 
         /* Left Column (Image Area) */
         .pd-image-col { display: flex; flex-direction: column; gap: 10px; width: 100%; }
