@@ -481,7 +481,6 @@
         .floating-actions { position: fixed; bottom: 20px; right: 0; z-index: 100; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
         .talk-agent-btn { background: #336688; color: white; padding: 12px 8px; font-size: 13px; font-weight: 700; writing-mode: vertical-rl; text-orientation: mixed; border-radius: var(--card-radius) 0 0 var(--card-radius); cursor: pointer; box-shadow: -4px 0 10px rgba(0,0,0,0.1); letter-spacing: 1px;}
 
-
         /* Auth View */
         .auth-view-layout { display: flex; flex-direction: column; min-height: 100vh; position: relative; }
         @media (min-width: 1024px) {
@@ -768,6 +767,43 @@
         .loc-submit-btn { background: #336688; color: white; border: none; border-radius: var(--card-radius); font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s; padding: 0 20px; height: 44px; text-transform: uppercase; }
         .loc-submit-btn:hover { background: #1a4d6a; }
 
+        /* =========================================
+           EVENTS VIEW STYLES
+           ========================================= */
+        #eventsView { background: var(--primary-bg); width: 100%; box-sizing: border-box; }
+        .events-wrapper { display: flex; flex-direction: column; width: 100%; padding: 16px 10px 32px; box-sizing: border-box; gap: 16px; }
+
+        .events-page-title { text-align: center; font-size: 20px; font-weight: 800; color: var(--text-dark); text-transform: uppercase; margin-bottom: 10px; }
+
+        .events-tabs { display: flex; justify-content: center; border-bottom: 1px solid var(--border-color); background: white; border-radius: var(--card-radius); overflow: hidden; margin-bottom: 10px;}
+        .events-tab { flex: 1; max-width: 200px; text-align: center; padding: 14px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: var(--transition); text-transform: uppercase;}
+        .events-tab.active { color: var(--blue-accent); border-bottom-color: var(--blue-accent); background: var(--blue-light); }
+
+        .events-filters { display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 768px) { .events-filters { flex-direction: row; align-items: center; justify-content: space-between; } }
+
+        .event-search-box { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; background: white; height: 42px; flex: 1; min-width: 250px;}
+        .event-search-box input { border: none; outline: none; font-size: 13px; font-family: 'Quantico', sans-serif; width: 100%; margin-left: 8px;}
+
+        .event-dropdowns { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+        .event-dropdowns::-webkit-scrollbar { display: none; }
+        .event-select { border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; height: 42px; font-size: 13px; font-family: 'Quantico', sans-serif; background: white; color: var(--text-dark); outline: none; min-width: 130px; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;}
+
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; margin-top: 10px;}
+        
+        .event-card { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); cursor: pointer;}
+        .event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .event-img-wrap { position: relative; width: 100%; height: 180px; background: #f1f5f9; }
+        .event-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .event-badge { position: absolute; top: 10px; right: 10px; background: var(--green-accent); color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .event-content { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+        .event-title { font-size: 15px; font-weight: 800; color: var(--text-dark); line-height: 1.4; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
+        .event-date { font-size: 12px; color: var(--text-dark); font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+        .event-date i { color: var(--text-muted); font-size: 14px;}
+        .event-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+        .event-tag { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 4px; background: var(--green-light); color: var(--green-accent); text-transform: uppercase; }
+        .event-tag.cat { background: var(--blue-light); color: var(--blue-dark); }
+
     </style>
 </head>
 <body>
@@ -817,7 +853,7 @@
             <div class="pill" onclick="toggleMegamenu(event)" id="catDropdownBtn"><i class="fa-solid fa-border-all" style="font-size: 12px;"></i> CATEGORY</div>
             <div class="pill">FREEBIES</div>
             <div class="pill">OFFERS</div>
-            <div class="pill">EVENTS</div>
+            <div class="pill" onclick="switchView('eventsView')">EVENTS</div>
             <div class="pill">CONTACT US</div>
         </div>
 
@@ -853,7 +889,6 @@
         <div id="skeletonContainer" class="skel-grid"></div>
         <div id="productGrid" class="product-grid" style="display: none;"></div>
     </div>
-
 
     <div id="productView" class="view-section">
         
@@ -997,6 +1032,42 @@
         </div>
 
     </div>
+
+    <div id="eventsView" class="view-section">
+        <div class="events-wrapper">
+            <div class="events-page-title">Oraco Events</div>
+
+            <div class="events-tabs">
+                <div class="events-tab active" id="tabLiveEvents" onclick="switchEventTab('live', this)">Live Events (6)</div>
+                <div class="events-tab" id="tabPastEvents" onclick="switchEventTab('past', this)">Past Events (4)</div>
+            </div>
+
+            <div class="events-filters">
+                <div class="event-search-box">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                    <input type="text" id="eventSearchInput" placeholder="SEARCH EVENTS..." oninput="filterEvents()">
+                </div>
+                <div class="event-dropdowns">
+                    <select class="event-select" id="eventCatFilter" onchange="filterEvents()">
+                        <option value="ALL">ALL CATEGORIES</option>
+                        <option value="HEALTH & MEDICINE">HEALTH & MEDICINE</option>
+                        <option value="EDUCATION">EDUCATION</option>
+                    </select>
+                    <select class="event-select" id="eventTypeFilter" onchange="filterEvents()">
+                        <option value="ALL">ALL EVENT TYPES</option>
+                        <option value="VIRTUAL">VIRTUAL</option>
+                        <option value="IN-PERSON">IN-PERSON</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="events-grid" id="eventsSkeletonContainer" style="display: none;"></div>
+            
+            <div class="events-grid" id="eventsGridContent" style="display: none;">
+                </div>
+        </div>
+    </div>
+
 
     <div class="floating-actions">
         <div class="talk-agent-btn">Talk to Agent</div>
@@ -1383,7 +1454,6 @@
         let pdInput = document.getElementById('pdPincodeInput');
         if(pdInput) {
             pdInput.value = pincode;
-            // Trigger delivery info update silently
             let dateStr = getExpectedDeliveryDate(pincode);
             document.getElementById('pdPincodeResult').innerHTML = `<span style="color: var(--green-accent); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Delivery by ${dateStr} to ${pincode}</span>`;
             document.querySelectorAll('.dynamic-delivery-date').forEach(span => {
@@ -1459,7 +1529,6 @@
         btn.innerText = "SUBMIT";
     }
 
-
     // --- Pincode Logic for Product View ---
     function getExpectedDeliveryDate(pincode) {
         const transitDatabase = {
@@ -1498,17 +1567,14 @@
                 updateGlobalLocationUI(input, city, state);
             }
         } catch(e) {
-            // Silently fallback on API error and just update UI
             document.getElementById('globalLocLabel').innerHTML = `Delivering to <span style="color: #f97316;">${input}</span>`;
         }
 
         checkBtn.innerText = "CHECK";
         const dateStr = getExpectedDeliveryDate(input);
         
-        // Show success message
         resultBox.innerHTML = `<span style="color: var(--green-accent); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Delivery by ${dateStr} to ${input}</span>`;
         
-        // Update dynamic delivery spans in variants
         const deliverySpans = document.querySelectorAll('.dynamic-delivery-date');
         deliverySpans.forEach(span => {
             span.innerHTML = `<i class="fa-solid fa-truck"></i> Arrives By ${dateStr}`;
@@ -1516,7 +1582,6 @@
         });
     }
 
-    // --- Dynamic Tab Heights (Only Collapse if > ~4 lines) ---
     function evaluateTabHeights() {
         document.querySelectorAll('.pd-tab-content').forEach(tc => {
             let isDisplayNone = (tc.style.display === 'none');
@@ -1568,17 +1633,37 @@
         { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', img: 'pro_2.jpg', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false }
     ];
 
+    // --- EVENTS DATA ---
+    const mockLiveEvents = [
+        { id: 1, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Post+%26+Core+Restorations', title: 'Post & Core Restorations - From Fragile to Functional', date: 'Wed May 06, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+        { id: 2, img: 'https://placehold.co/600x400/0f172a/ffffff?text=PFM+Crown+Preparation', title: 'PFM Crown Preparation for Molar (Beginners Course)', date: 'Thu May 14, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+        { id: 3, img: 'https://placehold.co/600x400/312e81/ffffff?text=Zirconia+Tooth+Prep', title: 'Tooth Preparation Course for Zirconia - Anterior Teeth', date: 'Sat May 23, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Education' },
+        { id: 4, img: 'https://placehold.co/600x400/9d174d/ffffff?text=Pediatric+Dentistry', title: 'Making Pediatric Dentistry Easy', date: 'Tue Jun 02, 2026 - 09:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+        { id: 5, img: 'https://placehold.co/600x400/064e3b/ffffff?text=Dental+Photography', title: 'Dental Photography Delhi', date: 'Fri Jun 12, 2026 - 09:30 AM (IST)', type: 'In-Person', cat: 'Education' },
+        { id: 6, img: 'https://placehold.co/600x400/7f1d1d/ffffff?text=Pediatric+Dentistry+Guwahati', title: 'Making Pediatric Dentistry Easy - Guwahati', date: 'Sun Jun 28, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' }
+    ];
+
+    const mockPastEvents = [
+        { id: 101, img: 'https://placehold.co/600x400/475569/ffffff?text=Endodontics+Masterclass', title: 'Endodontics Masterclass - Single Visit RCT', date: 'Mon Mar 16, 2026 - 10:00 AM (IST)', type: 'In-Person', cat: 'Education' },
+        { id: 102, img: 'https://placehold.co/600x400/334155/ffffff?text=Laser+Dentistry', title: 'Basics of Laser Dentistry', date: 'Thu Feb 26, 2026 - 02:00 PM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+        { id: 103, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Clear+Aligners+Workshop', title: 'Clear Aligners Certification Workshop', date: 'Sat Jan 10, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' },
+        { id: 104, img: 'https://placehold.co/600x400/0f172a/ffffff?text=Digital+Smile+Design', title: 'Digital Smile Design (DSD) Protocol', date: 'Wed Dec 10, 2025 - 04:00 PM (IST)', type: 'Virtual', cat: 'Education' }
+    ];
+
     // --- State ---
     let currentUser = null; 
     let cart = [];
     let orderHistory = [];
     let currentSelectedProduct = null;
+    let eventTimeout;
+    let currentEventTab = 'live'; // Tracking state for filtering
 
     const views = {
         homeView: document.getElementById('homeView'),
         productView: document.getElementById('productView'),
         authView: document.getElementById('authView'),
-        cartView: document.getElementById('cartView')
+        cartView: document.getElementById('cartView'),
+        eventsView: document.getElementById('eventsView')
     };
 
     // --- View Management ---
@@ -1596,7 +1681,7 @@
         const header = document.getElementById('globalHeader');
         const footer = document.getElementById('globalFooter');
         
-        if (targetViewId === 'homeView') {
+        if (targetViewId === 'homeView' || targetViewId === 'eventsView') {
             header.style.display = 'block';
             footer.style.display = 'block';
         } else if (targetViewId === 'productView') {
@@ -1609,7 +1694,91 @@
 
         window.scrollTo(0, 0);
 
-        if(targetViewId === 'cartView') renderCart();
+        if(targetViewId === 'cartView') {
+            renderCart();
+        }
+        
+        if(targetViewId === 'eventsView') {
+            // Reset filters when entering Events View
+            document.getElementById('eventSearchInput').value = '';
+            document.getElementById('eventCatFilter').value = 'ALL';
+            document.getElementById('eventTypeFilter').value = 'ALL';
+            
+            const liveTab = document.getElementById('tabLiveEvents');
+            if(liveTab) switchEventTab('live', liveTab);
+        }
+    }
+
+    // --- Events Tab Control & Shimmer & Filters ---
+    function switchEventTab(type, element) {
+        document.querySelectorAll('.events-tab').forEach(t => t.classList.remove('active'));
+        element.classList.add('active');
+        currentEventTab = type;
+
+        clearTimeout(eventTimeout);
+        const skel = document.getElementById('eventsSkeletonContainer');
+        const grid = document.getElementById('eventsGridContent');
+        
+        if(skel && grid) {
+            grid.style.display = 'none';
+            skel.style.display = 'grid';
+            
+            eventTimeout = setTimeout(() => {
+                skel.style.display = 'none';
+                grid.style.display = 'grid';
+                filterEvents(); // Uses active filters to render current tab
+            }, 1000); // 1 second shimmer delay on tab switch
+        }
+    }
+
+    function filterEvents() {
+        const searchText = (document.getElementById('eventSearchInput').value || '').toLowerCase();
+        const catFilter = document.getElementById('eventCatFilter').value;
+        const typeFilter = document.getElementById('eventTypeFilter').value;
+
+        const sourceData = currentEventTab === 'live' ? mockLiveEvents : mockPastEvents;
+
+        const filteredData = sourceData.filter(ev => {
+            const matchesSearch = ev.title.toLowerCase().includes(searchText) || ev.date.toLowerCase().includes(searchText);
+            const matchesCat = catFilter === 'ALL' || ev.cat.toUpperCase() === catFilter;
+            const matchesType = typeFilter === 'ALL' || ev.type.toUpperCase() === typeFilter;
+            
+            return matchesSearch && matchesCat && matchesType;
+        });
+
+        renderEventsData(filteredData, currentEventTab);
+    }
+
+    function renderEventsData(data, type) {
+        let html = '';
+        const badgeText = type === 'live' ? 'RUNNING' : 'COMPLETED';
+        const badgeBg = type === 'live' ? 'var(--green-accent)' : 'var(--text-muted)';
+
+        if(data.length === 0) {
+            html = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-weight: 700;">NO EVENTS FOUND MATCHING YOUR CRITERIA</div>`;
+        } else {
+            data.forEach(ev => {
+                html += `
+                    <div class="event-card">
+                        <div class="event-img-wrap">
+                            <span class="event-badge" style="background: ${badgeBg};">${badgeText}</span>
+                            <img src="${ev.img}" alt="${ev.title}">
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">${ev.title}</div>
+                            <div class="event-date"><i class="fa-regular fa-calendar"></i> ${ev.date}</div>
+                            <div class="event-tags">
+                                <span class="event-tag">${ev.type}</span>
+                                <span class="event-tag cat">${ev.cat}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        const grid = document.getElementById('eventsGridContent');
+        if(grid) grid.innerHTML = html;
     }
 
     // --- Search Animation ---
@@ -1694,7 +1863,7 @@
         document.body.classList.remove('no-scroll'); 
     }
 
-    // --- Products & Shimmers ---
+    // --- Products & Skeletons ---
     function renderSkeletons() {
         let skelHTML = '';
         for(let i=0; i<4; i++) {
@@ -1729,9 +1898,32 @@
         document.getElementById('productGrid').innerHTML = prodHTML;
     }
 
+    function renderEventSkeletons() {
+        let skelHTML = '';
+        for(let i = 0; i < 6; i++) {
+            skelHTML += `
+                <div class="event-card" style="box-shadow: none; pointer-events: none;">
+                    <div class="skeleton event-img-wrap" style="border-radius: 0;"></div>
+                    <div class="event-content">
+                        <div class="skeleton" style="height: 16px; width: 85%; margin-bottom: 8px; border-radius: 4px;"></div>
+                        <div class="skeleton" style="height: 16px; width: 60%; margin-bottom: 16px; border-radius: 4px;"></div>
+                        <div class="skeleton" style="height: 12px; width: 40%; margin-bottom: 16px; border-radius: 4px;"></div>
+                        <div class="event-tags">
+                            <div class="skeleton" style="height: 20px; width: 50px; border-radius: 4px;"></div>
+                            <div class="skeleton" style="height: 20px; width: 80px; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        const skelContainer = document.getElementById('eventsSkeletonContainer');
+        if(skelContainer) skelContainer.innerHTML = skelHTML;
+    }
+
+
     // --- HEART TOGGLE ANIMATION FUNCTION ---
     function toggleWishlist(event, element) {
-        if(event) event.stopPropagation(); // Prevents opening the product card when clicked on the grid
+        if(event) event.stopPropagation();
 
         element.classList.toggle('active');
         
@@ -1764,7 +1956,6 @@
         
         document.querySelectorAll('.pd-tab-content').forEach(tc => {
             tc.style.display = 'none';
-            // Only collapse it back if it's meant to be collapsible
             if(tc.classList.contains('is-collapsible')) {
                 tc.classList.remove('expanded'); 
             }
@@ -1782,12 +1973,9 @@
         thumbs[0].src = currentSelectedProduct.img;
         thumbs[0].click(); 
         
-        // For mobile bottom bar
         document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
 
         switchView('productView');
-        
-        // Evaluate dynamic tab heights once rendering starts
         setTimeout(evaluateTabHeights, 100);
     }
 
@@ -1810,7 +1998,6 @@
     function updateCartBadges() {
         const count = cart.length;
         document.getElementById('mainCartBadge').innerText = count;
-        // Check if secondary badges exist before updating
         const pdBadge = document.getElementById('pdCartBadge');
         if (pdBadge) pdBadge.innerText = count;
     }
@@ -2063,10 +2250,11 @@
         document.getElementById('productGrid').style.display = 'none';
         renderCategories(); 
         renderSkeletons();
+        renderEventSkeletons(); // INITIALIZE EVENT SKELETONS
         renderProducts();
         typeWriterEffect(); 
         updateUIForAuth();
-        setupZoom(); // INITIALIZE ZOOM EFFECT
+        setupZoom();
         setTimeout(() => {
             document.getElementById('skeletonContainer').style.display = 'none';
             document.getElementById('productGrid').style.display = 'grid';
