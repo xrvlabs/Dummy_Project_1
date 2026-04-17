@@ -227,7 +227,6 @@
            CLEAN, ALIGNED & UNIFORM PRODUCT DETAIL UI 
            ------------------------------------------- */
         
-        /* Removed max-width to allow fluid layout mimicking the home page grid margins */
         .pd-wrapper { 
             display: flex; flex-direction: column; 
             gap: 10px; 
@@ -243,12 +242,15 @@
         .pd-back-btn:hover { color: var(--blue-accent); }
 
         .pd-grid-layout { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; width: 100%; }
-        /* YAHAN DESKTOP VIEW KE LIYE GAP 24px SE 10px KIYA GAYA HAI */
-        @media (min-width: 1024px) { .pd-grid-layout { grid-template-columns: 480px 1fr; gap: 10px; } }
+        /* Desktop Image Right, Content Left */
+        @media (min-width: 1024px) { 
+            .pd-grid-layout { grid-template-columns: 1fr 480px; gap: 10px; } 
+            .pd-image-col { order: 2; position: sticky; top: 140px; align-self: start; }
+            .pd-content-col { order: 1; }
+        }
 
-        /* Left Column (Image Area) */
+        /* Left/Right Columns */
         .pd-image-col { display: flex; flex-direction: column; gap: 10px; width: 100%; z-index: 950;}
-        @media (min-width: 1024px) { .pd-image-col { position: sticky; top: 140px; align-self: start; } }
         
         .pd-main-img-box { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 20px; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; box-sizing: border-box; cursor: crosshair;}
         
@@ -272,7 +274,8 @@
         .zoom-result {
             position: absolute; 
             top: 0; 
-            left: calc(100% + 10px); 
+            right: calc(100% + 10px); /* Zooms out to the left since image is on right */
+            left: auto;
             width: 500px; 
             height: 500px; 
             background-color: white;
@@ -284,7 +287,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
         }
         
-        /* Blue Overlay for Right Column */
+        /* Blue Overlay for Content Column */
         .right-col-blue-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -307,11 +310,11 @@
         .pd-thumb { width: 64px; height: 64px; flex-shrink: 0; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 4px; object-fit: contain; cursor: pointer; background: white; transition: 0.2s;}
         .pd-thumb.active { border-color: var(--blue-dark); border-width: 2px; }
 
-        /* Right Column (Scrollable Content) */
+        /* Content Column (Scrollable details) */
         .pd-content-col { display: flex; flex-direction: column; gap: 10px; width: 100%; min-width: 0; position: relative; }
 
         .pd-title-box { background: white; padding: 20px 10px; border-radius: var(--card-radius); border: 1px solid var(--border-color); width: 100%; box-sizing: border-box;}
-        .pd-title-box h1 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; line-height: 1.3;}
+        .pd-title-box h1 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; line-height: 1.3; text-transform: uppercase;}
         @media (min-width: 768px) { .pd-title-box h1 { font-size: 24px; } }
         .pd-title-box p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
@@ -333,11 +336,10 @@
         .pd-pincode-check-btn:hover { background: var(--blue-accent); }
         .pd-pincode-result { margin-top: 10px; font-size: 12px; }
 
-        /* Cleaned Variant Cards - Grid layout & Hover Preview */
+        /* Cleaned Variant Cards - Grid layout */
         .pd-variants-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
         @media (min-width: 1024px) {
             .pd-variants-area { grid-template-columns: repeat(2, 1fr); }
-            .pd-variant-card:only-child { grid-column: span 2; }
         }
         
         .pd-variant-card { position: relative; z-index: 1; background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 16px 10px; display: flex; flex-direction: column; gap: 16px; transition: box-shadow 0.2s; width: 100%; box-sizing: border-box;}
@@ -428,6 +430,68 @@
             min-width: 90px; text-align: center; height: 40px; box-sizing: border-box;
         }
         .pd-vc-add-btn:hover { background: #1a4d6a; }
+
+
+        /* -------------------------------------------
+           NEW LAYOUT COMPONENTS (DISCOUNT, REVIEWS, BENEFITS)
+           ------------------------------------------- */
+           
+        /* DISCOUNT TABLE CARD */
+        .pd-discount-card {
+            background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius);
+            padding: 16px; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box;
+        }
+        .pd-discount-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .pd-discount-table th { padding: 10px; font-weight: 800; color: var(--text-dark); border-bottom: 1px solid #eee; background: #f8fafc;}
+        .pd-discount-table td { padding: 12px 10px; text-align: center; color: var(--text-dark); border-bottom: 1px solid #eee; font-weight: 700; }
+        .pd-discount-table tr:last-child td { border-bottom: none; }
+
+        /* EXTRA INFO AREA (REVIEWS + BENEFITS) */
+        .pd-extra-info-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-top: 10px;}
+        @media (min-width: 1024px) { .pd-extra-info-area { grid-template-columns: repeat(2, 1fr); } }
+
+        /* REVIEWS SLIDER STYLES */
+        .pd-review-slider-card {
+            background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); 
+            padding: 16px 12px; display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;
+            position: relative; overflow: hidden; min-height: 200px;
+        }
+        .pd-rs-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;}
+        .pd-rs-nav i { cursor: pointer; padding: 4px 8px; font-size: 14px; transition: color 0.2s; color: var(--text-dark);}
+        .pd-rs-nav i:hover { color: var(--blue-accent); }
+        .pd-rs-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; flex: 1; align-items: center;}
+        .pd-rs-track::-webkit-scrollbar { display: none; }
+        
+        .pd-rs-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; gap: 16px; align-items: center; padding-right: 10px; box-sizing: border-box;}
+        @media (max-width: 767px) { .pd-rs-slide { flex-direction: column; align-items: flex-start; gap: 8px;} }
+
+        .pd-rs-left { display: flex; flex-direction: column; gap: 8px; min-width: 140px; border-right: 1px solid #eee; padding-right: 16px; }
+        @media (max-width: 767px) { .pd-rs-left { border-right: none; padding-right: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; width: 100%; flex-direction: row; align-items: center; justify-content: space-between;} }
+        
+        .pd-rs-stars { font-size: 14px; }
+        .pd-rs-date { font-size: 12px; font-weight: 800; color: var(--text-dark); margin-top: 4px; }
+        @media (max-width: 767px) { .pd-rs-date { margin-top: 0; } }
+        .pd-rs-author { font-size: 12px; color: var(--text-dark); font-weight: 700; text-transform: capitalize;}
+
+        .pd-rs-right { display: flex; flex-direction: column; gap: 8px; flex: 1;}
+        .pd-rs-title { font-size: 15px; font-weight: 800; color: var(--text-dark); }
+        .pd-rs-desc { font-size: 13px; color: var(--text-dark); line-height: 1.4;}
+        .pd-rs-actions { display: flex; gap: 12px; align-items: center; margin-top: 4px; font-size: 13px; color: var(--text-dark); font-weight: 800;}
+        .pd-rs-actions i { cursor: pointer; transition: 0.2s;}
+        .pd-rs-actions i:hover { color: var(--blue-accent); }
+
+        /* BENEFITS STYLES */
+        .pd-benefits-card {
+            background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius);
+            padding: 16px; display: flex; flex-direction: column; gap: 16px; width: 100%; box-sizing: border-box; justify-content: center;
+        }
+        .pd-benefits-header { text-align: center; font-size: 14px; font-weight: 800; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; position: relative;}
+        .pd-benefits-header::after { content: ''; position: absolute; bottom: -8px; left: 10%; width: 80%; height: 1px; background: var(--border-color); }
+        .pd-benefits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;}
+        .pd-benefit-box { background: #dcfce7; padding: 12px 8px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+        .pd-benefit-box i { font-size: 18px; color: var(--text-dark); }
+        .pd-benefit-box span { font-size: 10px; font-weight: 700; color: var(--text-dark); line-height: 1.3;}
+
 
         /* Simplified Tabs System (50/50 Split & Accordion) */
         .pd-tabs-container { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); overflow: hidden; width: 100%; margin-top: 0px; box-sizing: border-box;}
@@ -969,62 +1033,9 @@
                     </div>
 
                     <div class="pd-variants-area" id="pd-variants-container">
-                        
-                        <div class="pd-variant-card">
-                            <div class="pd-vc-top">
-                                <div class="pd-vc-img-wrapper">
-                                    <img src="pro_1.jpg" class="pd-vc-img" alt="Grey Resin">
-                                    <div class="variant-preview-popup">
-                                        <img src="pro_1.jpg" alt="Grey Resin">
-                                        <div class="vp-title">Labodent DentWERK HD Model Resin - Grey 1Kg</div>
-                                        <div class="vp-price">₹1,499 <span class="vp-mrp">₹6,500</span></div>
-                                    </div>
-                                </div>
-                                <div class="pd-vc-details">
-                                    <div class="pd-vc-title">Labodent DentWERK HD Model Resin - Grey 1Kg</div>
-                                    <div class="pd-vc-delivery">
-                                        <span class="dynamic-delivery-date"><i class="fa-solid fa-truck"></i> Please enter pincode to check delivery</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="pd-vc-bottom">
-                                <div class="pd-vc-price-box">
-                                    <span class="pd-vc-price">₹1,499</span>
-                                    <span class="pd-vc-mrp">₹6,500</span>
-                                </div>
-                                <button class="pd-vc-add-btn" onclick="addToCart(1)">ADD</button>
-                            </div>
                         </div>
-
-                        <div class="pd-variant-card">
-                            <div class="pd-vc-top">
-                                <div class="pd-vc-img-wrapper">
-                                    <img src="pro_2.jpg" class="pd-vc-img" alt="Almond Resin">
-                                    <div class="variant-preview-popup">
-                                        <img src="pro_2.jpg" alt="Almond Resin">
-                                        <div class="vp-title">Labodent DentWERK HD Model Resin - Almond 1Kg</div>
-                                        <div class="vp-price">₹1,499 <span class="vp-mrp">₹6,500</span></div>
-                                    </div>
-                                </div>
-                                <div class="pd-vc-details">
-                                    <div class="pd-vc-title">Labodent DentWERK HD Model Resin - Almond 1Kg</div>
-                                    <div class="pd-vc-delivery">
-                                        <span class="dynamic-delivery-date"><i class="fa-solid fa-truck"></i> Please enter pincode to check delivery</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pd-vc-bottom">
-                                <div class="pd-vc-price-box">
-                                    <span class="pd-vc-price">₹1,499</span>
-                                    <span class="pd-vc-mrp">₹6,500</span>
-                                </div>
-                                <button class="pd-vc-add-btn" onclick="addToCart(2)">ADD</button>
-                            </div>
-                        </div>
-
-                    </div>
+                    
+                    <div class="pd-extra-info-area" id="pd-extra-info-container"></div>
 
                     <div class="pd-tabs-container">
                         <div class="pd-tabs-header">
@@ -1545,6 +1556,7 @@
             document.querySelectorAll('.dynamic-delivery-date').forEach(span => {
                 span.innerHTML = `<i class="fa-solid fa-truck"></i> Arrives By ${dateStr}`;
                 span.style.color = "var(--text-dark)";
+                span.style.display = 'inline-block';
             });
         }
     }
@@ -1665,6 +1677,7 @@
         deliverySpans.forEach(span => {
             span.innerHTML = `<i class="fa-solid fa-truck"></i> Arrives By ${dateStr}`;
             span.style.color = "var(--text-dark)";
+            span.style.display = 'inline-block';
         });
     }
 
@@ -1691,6 +1704,29 @@
         });
     }
 
+    // --- REVIEWS LOGIC ---
+    const mockReviews = [
+        { stars: 4, title: "best airoter in class", desc: "its working as smooth as butter", date: "5/31/25, 10:58 AM", author: "dr,kaushik vasani", likes: 0, dislikes: 0 },
+        { stars: 5, title: "Excellent Product", desc: "Highly recommended for daily use.", date: "6/01/25, 09:15 AM", author: "Dr. Sharma", likes: 2, dislikes: 0 },
+        { stars: 3, title: "Good, but could be better", desc: "The grip is slightly slippery.", date: "6/05/25, 02:30 PM", author: "Dr. Patel", likes: 1, dislikes: 1 }
+    ];
+
+    function generateReviewStars(count) {
+        let starsHtml = '';
+        for(let i=1; i<=5; i++) {
+            if(i <= count) starsHtml += '<i class="fa-solid fa-star" style="color: #fc9264;"></i> ';
+            else starsHtml += '<i class="fa-regular fa-star" style="color: #94a3b8;"></i> ';
+        }
+        return starsHtml;
+    }
+
+    function scrollReviews(dir) {
+        const track = document.getElementById('pdReviewsTrack');
+        if(!track) return;
+        const slideWidth = track.offsetWidth;
+        track.scrollBy({ left: dir * slideWidth, behavior: 'smooth' });
+    }
+
     // --- Data ---
     const categoriesData = [
         {
@@ -1713,10 +1749,41 @@
     ];
 
     const mockProducts = [
-        { id: 1, title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', img: 'pro_1.jpg', priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true },
-        { id: 2, title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', img: 'pro_2.jpg', priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false },
-        { id: 3, title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', img: 'pro_1.jpg', priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false },
-        { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', img: 'pro_2.jpg', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false }
+        { 
+            id: 1, 
+            title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', 
+            subtitle: 'Advanced digital imaging sensor for precise dental diagnostics',
+            img: 'pro_1.jpg', 
+            priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true,
+            variants: [{ name: 'Size 1.5 (Standard)', img: 'pro_1.jpg', price: '55,000', mrp: '210,000', priceNum: 55000 }]
+        },
+        { 
+            id: 2, 
+            title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', 
+            subtitle: 'Comprehensive driver kit for all major implant systems',
+            img: 'pro_2.jpg', 
+            priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false,
+            variants: [{ name: 'Standard Kit (8 Drivers)', img: 'pro_2.jpg', price: '3,490', mrp: '13,990', priceNum: 3490 }]
+        },
+        { 
+            id: 3, 
+            title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', 
+            subtitle: 'Calcium Hydroxide Paste with Barium Sulfate for root canal therapy',
+            img: 'pro_1.jpg', 
+            priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false,
+            variants: [{ name: 'Pack of 4 Syringes', img: 'pro_1.jpg', price: '360', mrp: '1,100', priceNum: 360 }]
+        },
+        { 
+            id: 4, 
+            title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', 
+            subtitle: 'High precision dental 3D printing resin with low shrinkage',
+            img: 'pro_2.jpg', 
+            priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false,
+            variants: [
+                { name: 'Grey Shade - 1Kg', img: 'pro_1.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 },
+                { name: 'Almond Shade - 1Kg', img: 'pro_2.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }
+            ]
+        }
     ];
 
     // --- EVENTS DATA ---
@@ -2054,13 +2121,152 @@
         currentSelectedProduct = mockProducts.find(p => p.id === id);
         if(!currentSelectedProduct) return;
         
+        // Main image
         document.getElementById('pd-hero-img').src = currentSelectedProduct.img;
         
+        // Thumbs
         let thumbs = document.querySelectorAll('.pd-thumb');
         thumbs[0].src = currentSelectedProduct.img;
+        if(currentSelectedProduct.variants.length > 1) {
+             thumbs[1].src = currentSelectedProduct.variants[1].img;
+             thumbs[1].style.display = 'block';
+        } else {
+             thumbs[1].style.display = 'none';
+        }
+        thumbs[2].style.display = 'none';
         thumbs[0].click(); 
         
+        // Title & Subtitle
+        document.getElementById('pd-title').innerText = currentSelectedProduct.title;
+        document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle;
+        
+        // Mobile bottom price
         document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
+
+        // Setup the initial hidden delivery text based on global pincode presence
+        let currentPin = document.getElementById('pdPincodeInput').value;
+        let deliveryHtml = `<span class="dynamic-delivery-date" style="display:none;"></span>`;
+        if (currentPin && currentPin.length === 6) {
+            let dateStr = getExpectedDeliveryDate(currentPin);
+            deliveryHtml = `<span class="dynamic-delivery-date" style="color: var(--text-dark); display: inline-block;"><i class="fa-solid fa-truck"></i> Arrives By ${dateStr}</span>`;
+        }
+
+        // Dynamically Render Variants
+        const variantsContainer = document.getElementById('pd-variants-container');
+        const extraInfoContainer = document.getElementById('pd-extra-info-container');
+        
+        let variantsHTML = '';
+        let extraInfoHTML = '';
+        
+        currentSelectedProduct.variants.forEach((variant) => {
+            variantsHTML += `
+                <div class="pd-variant-card">
+                    <div class="pd-vc-top">
+                        <div class="pd-vc-img-wrapper">
+                            <img src="${variant.img}" class="pd-vc-img" alt="${variant.name}">
+                            <div class="variant-preview-popup">
+                                <img src="${variant.img}" alt="${variant.name}">
+                                <div class="vp-title">${currentSelectedProduct.title} - ${variant.name}</div>
+                                <div class="vp-price">₹${variant.price} <span class="vp-mrp">₹${variant.mrp}</span></div>
+                            </div>
+                        </div>
+                        <div class="pd-vc-details">
+                            <div class="pd-vc-title">${currentSelectedProduct.title} - ${variant.name}</div>
+                            <div class="pd-vc-delivery">
+                                ${deliveryHtml}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pd-vc-bottom">
+                        <div class="pd-vc-price-box">
+                            <span class="pd-vc-price">₹${variant.price}</span>
+                            <span class="pd-vc-mrp">₹${variant.mrp}</span>
+                        </div>
+                        <button class="pd-vc-add-btn" onclick="addToCart(${currentSelectedProduct.id})">ADD</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // IF ONLY ONE VARIANT, SHOW DISCOUNT TABLE NEXT TO IT, AND REVIEWS + BENEFITS BELOW
+        if(currentSelectedProduct.variants.length === 1) {
+            variantsHTML += `
+                <div class="pd-discount-card">
+                    <table class="pd-discount-table">
+                        <thead>
+                            <tr><th>Quantity</th><th>Unit discount</th><th>You Save</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>2</td><td>41%</td><td>Up to ₹2,731.97</td></tr>
+                            <tr><td>5</td><td>42%</td><td>Up to ₹6,996.50</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            extraInfoHTML = `
+                <div class="pd-review-slider-card">
+                    <div class="pd-rs-header">
+                        <span>Customer Reviews</span>
+                        <div class="pd-rs-nav">
+                            <i class="fa-solid fa-chevron-left" onclick="scrollReviews(-1)"></i>
+                            <i class="fa-solid fa-chevron-right" onclick="scrollReviews(1)"></i>
+                        </div>
+                    </div>
+                    <div class="pd-rs-track" id="pdReviewsTrack">
+                        ${mockReviews.map(r => `
+                            <div class="pd-rs-slide">
+                                <div class="pd-rs-left">
+                                    <div class="pd-rs-stars">${generateReviewStars(r.stars)}</div>
+                                    <div class="pd-rs-date">${r.date}</div>
+                                    <div class="pd-rs-author">By ${r.author}</div>
+                                </div>
+                                <div class="pd-rs-right">
+                                    <div class="pd-rs-title">${r.title}</div>
+                                    <div class="pd-rs-desc">${r.desc}</div>
+                                    <div class="pd-rs-actions">
+                                        <i class="fa-solid fa-thumbs-up"></i> ${r.likes}
+                                        <i class="fa-solid fa-thumbs-down"></i> ${r.dislikes}
+                                        <i class="fa-solid fa-flag"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="pd-benefits-card">
+                    <div class="pd-benefits-header">ORACO BENEFITS</div>
+                    <div class="pd-benefits-grid">
+                        <div class="pd-benefit-box">
+                            <i class="fa-solid fa-truck-fast"></i>
+                            <span>Free Shipping over order of 3000</span>
+                        </div>
+                        <div class="pd-benefit-box">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <span>Hassle Free Cancellation</span>
+                        </div>
+                        <div class="pd-benefit-box">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>10 Days Replacement</span>
+                        </div>
+                        <div class="pd-benefit-box">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>100% Genuine Products</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        variantsContainer.innerHTML = variantsHTML;
+        extraInfoContainer.innerHTML = extraInfoHTML;
+
+        // Refresh pincode result if already checked
+        const pinInput = document.getElementById('pdPincodeInput').value;
+        if(pinInput && pinInput.length === 6) {
+            checkPincode();
+        }
 
         switchView('productView');
         setTimeout(evaluateTabHeights, 100);
