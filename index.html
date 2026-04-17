@@ -1123,18 +1123,18 @@
         {
             id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag',
             items: [
-                { name: 'WALDENT', img: 'pro_1.jpg' },
-                { name: '3M ESPE', img: 'pro_2.jpg' },
-                { name: 'DENTSPLY', img: 'pro_1.jpg' },
-                { name: 'GC', img: 'pro_2.jpg' }
+                { name: 'WALDENT', img: 'pro_1.jpg', prodId: 1 },
+                { name: '3M ESPE', img: 'pro_2.jpg', prodId: 2 },
+                { name: 'DENTSPLY', img: 'pro_1.jpg', prodId: 3 },
+                { name: 'GC', img: 'pro_2.jpg', prodId: 4 }
             ]
         },
         {
             id: 'cat_endo', title: 'ENDODONTICS', icon: 'fa-syringe',
             items: [
-                { name: 'ROTARY FILES', img: 'pro_1.jpg' },
-                { name: 'LOCATORS', img: 'pro_2.jpg' },
-                { name: 'ENDO MOTORS', img: 'pro_1.jpg' }
+                { name: 'ROTARY FILES', img: 'pro_1.jpg', prodId: 1 },
+                { name: 'LOCATORS', img: 'pro_2.jpg', prodId: 2 },
+                { name: 'ENDO MOTORS', img: 'pro_1.jpg', prodId: 3 }
             ]
         }
     ];
@@ -1240,7 +1240,7 @@
     function renderSubcategories(cat) {
         document.getElementById('mmContentTitle').innerHTML = `${cat.title} <span>${cat.items.length}</span>`;
         document.getElementById('mmContentGrid').innerHTML = cat.items.map(item => `
-            <div class="subcat-card">
+            <div class="subcat-card" onclick="openProduct(${item.prodId || 1})">
                 <div class="subcat-img"><img src="${item.img}" alt="${item.name}"></div>
                 <div class="subcat-title">${item.name}</div>
             </div>
