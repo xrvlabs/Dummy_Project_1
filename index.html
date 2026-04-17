@@ -884,7 +884,19 @@
         .event-card { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); cursor: pointer;}
         .event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); border-color: #cbd5e1; }
         .event-img-wrap { position: relative; width: 100%; height: 180px; background: #f1f5f9; }
-        .event-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        /* SMOOTH IMAGE CROSS-FADE EFFECT */
+        @keyframes imageFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .event-img-wrap img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            opacity: 0; /* Starts hidden */
+            animation: imageFade 0.8s ease-in-out forwards; /* Smooth fade in */
+        }
         .event-badge { position: absolute; top: 10px; right: 10px; background: var(--green-accent); color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
         .event-content { padding: 16px; display: flex; flex-direction: column; flex: 1; }
         .event-title { font-size: 15px; font-weight: 800; color: var(--text-dark); line-height: 1.4; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
