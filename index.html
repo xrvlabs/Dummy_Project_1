@@ -213,11 +213,12 @@
            CLEAN, ALIGNED & UNIFORM PRODUCT DETAIL UI 
            ------------------------------------------- */
         
+        /* Removed max-width to allow fluid layout mimicking the home page grid margins */
         .pd-wrapper { 
             display: flex; flex-direction: column; 
             gap: 10px; 
-            padding: 10px; 
-            max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box;
+            padding: 16px 10px 32px; 
+            width: 100%; box-sizing: border-box;
         }
 
         .pd-back-btn { 
@@ -258,7 +259,13 @@
         .pd-pincode-input-group { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 4px 4px 4px 12px; background: #f8fafc;}
         .pd-pincode-input-group i { color: var(--blue-accent); font-size: 16px; }
         .pd-pincode-input-group input { flex: 1; border: none; outline: none; background: transparent; padding: 8px; font-size: 14px; font-family: 'Quantico', sans-serif; width: 100%; min-width: 0;}
-        .pd-pincode-input-group button { background: var(--text-dark); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s;}
+        
+        /* MATCHING CHECK BUTTON */
+        .pd-pincode-input-group button { 
+            background: var(--text-dark); color: white; border: none; 
+            padding: 8px 16px; border-radius: 4px; font-weight: 700; font-size: 14px; 
+            cursor: pointer; transition: 0.2s; min-width: 90px; text-align: center;
+        }
         .pd-pincode-input-group button:hover { background: var(--blue-accent); }
         .pd-pincode-result { margin-top: 10px; font-size: 12px; }
 
@@ -280,16 +287,25 @@
         .pd-vc-delivery span { display: flex; align-items: center; gap: 6px; font-weight: 700; }
         .pd-vc-delivery i { color: var(--blue-dark); font-size: 14px;}
 
-        /* Bottom portion of variant card (Price Left, Button Right) */
-        .pd-vc-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px dashed var(--border-color); padding-top: 12px;}
+        /* Bottom portion of variant card (Price & Add Button Aligned) */
+        .pd-vc-bottom { 
+            display: flex; justify-content: space-between; align-items: center; 
+            gap: 8px; border-top: 1px dashed var(--border-color); padding-top: 12px;
+        }
         
-        .pd-vc-price-box { display: flex; flex-direction: column; gap: 2px;}
+        /* ALIGNED & COMPACT PRICE ROW */
+        .pd-vc-price-box { display: flex; flex-direction: row; align-items: baseline; gap: 8px;}
         .pd-vc-price { font-size: 20px; font-weight: 800; color: var(--text-dark); line-height: 1;}
         @media (min-width: 768px) { .pd-vc-price { font-size: 24px; } }
         .pd-vc-mrp { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
         
-        /* ADD button matching CHECK button */
-        .pd-vc-add-btn { background: #336688; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s;}
+        /* MATCHING ADD BUTTON */
+        .pd-vc-add-btn { 
+            background: #336688; color: white; border: none; 
+            padding: 8px 16px; border-radius: 4px; font-size: 14px; 
+            font-weight: 700; cursor: pointer; transition: 0.2s;
+            min-width: 90px; text-align: center;
+        }
         .pd-vc-add-btn:hover { background: #1a4d6a; }
 
         /* Simplified Tabs System (50/50 Split & Accordion) */
@@ -318,9 +334,18 @@
 
         .pd-tab-content.expanded { max-height: 1000px; cursor: auto; }
         
-        .pd-tab-content ul { padding-left: 20px; list-style-type: none;}
-        .pd-tab-content li { margin-bottom: 12px; color: var(--text-dark); display: flex; gap: 10px; align-items: flex-start;}
-        .pd-tab-content li::before { content: '•'; color: var(--blue-accent); font-weight: bold; font-size: 18px; line-height: 1;}
+        /* CORRECT BULLET ALIGNMENT */
+        .pd-tab-content ul { padding-left: 0; list-style-type: none; margin: 0;}
+        .pd-tab-content li { 
+            margin-bottom: 12px; color: var(--text-dark); 
+            position: relative; padding-left: 18px; 
+            display: block; line-height: 1.5;
+        }
+        .pd-tab-content li::before { 
+            content: '•'; color: var(--blue-accent); 
+            font-weight: bold; font-size: 20px; 
+            position: absolute; left: 0; top: -3px; line-height: 1;
+        }
 
         /* Mobile Bottom Sticky Bar */
         .pd-bottom-bar-mobile { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); z-index: 1000; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
