@@ -467,7 +467,7 @@
         /* -------------------------------------------
            NEW LAYOUT COMPONENTS (DISCOUNT, REVIEWS, BENEFITS)
            ------------------------------------------- */
-           
+            
         /* DISCOUNT TABLE CARD */
         .pd-discount-card {
             background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius);
@@ -1552,7 +1552,25 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDzDoIP519SXu61slBHHDA0dTKP51WpbwU",
+        authDomain: "oracodental-e048e.firebaseapp.com",
+        databaseURL: "https://oracodental-e048e-default-rtdb.firebaseio.com",
+        projectId: "oracodental-e048e",
+        storageBucket: "oracodental-e048e.firebasestorage.app",
+        messagingSenderId: "1002653789384",
+        appId: "1:1002653789384:web:ba855faa4ad4def8f209fd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
     // --- ZOOM LOGIC ---
     function setupZoom() {
         const imgBox = document.getElementById('pdMainImgBox');
@@ -1817,7 +1835,7 @@
     }
 
     // --- Data ---
-    const categoriesData = [
+    let categoriesData = [
         {
             id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag',
             items: [
@@ -1837,7 +1855,7 @@
         }
     ];
 
-    const mockProducts = [
+    let mockProducts = [
         { 
             id: 1, 
             title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', 
@@ -1876,7 +1894,7 @@
     ];
 
     // --- EVENTS DATA ---
-    const mockLiveEvents = [
+    let mockLiveEvents = [
         { id: 1, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Post+%26+Core+Restorations', title: 'Post & Core Restorations - From Fragile to Functional', date: 'Wed May 06, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
         { id: 2, img: 'https://placehold.co/600x400/0f172a/ffffff?text=PFM+Crown+Preparation', title: 'PFM Crown Preparation for Molar (Beginners Course)', date: 'Thu May 14, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
         { id: 3, img: 'https://placehold.co/600x400/312e81/ffffff?text=Zirconia+Tooth+Prep', title: 'Tooth Preparation Course for Zirconia - Anterior Teeth', date: 'Sat May 23, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Education' },
@@ -1885,7 +1903,7 @@
         { id: 6, img: 'https://placehold.co/600x400/7f1d1d/ffffff?text=Pediatric+Dentistry+Guwahati', title: 'Making Pediatric Dentistry Easy - Guwahati', date: 'Sun Jun 28, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' }
     ];
 
-    const mockPastEvents = [
+    let mockPastEvents = [
         { id: 101, img: 'https://placehold.co/600x400/475569/ffffff?text=Endodontics+Masterclass', title: 'Endodontics Masterclass - Single Visit RCT', date: 'Mon Mar 16, 2026 - 10:00 AM (IST)', type: 'In-Person', cat: 'Education' },
         { id: 102, img: 'https://placehold.co/600x400/334155/ffffff?text=Laser+Dentistry', title: 'Basics of Laser Dentistry', date: 'Thu Feb 26, 2026 - 02:00 PM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
         { id: 103, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Clear+Aligners+Workshop', title: 'Clear Aligners Certification Workshop', date: 'Sat Jan 10, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' },
@@ -1908,6 +1926,43 @@
         eventsView: document.getElementById('eventsView'),
         contactView: document.getElementById('contactView')
     };
+
+    // --- Firebase Initialization Data Routine ---
+    async function initFirebaseAndData() {
+        try {
+            const prodSnap = await getDocs(collection(db, "products"));
+            
+            if (prodSnap.empty) {
+                // If DB is empty, push default dummy data
+                for (let p of mockProducts) await setDoc(doc(db, "products", p.id.toString()), p);
+                for (let c of categoriesData) await setDoc(doc(db, "categories", c.id), c);
+                for (let e of mockLiveEvents) await setDoc(doc(db, "events", "live_" + e.id), { ...e, status: 'live' });
+                for (let e of mockPastEvents) await setDoc(doc(db, "events", "past_" + e.id), { ...e, status: 'past' });
+                console.log("Firebase seeded automatically.");
+            } else {
+                // Otherwise fetch fresh data
+                mockProducts = prodSnap.docs.map(d => d.data());
+                
+                const catSnap = await getDocs(collection(db, "categories"));
+                if(!catSnap.empty) categoriesData = catSnap.docs.map(d => d.data());
+                
+                const eventSnap = await getDocs(collection(db, "events"));
+                if(!eventSnap.empty) {
+                    const allEvents = eventSnap.docs.map(d => d.data());
+                    mockLiveEvents = allEvents.filter(e => e.status === 'live');
+                    mockPastEvents = allEvents.filter(e => e.status === 'past');
+                }
+            }
+        } catch(e) {
+            console.error("Firebase connection issue. Using local mock data.", e);
+        }
+
+        // Render UI
+        document.getElementById('skeletonContainer').style.display = 'none';
+        document.getElementById('productGrid').style.display = 'grid';
+        renderCategories();
+        renderProducts();
+    }
 
     // --- View Management ---
     function switchView(targetViewId) {
@@ -2082,13 +2137,15 @@
     }
 
     function renderSubcategories(cat) {
-        document.getElementById('mmContentTitle').innerHTML = `${cat.title} <span>${cat.items.length}</span>`;
-        document.getElementById('mmContentGrid').innerHTML = cat.items.map(item => `
-            <div class="subcat-card" onclick="openProduct(${item.prodId || 1})">
-                <div class="subcat-img"><img src="${item.img}" alt="${item.name}"></div>
-                <div class="subcat-title">${item.name}</div>
-            </div>
-        `).join('');
+        document.getElementById('mmContentTitle').innerHTML = `${cat.title} <span>${cat.items ? cat.items.length : 0}</span>`;
+        if(cat.items) {
+            document.getElementById('mmContentGrid').innerHTML = cat.items.map(item => `
+                <div class="subcat-card" onclick="openProduct(${item.prodId || 1})">
+                    <div class="subcat-img"><img src="${item.img}" alt="${item.name}"></div>
+                    <div class="subcat-title">${item.name}</div>
+                </div>
+            `).join('');
+        }
     }
 
     function toggleMegamenu(e) {
@@ -2128,7 +2185,6 @@
     function renderProducts() {
         let prodHTML = '';
         mockProducts.forEach(prod => {
-            // FREEBIE tag ka logic yahan se hata diya gaya hai
             prodHTML += `
                 <div class="product-card" onclick="openProduct(${prod.id})">
                     <div class="product-image-container">
@@ -2172,13 +2228,10 @@
         if(skelContainer) skelContainer.innerHTML = skelHTML;
     }
 
-
     // --- HEART TOGGLE ANIMATION FUNCTION ---
     function toggleWishlist(event, element) {
         if(event) event.stopPropagation();
-
         element.classList.toggle('active');
-        
         if (element.classList.contains('active')) {
             element.classList.remove('fa-regular');
             element.classList.add('fa-solid');
@@ -2195,7 +2248,6 @@
         const img = document.getElementById('pd-hero-img');
         img.src = element.src;
         
-        // Sync zoom box image if currently open
         const result = document.getElementById('zoomResult');
         if (result && result.style.display === 'block') {
             result.style.backgroundImage = `url(${img.src})`;
@@ -2217,11 +2269,10 @@
 
     // --- Update Variant Quantity ---
     function updateVariantQty(event, btnElement, change) {
-        if(event) event.stopPropagation(); // Prevents clicking the variant card
+        if(event) event.stopPropagation();
         const inputField = btnElement.parentElement.querySelector('.qty-input');
         let currentQty = parseInt(inputField.value) || 1;
         let newQty = currentQty + change;
-        
         if (newQty >= 1) {
             inputField.value = newQty;
         }
@@ -2231,10 +2282,8 @@
         currentSelectedProduct = mockProducts.find(p => p.id === id);
         if(!currentSelectedProduct) return;
         
-        // Main image
         document.getElementById('pd-hero-img').src = currentSelectedProduct.img;
         
-        // Thumbs
         let thumbs = document.querySelectorAll('.pd-thumb');
         thumbs[0].src = currentSelectedProduct.img;
         if(currentSelectedProduct.variants.length > 1) {
@@ -2246,14 +2295,11 @@
         thumbs[2].style.display = 'none';
         thumbs[0].click(); 
         
-        // Title & Subtitle
         document.getElementById('pd-title').innerText = currentSelectedProduct.title;
         document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle;
         
-        // Mobile bottom price
         document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
 
-        // Setup the initial hidden delivery text based on global pincode presence
         let currentPin = document.getElementById('pdPincodeInput').value;
         let deliveryHtml = `<span class="dynamic-delivery-date" style="display:none;"></span>`;
         if (currentPin && currentPin.length === 6) {
@@ -2261,9 +2307,7 @@
             deliveryHtml = `<span class="dynamic-delivery-date" style="color: var(--text-dark); display: inline-block;"><i class="fa-solid fa-truck"></i> Arrives By ${dateStr}</span>`;
         }
 
-        // Dynamically Render Variants in a masonry style grid
         const masonryContainer = document.getElementById('pd-masonry-container');
-        
         let leftColHTML = `<div class="pd-masonry-col">`;
         let rightColHTML = `<div class="pd-masonry-col">`;
         
@@ -2305,7 +2349,6 @@
             `;
         });
 
-        // IF ONLY ONE VARIANT, DISTRIBUTE WIDGETS PROPERLY TO ELIMINATE EMPTY GAPS
         if(currentSelectedProduct.variants.length === 1) {
             rightColHTML += `
                 <div class="pd-discount-card">
@@ -2383,7 +2426,6 @@
 
         masonryContainer.innerHTML = leftColHTML + rightColHTML;
 
-        // Refresh pincode result if already checked
         const pinInput = document.getElementById('pdPincodeInput').value;
         if(pinInput && pinInput.length === 6) {
             checkPincode();
@@ -2457,20 +2499,33 @@
         document.getElementById('cartTotal').innerText = `₹${total.toLocaleString()}`;
     }
 
-    function placeOrder() {
-        if(cart.length === 0) return;
+    async function placeOrder() {
+        if(cart.length === 0 || !currentUser) return;
+        
         let total = cart.reduce((sum, item) => sum + item.priceNum, 0);
         
-        orderHistory.unshift({
-            id: 'ORD-' + Math.floor(Math.random() * 10000),
+        const newOrder = {
+            userId: currentUser.uid,
+            total: total,
             date: new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
-            items: [...cart],
-            total: total
-        });
+            status: "Processing",
+            items: cart
+        };
 
-        cart = [];
-        updateCartBadges();
-        triggerRain();
+        try {
+            const docRef = await addDoc(collection(db, "orders"), newOrder);
+            
+            orderHistory.unshift({
+                id: 'ORD-' + docRef.id.substring(0, 6).toUpperCase(),
+                ...newOrder
+            });
+
+            cart = [];
+            updateCartBadges();
+            triggerRain();
+        } catch(e) {
+            alert("Error placing order: " + e.message);
+        }
     }
 
     function renderProfileOrders() {
@@ -2482,12 +2537,26 @@
             html += `
                 <div class="order-row">
                     <div><strong>#${order.id}</strong><br><small>${order.date}</small></div>
-                    <div style="text-align:right; color:var(--text-muted);"><strong>Processing</strong><br>₹${order.total.toLocaleString()}</div>
+                    <div style="text-align:right; color:var(--text-muted);"><strong>${order.status}</strong><br>₹${order.total.toLocaleString()}</div>
                 </div>
             `;
         });
-        const existing = container.innerHTML;
-        container.innerHTML = html + existing;
+        container.innerHTML = html;
+    }
+    
+    async function fetchUserOrders() {
+        if(!currentUser) return;
+        try {
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+            const snap = await getDocs(q);
+            orderHistory = snap.docs.map(d => ({
+                id: 'ORD-' + d.id.substring(0, 6).toUpperCase(),
+                ...d.data()
+            }));
+            renderProfileOrders();
+        } catch(e) {
+            console.error("Error fetching orders:", e);
+        }
     }
 
     function triggerRain() {
@@ -2515,6 +2584,27 @@
     }
 
     // --- AUTH & PROFILE ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const userDoc = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
+                let userData = { name: "Dr. User", phone: "Update in Profile" };
+                if(!userDoc.empty) userData = userDoc.docs[0].data();
+                
+                currentUser = { uid: user.uid, email: user.email, name: userData.name, phone: userData.phone };
+                fetchUserOrders();
+            } catch(e) {
+                console.error("Error fetching user profile:", e);
+            }
+        } else {
+            currentUser = null;
+            cart = [];
+            orderHistory = [];
+            updateCartBadges();
+        }
+        updateUIForAuth();
+    });
+
     function handleAuthClick() {
         if (currentUser) {
             openProfile();
@@ -2556,44 +2646,46 @@
         }
     }
 
-    function submitAuth(e) {
+    async function submitAuth(e) {
         e.preventDefault();
         const isSignup = document.getElementById('tabSignup').classList.contains('active');
         const email = document.getElementById('authEmail').value;
         const password = document.getElementById('authPassword').value;
         const errorMsg = document.getElementById('authErrorMsg');
+        const btn = document.getElementById('authSubmitBtn');
 
-        if (!isSignup) {
-            if(email === 'demo@gridlabs.com' && password === 'demo123') {
-                currentUser = { name: "Dr. Demo User", email: email, phone: "+91-9876543210" };
-                errorMsg.style.display = 'none';
-                updateUIForAuth();
-                switchView('homeView');
+        btn.innerText = "WAIT...";
+        try {
+            if (isSignup) {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    email: email,
+                    name: "Dr. " + email.split('@')[0],
+                    phone: "Update in Profile",
+                    role: "client",
+                    coins: 0
+                });
             } else {
-                errorMsg.style.display = 'block';
+                await signInWithEmailAndPassword(auth, email, password);
             }
-        } else {
-            let name = "Dr. " + email.split('@')[0];
-            currentUser = { name: name, email: email, phone: "+91-9876543210" };
             errorMsg.style.display = 'none';
-            updateUIForAuth();
             switchView('homeView');
+        } catch (error) {
+            errorMsg.innerText = error.message.replace('Firebase: ', '');
+            errorMsg.style.display = 'block';
         }
+        btn.innerText = isSignup ? "CREATE ACCOUNT" : "LOGIN SECURELY";
     }
 
     function logoutUser() {
-        currentUser = null;
-        cart = []; 
-        orderHistory = []; 
-        updateCartBadges();
-        updateUIForAuth();
-        closeProfile();
-        switchView('homeView');
+        signOut(auth).then(() => {
+            closeProfile();
+            switchView('homeView');
+        });
     }
 
     function updateUIForAuth() {
         const mainCartIcon = document.getElementById('mainCartIcon');
-
         if (currentUser) {
             document.getElementById('topBarAuthText').innerText = "HI, " + currentUser.name.split(' ')[0].toUpperCase();
             document.getElementById('authForm').reset();
@@ -2631,7 +2723,12 @@
             case 'Account Info':
                 return `<div class="tab-content-box"><h4>Personal Details</h4><p><strong>Name:</strong> ${currentUser.name}</p><p><strong>Email:</strong> ${currentUser.email}</p><p><strong>Phone:</strong> ${currentUser.phone}</p></div><button class="signout-btn" style="border-color:var(--blue-accent); color:var(--blue-accent); margin-top:12px;">Edit Details</button>`;
             case 'Orders':
-                return `<div class="tab-content-box"><h4>Order #ORD-9921</h4><p>Placed on 23 June 2026</p><p style="color:var(--green-accent); font-weight:700;">Status: Delivered</p><p><strong>Total: ₹4,500</strong></p></div><div class="tab-content-box"><h4>Order #ORD-8812</h4><p>Placed on 10 June 2026</p><p style="color:var(--text-muted); font-weight:700;">Status: Processing</p><p><strong>Total: ₹1,200</strong></p></div>`;
+                if(orderHistory.length === 0) return `<div class="tab-content-box" style="text-align:center;"><h4>No Orders Yet</h4></div>`;
+                let ordersHtml = '';
+                orderHistory.forEach(o => {
+                    ordersHtml += `<div class="tab-content-box"><h4>Order #${o.id}</h4><p>Placed on ${o.date}</p><p style="font-weight:700; color: ${o.status === 'Delivered' ? 'var(--green-accent)' : 'var(--text-muted)'};">Status: ${o.status}</p><p><strong>Total: ₹${o.total.toLocaleString()}</strong></p></div>`;
+                });
+                return ordersHtml;
             case 'Addresses':
                 return `<div class="tab-content-box" style="border-left: 4px solid var(--blue-accent);"><h4>Clinic Address (Default)</h4><p>Oraco Dental Clinic</p><p>123 Health Street, Sector 4</p><p>New Delhi, India - 110074</p></div><button class="signout-btn" style="border-color:var(--blue-accent); color:var(--blue-accent); margin-top:12px;">+ Add New Address</button>`;
             case 'Payments':
@@ -2682,18 +2779,48 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('skeletonContainer').style.display = 'grid';
         document.getElementById('productGrid').style.display = 'none';
-        renderCategories(); 
+        
         renderSkeletons();
-        renderEventSkeletons(); // INITIALIZE EVENT SKELETONS
-        renderProducts();
+        renderEventSkeletons();
         typeWriterEffect(); 
-        updateUIForAuth();
         setupZoom();
-        setTimeout(() => {
-            document.getElementById('skeletonContainer').style.display = 'none';
-            document.getElementById('productGrid').style.display = 'grid';
-        }, 1500);
+        
+        // Fetch from Firebase and load data
+        initFirebaseAndData();
     });
+
+    // --- ATTACH ALL FUNCTIONS TO GLOBAL WINDOW ---
+    // This allows your HTML onclick="" to access these module-scoped functions
+    window.switchView = switchView;
+    window.openLocationModal = openLocationModal;
+    window.closeLocationModal = closeLocationModal;
+    window.autoFetchLocation = autoFetchLocation;
+    window.submitModalPincode = submitModalPincode;
+    window.checkPincode = checkPincode;
+    window.toggleMegamenu = toggleMegamenu;
+    window.closeMegamenu = closeMegamenu;
+    window.handleCatInteraction = handleCatInteraction;
+    window.openProduct = openProduct;
+    window.toggleWishlist = toggleWishlist;
+    window.changeImage = changeImage;
+    window.switchTab = switchTab;
+    window.updateVariantQty = updateVariantQty;
+    window.scrollReviews = scrollReviews;
+    window.switchEventTab = switchEventTab;
+    window.filterEvents = filterEvents;
+    window.handleAuthClick = handleAuthClick;
+    window.toggleAuthMode = toggleAuthMode;
+    window.submitAuth = submitAuth;
+    window.logoutUser = logoutUser;
+    window.addToCart = addToCart;
+    window.removeFromCart = removeFromCart;
+    window.placeOrder = placeOrder;
+    window.openProfile = openProfile;
+    window.closeProfile = closeProfile;
+    window.openProfileTab = openProfileTab;
+    window.closeProfileTab = closeProfileTab;
+    window.toggleSocial = toggleSocial;
+    window.submitContact = submitContact;
 
 </script>
 </body>
