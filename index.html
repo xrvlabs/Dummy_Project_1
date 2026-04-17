@@ -263,23 +263,28 @@
             position: absolute;
             border: 1px solid rgba(51, 102, 136, 0.8);
             background: rgba(104, 198, 217, 0.3);
-            width: 150px; height: 150px;
+            width: 250px; 
+            height: 250px; 
             display: none;
             pointer-events: none;
             z-index: 10;
         }
         
         .zoom-result {
-            position: absolute;
-            top: 0; left: calc(100% + 10px);
-            width: 500px; height: 480px;
+            position: fixed; /* Fixed to the screen, not the scrollable document */
+            top: 50vh; /* Absolute middle of the screen vertically */
+            /* Mathematically places it exactly in the center of the right-side content column */
+            left: calc(480px + ((100vw - 480px) / 2)); 
+            transform: translate(-50%, -50%); /* Perfect centering offset */
+            width: 550px; 
+            height: 550px;
             background-color: white;
             background-repeat: no-repeat;
             display: none;
             z-index: 1000;
             border-radius: var(--card-radius);
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.15);
         }
         
         /* Blue Overlay for Right Column */
