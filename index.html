@@ -235,19 +235,12 @@
         .pd-thumb.active { border-color: var(--blue-dark); border-width: 2px; }
 
         /* Right Column (Scrollable Content) */
-        .pd-content-col { display: flex; flex-direction: column; gap: 20px; width: 100%; min-width: 0; /* Prevents flex blowout */ }
+        .pd-content-col { display: flex; flex-direction: column; gap: 20px; width: 100%; min-width: 0; }
 
         .pd-title-box { background: white; padding: 20px; border-radius: var(--card-radius); border: 1px solid var(--border-color); width: 100%; box-sizing: border-box;}
         .pd-title-box h1 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; line-height: 1.3;}
         @media (min-width: 768px) { .pd-title-box h1 { font-size: 22px; } }
         .pd-title-box p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-        
-        .pd-brand-strip { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: var(--card-radius); border: 1px solid var(--border-color); cursor: pointer; transition: 0.2s;}
-        .pd-brand-strip:hover { border-color: var(--blue-accent); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .pd-brand-strip img { width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 4px; padding: 4px; border: 1px solid #e2e8f0; flex-shrink: 0;}
-        .pd-brand-strip div { display: flex; flex-direction: column; gap: 4px;}
-        .pd-brand-strip div strong { font-size: 16px; color: var(--text-dark); font-weight: 800;}
-        .pd-brand-strip div span { font-size: 12px; color: var(--blue-dark); font-weight: 700; display: flex; align-items: center; gap: 4px;}
 
         /* New Pincode Box */
         .pd-pincode-box { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 16px; width: 100%; box-sizing: border-box;}
@@ -279,14 +272,7 @@
         .pd-vc-pricing { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px;}
         .pd-vc-price { font-size: 22px; font-weight: 800; color: var(--text-dark); }
         .pd-vc-mrp { font-size: 14px; color: var(--text-muted); text-decoration: line-through; }
-        .pd-vc-coins { font-size: 12px; color: #d97706; font-weight: 700; display: flex; align-items: center; gap: 4px; }
         
-        .pd-vc-delivery { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 12px; border-top: 1px dashed var(--border-color); padding-top: 12px;}
-        @media (min-width: 768px) { .pd-vc-delivery { flex-direction: row; align-items: center; gap: 16px; } }
-        .pd-vc-delivery span { display: flex; align-items: center; gap: 6px; font-weight: 700; }
-        .pd-vc-delivery i { color: var(--blue-dark); font-size: 14px;}
-        .pd-vc-delivery .green { color: var(--green-accent); }
-
         .pd-vc-action { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px;}
         @media (min-width: 768px) { .pd-vc-action { flex-direction: column; justify-content: center; align-items: flex-end; border-top: none; padding-top: 0; min-width: 120px; } }
         
@@ -294,7 +280,7 @@
         @media (min-width: 768px) { .pd-vc-add-btn { width: 100%; padding: 12px 32px; } }
         .pd-vc-add-btn:hover { background: #1a4d6a; }
 
-        /* Tabs System matching Screenshot */
+        /* Tabs System */
         .pd-tabs-container { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); overflow: hidden; margin-top: 10px; width: 100%; box-sizing: border-box;}
         .pd-tabs-header { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border-color); background: #f8fafc; scrollbar-width: none; }
         .pd-tabs-header::-webkit-scrollbar { display: none; }
@@ -671,14 +657,6 @@
                     <div class="pd-title-box">
                         <h1 id="pd-title">Labodent DentWERK HD Model Resin</h1>
                         <p id="pd-subtitle">High precision dental 3D printing resin with low shrinkage for accurate model fabrication</p>
-                        
-                        <div class="pd-brand-strip">
-                            <img src="pro_1.jpg" alt="Labodent Logo">
-                            <div>
-                                <strong>Labodent</strong>
-                                <span>View More Products From Labodent <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></span>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="pd-pincode-box">
@@ -701,9 +679,6 @@
                                     <div class="pd-vc-pricing">
                                         <span class="pd-vc-price">₹1,499</span>
                                     </div>
-                                    <div class="pd-vc-delivery">
-                                        <span class="dynamic-delivery-date"><i class="fa-solid fa-truck"></i> Please enter pincode to check delivery</span>
-                                    </div>
                                 </div>
                             </div>
 
@@ -720,9 +695,6 @@
                                     <div class="pd-vc-pricing">
                                         <span class="pd-vc-price">₹1,499</span>
                                     </div>
-                                    <div class="pd-vc-delivery">
-                                        <span class="dynamic-delivery-date"><i class="fa-solid fa-truck"></i> Please enter pincode to check delivery</span>
-                                    </div>
                                 </div>
                             </div>
 
@@ -737,9 +709,6 @@
                         <div class="pd-tabs-header">
                             <div class="pd-tab active" onclick="switchTab(this, 'tab-features')"><i class="fa-solid fa-list-ul"></i> Features</div>
                             <div class="pd-tab" onclick="switchTab(this, 'tab-desc')"><i class="fa-regular fa-file-lines"></i> Description</div>
-                            <div class="pd-tab" onclick="switchTab(this, 'tab-specs')"><i class="fa-solid fa-gear"></i> Key Specifications</div>
-                            <div class="pd-tab" onclick="switchTab(this, 'tab-pack')"><i class="fa-solid fa-box-open"></i> Packaging</div>
-                            <div class="pd-tab" onclick="switchTab(this, 'tab-dir')"><i class="fa-solid fa-arrow-turn-up"></i> Direction To Use</div>
                         </div>
 
                         <div class="pd-tab-content" id="tab-features">
@@ -759,16 +728,6 @@
                             <strong>DentWerk 3D Model 4 Resin</strong> is a high-performance photopolymer resin specifically developed for dental model fabrication using advanced 3D printing technologies. Designed to deliver exceptional accuracy and detail, it ensures precise reproduction of dental structures, making it ideal for study models, diagnostic setups, and treatment planning. 
                             <br><br>
                             Compatible with LCD, DLP, and SLA 3D printers operating within a wavelength range of 365-405 nm, this resin offers versatility across multiple digital workflows.
-                        </div>
-
-                        <div class="pd-tab-content" id="tab-specs" style="display: none;">
-                            <p>Key technical specifications and material data will be listed here.</p>
-                        </div>
-                        <div class="pd-tab-content" id="tab-pack" style="display: none;">
-                            <p>Packaging details and included items.</p>
-                        </div>
-                        <div class="pd-tab-content" id="tab-dir" style="display: none;">
-                            <p>Directions for safe usage and storage.</p>
                         </div>
                     </div>
 
@@ -1086,13 +1045,6 @@
         // Show success message
         resultBox.innerHTML = `<span style="color: var(--green-accent); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Delivery by ${dateStr} to ${input}</span>`;
         
-        // Update Variant Cards Delivery Text
-        const deliverySpans = document.querySelectorAll('.dynamic-delivery-date');
-        deliverySpans.forEach(span => {
-            span.innerHTML = `<i class="fa-solid fa-truck"></i> Arrives By ${dateStr}`;
-            span.style.color = "var(--text-dark)";
-        });
-
         // Update Global Header Pincode Text
         document.getElementById('globalPincodeText').innerHTML = `${input} <i class="fa-solid fa-caret-down"></i>`;
     }
