@@ -422,6 +422,25 @@
         @media (min-width: 768px) { .pd-vc-price { font-size: 24px; } }
         .pd-vc-mrp { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
         
+        /* QUANTITY CONTROLS */
+        .pd-qty-control {
+            display: flex; align-items: center; border: 1px solid var(--border-color);
+            border-radius: var(--card-radius); height: 40px; background: white; overflow: hidden;
+        }
+        .qty-btn {
+            background: #f8fafc; border: none; color: var(--text-dark); width: 32px; height: 100%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; font-size: 10px;
+        }
+        .qty-btn:hover { background: #e2e8f0; }
+        .qty-input {
+            width: 36px; height: 100%; border: none; border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color); text-align: center; font-size: 14px; font-weight: 800;
+            color: var(--text-dark); outline: none; font-family: 'Quantico', sans-serif; pointer-events: none;
+        }
+        /* Hide arrows for number input */
+        .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .qty-input { -moz-appearance: textfield; }
+
         /* MATCHING ADD BUTTON */
         .pd-vc-add-btn { 
             background: #336688; color: white; border: none; 
@@ -446,8 +465,8 @@
         .pd-discount-table td { padding: 12px 10px; text-align: center; color: var(--text-dark); border-bottom: 1px solid #eee; font-weight: 700; }
         .pd-discount-table tr:last-child td { border-bottom: none; }
 
-       /* EXTRA INFO AREA (REVIEWS + BENEFITS) */
-        .pd-extra-info-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-top: 0; }
+        /* EXTRA INFO AREA (REVIEWS + BENEFITS) */
+        .pd-extra-info-area { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-top: 0;}
         @media (min-width: 1024px) { .pd-extra-info-area { grid-template-columns: repeat(2, 1fr); } }
 
         /* REVIEWS SLIDER STYLES */
@@ -832,7 +851,7 @@
         .loc-submit-btn:hover { background: #1a4d6a; }
 
         /* =========================================
-           EVENTS VIEW STYLES
+           EVENTS VIEW STYLES (UPDATED FOR MOBILE/TABLET)
            ========================================= */
         #eventsView { background: var(--primary-bg); width: 100%; box-sizing: border-box; }
         .events-wrapper { display: flex; flex-direction: column; width: 100%; padding: 16px 10px 32px; box-sizing: border-box; gap: 16px; }
@@ -843,15 +862,22 @@
         .events-tab { flex: 1; max-width: 200px; text-align: center; padding: 14px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: var(--transition); text-transform: uppercase;}
         .events-tab.active { color: var(--blue-accent); border-bottom-color: var(--blue-accent); background: var(--blue-light); }
 
-        .events-filters { display: flex; flex-direction: column; gap: 10px; }
+        .events-filters { display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
         @media (min-width: 768px) { .events-filters { flex-direction: row; align-items: center; justify-content: space-between; } }
 
-        .event-search-box { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; background: white; height: 42px; flex: 1; min-width: 250px;}
+        .event-search-box { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; background: white; height: 42px; width: 100%; box-sizing: border-box; }
+        @media (min-width: 768px) { .event-search-box { flex: 1; min-width: 250px; width: auto; } }
+        
         .event-search-box input { border: none; outline: none; font-size: 13px; font-family: 'Quantico', sans-serif; width: 100%; margin-left: 8px;}
 
-        .event-dropdowns { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+        /* Dropdowns set to 2-column grid on mobile */
+        .event-dropdowns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        @media (min-width: 768px) { .event-dropdowns { display: flex; width: auto; overflow-x: visible; } }
+        
         .event-dropdowns::-webkit-scrollbar { display: none; }
-        .event-select { border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; height: 42px; font-size: 13px; font-family: 'Quantico', sans-serif; background: white; color: var(--text-dark); outline: none; min-width: 130px; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;}
+        
+        .event-select { border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 0 12px; height: 42px; font-size: 13px; font-family: 'Quantico', sans-serif; background: white; color: var(--text-dark); outline: none; width: 100%; min-width: 0; box-sizing: border-box; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;}
+        @media (min-width: 768px) { .event-select { width: auto; min-width: 130px; } }
 
         .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; margin-top: 10px;}
         
@@ -1072,7 +1098,7 @@
                 <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Starting at</span>
                 <div class="bottom-price" id="bottom-price-mobile">₹1,499</div>
             </div>
-            <button class="bottom-btn" onclick="addToCart(1)">ADD</button>
+            <button class="bottom-btn" onclick="addToCart(1)">BUY</button>
         </div>
 
     </div>
@@ -2117,6 +2143,18 @@
         document.getElementById(tabId).style.display = 'block';
     }
 
+    // --- Update Variant Quantity ---
+    function updateVariantQty(event, btnElement, change) {
+        if(event) event.stopPropagation(); // Prevents clicking the variant card
+        const inputField = btnElement.parentElement.querySelector('.qty-input');
+        let currentQty = parseInt(inputField.value) || 1;
+        let newQty = currentQty + change;
+        
+        if (newQty >= 1) {
+            inputField.value = newQty;
+        }
+    }
+
     function openProduct(id) {
         currentSelectedProduct = mockProducts.find(p => p.id === id);
         if(!currentSelectedProduct) return;
@@ -2183,7 +2221,14 @@
                             <span class="pd-vc-price">₹${variant.price}</span>
                             <span class="pd-vc-mrp">₹${variant.mrp}</span>
                         </div>
-                        <button class="pd-vc-add-btn" onclick="addToCart(${currentSelectedProduct.id})">ADD</button>
+                        <div style="display: flex; gap: 8px;">
+                            <div class="pd-qty-control">
+                                <button class="qty-btn" onclick="updateVariantQty(event, this, -1)"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" class="qty-input" value="1" min="1" readonly>
+                                <button class="qty-btn" onclick="updateVariantQty(event, this, 1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <button class="pd-vc-add-btn" onclick="addToCart(${currentSelectedProduct.id})">ADD</button>
+                        </div>
                     </div>
                 </div>
             `;
