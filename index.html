@@ -178,28 +178,68 @@
             .subcat-title { font-size: 12px; padding: 12px 8px; }
         }
 
-        /* FULL-WIDTH WRAPPER FOR SLIDER */
-        .hero-wrapper-full { width: 100%; background-color: transparent; display: flex; justify-content: center; padding: 0 10px; }
-        @media (min-width: 768px) { .hero-wrapper-full { padding: 0 10px; } }
+        /* ---------------------------------------------------
+           DESKTOP SPLIT BANNER LAYOUT (Slider + Promo Cards)
+           --------------------------------------------------- */
+        .home-top-container {
+            display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%; box-sizing: border-box; max-width: 1400px; margin: 0 auto;
+        }
+        .hero-slider-wrap { flex: 1; width: 100%; min-width: 0; }
+        
+        .promo-cards-side {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
+        }
+
+        @media (min-width: 1024px) {
+            .home-top-container { flex-direction: row; align-items: stretch; }
+            .hero-slider-wrap { flex: 7.5; } /* Left side takes 75% */
+            .promo-cards-side { flex: 2.5; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } /* Right takes 25% */
+            .hero-slider.contained { height: 100%; }
+        }
 
         .hero-slider.contained {
             display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-            -ms-overflow-style: none; margin: 0; width: 100%; max-width: 1400px;
-            border-radius: 0 0 var(--card-radius) var(--card-radius); /* Taki upar se bilkul flat touch ho */
+            -ms-overflow-style: none; margin: 0; width: 100%; height: 100%;
+            border-radius: var(--card-radius);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #000;
         }
         .hero-slider.contained::-webkit-scrollbar { display: none; }
-        .hero-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; position: relative; }
+        .hero-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; position: relative; justify-content: center; align-items: center;}
         .hero-slide img { 
             width: 100%; 
-            height: auto; 
-            object-fit: contain; 
+            height: 100%; 
+            object-fit: cover; 
             display: block; 
-            opacity: 0; /* Starts hidden */
-            animation: imageFade 0.8s ease-in-out forwards; /* Smooth fade in */
+            opacity: 0; 
+            animation: imageFade 0.8s ease-in-out forwards; 
         }
 
-        /* Unified Home Gaps (10px Top to match the 10px gap between cards) */
+        /* PROMO CARDS STYLING (Instagram Frame Style) */
+        .promo-card {
+            position: relative; overflow: hidden; border-radius: var(--card-radius); padding: 20px;
+            display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: transform 0.2s;
+            min-height: 150px;
+        }
+        .promo-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .promo-content { position: relative; z-index: 2; max-width: 65%; }
+        .promo-title { font-size: 16px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; color: white; }
+        @media (min-width: 1200px) { .promo-title { font-size: 20px; } }
+        .promo-subtitle { font-size: 11px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; opacity: 0.9; color: white; }
+        .promo-btn { font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; background: white; color: var(--text-dark);}
+        .promo-btn:hover { opacity: 0.9; transform: scale(1.05); }
+        
+        .promo-img-wrap { position: absolute; right: -15px; bottom: -15px; width: 110px; z-index: 1; transform: rotate(-5deg); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .promo-card:hover .promo-img-wrap { transform: rotate(-8deg) scale(1.05); }
+        .ig-frame { background: white; padding: 4px 4px 14px 4px; border-radius: 4px; box-shadow: -4px 10px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 4px; }
+        .ig-frame img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #f8fafc; border-radius: 2px; }
+        .ig-icons { display: flex; gap: 6px; padding: 0 4px; font-size: 9px; color: var(--text-dark); }
+        
+        @media (min-width: 1200px) {
+            .promo-img-wrap { width: 130px; right: -10px; bottom: -10px; }
+        }
+        /* --------------------------------------------------- */
+
+        /* Unified Home Gaps */
         .skel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 10px 10px 32px; }
         @media (min-width: 768px) { .skel-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
         
@@ -972,6 +1012,66 @@
         .faq-item.active .faq-a { display: block; }
         .faq-item.active .faq-q i { transform: rotate(180deg); }
 
+        /* ---------------------------------------------------
+           DESKTOP SPLIT BANNER LAYOUT (Slider + Promo Cards)
+           --------------------------------------------------- */
+        .home-top-container {
+            display: flex; flex-direction: column; gap: 10px; padding: 10px; width: 100%; box-sizing: border-box; max-width: 1400px; margin: 0 auto;
+        }
+        .hero-slider-wrap { flex: 1; width: 100%; min-width: 0; }
+        
+        .promo-cards-side {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
+        }
+
+        @media (min-width: 1024px) {
+            .home-top-container { flex-direction: row; align-items: stretch; }
+            .hero-slider-wrap { flex: 7.5; } /* Left side takes 75% */
+            .promo-cards-side { flex: 2.5; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } /* Right takes 25% */
+            .hero-slider.contained { height: 100%; }
+        }
+
+        .hero-slider.contained {
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+            -ms-overflow-style: none; margin: 0; width: 100%; height: 100%;
+            border-radius: var(--card-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #000;
+        }
+        .hero-slider.contained::-webkit-scrollbar { display: none; }
+        .hero-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; position: relative; justify-content: center; align-items: center;}
+        .hero-slide img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block; 
+            opacity: 0; 
+            animation: imageFade 0.8s ease-in-out forwards; 
+        }
+
+        /* PROMO CARDS STYLING (Instagram Frame Style) */
+        .promo-card {
+            position: relative; overflow: hidden; border-radius: var(--card-radius); padding: 20px;
+            display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: transform 0.2s;
+            min-height: 150px;
+        }
+        .promo-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .promo-content { position: relative; z-index: 2; max-width: 65%; }
+        .promo-title { font-size: 16px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; color: white; }
+        @media (min-width: 1200px) { .promo-title { font-size: 20px; } }
+        .promo-subtitle { font-size: 11px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; opacity: 0.9; color: white; }
+        .promo-btn { font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; background: white; color: var(--text-dark);}
+        .promo-btn:hover { opacity: 0.9; transform: scale(1.05); }
+        
+        .promo-img-wrap { position: absolute; right: -15px; bottom: -15px; width: 110px; z-index: 1; transform: rotate(-5deg); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .promo-card:hover .promo-img-wrap { transform: rotate(-8deg) scale(1.05); }
+        .ig-frame { background: white; padding: 4px 4px 14px 4px; border-radius: 4px; box-shadow: -4px 10px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 4px; }
+        .ig-frame img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #f8fafc; border-radius: 2px; }
+        .ig-icons { display: flex; gap: 6px; padding: 0 4px; font-size: 9px; color: var(--text-dark); }
+        
+        @media (min-width: 1200px) {
+            .promo-img-wrap { width: 130px; right: -10px; bottom: -10px; }
+        }
+        /* --------------------------------------------------- */
     </style>
 </head>
 <body>
@@ -1046,10 +1146,42 @@
 
 
     <div id="homeView" class="view-section active">
-        <div class="hero-wrapper-full">
-            <div class="hero-slider contained">
-                <div class="hero-slide">
-                    <img src="banner_1.jpg" alt="Waldent ShadePro Digital Shade Determination Device">
+        
+        <div class="home-top-container">
+            <div class="hero-slider-wrap">
+                <div class="hero-slider contained">
+                    <div class="hero-slide">
+                        <img src="banner_1.jpg" alt="Waldent ShadePro Digital Shade Determination Device">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="promo-cards-side">
+                <div class="promo-card" style="background: linear-gradient(135deg, #1fa2a6, #58d8d3);">
+                    <div class="promo-content">
+                        <div class="promo-title">Flowable<br>Composites</div>
+                        <div class="promo-subtitle">Septodont, Waldent<br>Coltene & More</div>
+                        <div class="promo-btn">SHOP NOW</div>
+                    </div>
+                    <div class="promo-img-wrap ig-frame-1">
+                        <div class="ig-frame">
+                            <img src="pro_1.jpg" alt="Composite">
+                            <div class="ig-icons"><i class="fa-solid fa-heart" style="color:#ef4444;"></i> <i class="fa-regular fa-comment"></i> <i class="fa-regular fa-paper-plane"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="promo-card" style="background: linear-gradient(135deg, #91a8d0, #e2eafc);">
+                    <div class="promo-content">
+                        <div class="promo-title" style="color: #334155;">Pedo<br>Crowns</div>
+                        <div class="promo-subtitle" style="color: #475569;">Kids-e-Crown, 3M ESPE<br>Tor Vm & More</div>
+                        <div class="promo-btn" style="background: #3b82f6; color: white;">SHOP NOW</div>
+                    </div>
+                    <div class="promo-img-wrap ig-frame-2">
+                        <div class="ig-frame">
+                            <img src="pro_2.jpg" alt="Crowns">
+                            <div class="ig-icons"><i class="fa-solid fa-heart" style="color:#ef4444;"></i> <i class="fa-regular fa-comment"></i> <i class="fa-regular fa-paper-plane"></i></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
