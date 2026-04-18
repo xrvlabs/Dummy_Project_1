@@ -1628,7 +1628,12 @@
             result.style.backgroundPosition = `-${lensX * cx}px -${lensY * cy}px`;
         });
     }
-
+    function updateEventTabCounts() {
+        const liveTab = document.getElementById('tabLiveEvents');
+        const pastTab = document.getElementById('tabPastEvents');
+        if(liveTab) liveTab.innerText = `Live Events (${mockLiveEvents.length})`;
+        if(pastTab) pastTab.innerText = `Past Events (${mockPastEvents.length})`;
+    }
     // --- LOCATION LOGIC ---
     function openLocationModal() {
         document.getElementById('locationOverlay').style.display = 'block';
@@ -1931,6 +1936,7 @@
         document.getElementById('skeletonContainer').style.display = 'none';
         document.getElementById('productGrid').style.display = 'grid';
         renderProducts();
+        updateEventTabCounts();
         filterEvents();
     }
 
