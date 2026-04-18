@@ -2147,7 +2147,9 @@
     }
 
     function renderSubcategories(cat) {
-        document.getElementById('mmContentTitle').innerHTML = `${cat.title} <span>${cat.items ? cat.items.length : 0}</span>`;
+        // Sirf category ka title show hoga, count hata diya gaya hai
+        document.getElementById('mmContentTitle').innerHTML = cat.title;
+        
         if(cat.items) {
             document.getElementById('mmContentGrid').innerHTML = cat.items.map(item => `
                 <div class="subcat-card" onclick="openProduct(${item.prodId || 1})">
@@ -2774,10 +2776,32 @@
         }, 1500);
     }
 
+    // --- OUTSIDE CLICK & SCROLL HANDLERS ---
     document.addEventListener('click', (event) => {
+        // 1. Social Icons Outside Click
         const isClickInsideSocialIcon = event.target.closest('.social-icon');
-        if (!isClickInsideSocialIcon) { document.querySelectorAll('.social-icon').forEach(icon => icon.classList.remove('expanded')); }
+        if (!isClickInsideSocialIcon) { 
+            document.querySelectorAll('.social-icon').forEach(icon => icon.classList.remove('expanded')); 
+        }
+
+        // 2. Megamenu Outside Click (Mobile/Tablet auto-close)
+        const megamenu = document.getElementById('megamenu');
+        const catBtn = document.getElementById('catDropdownBtn');
+        if (window.innerWidth < 1024 && megamenu && megamenu.classList.contains('active')) {
+            // Agar click megamenu ke andar nahi hai aur category button par bhi nahi hai
+            if (!megamenu.contains(event.target) && (!catBtn || !catBtn.contains(event.target))) {
+                closeMegamenu();
+            }
+        }
     });
+
+    // 3. Megamenu Scroll Auto-Close (Mobile/Tablet)
+    window.addEventListener('scroll', () => {
+        const megamenu = document.getElementById('megamenu');
+        if (window.innerWidth < 1024 && megamenu && megamenu.classList.contains('active')) {
+            closeMegamenu();
+        }
+    }, { passive: true });
 
     window.addEventListener('resize', evaluateTabHeights);
 
