@@ -1147,12 +1147,12 @@
         
         <div class="home-top-container">
             <div class="hero-slider-wrap">
-                <div class="hero-slider contained">
-                    <div class="hero-slide">
-                        <img src="banner_1.jpg" alt="Waldent ShadePro Digital Shade Determination Device">
-                    </div>
-                </div>
-            </div>
+    <div class="hero-slider contained" id="heroSliderContainer">
+        <div class="hero-slide">
+            <div class="skeleton" style="width: 100%; height: 100%;"></div>
+        </div>
+    </div>
+</div>
             
             <div class="promo-cards-side">
                 <div class="promo-card" style="background: linear-gradient(135deg, #1fa2a6, #58d8d3);">
@@ -1980,7 +1980,29 @@
     let mockProducts = [];
     let mockLiveEvents = [];
     let mockPastEvents = [];
+let bannersData = [];
 
+// Banners render karne ka naya function
+function renderBanners() {
+    const sliderContainer = document.getElementById('heroSliderContainer');
+    if (!sliderContainer) return;
+
+    if (bannersData.length === 0) {
+        // Agar database me koi banner nahi hai, to fallback image show karo
+        sliderContainer.innerHTML = `
+            <div class="hero-slide">
+                <img src="banner_1.jpg" alt="Default Promo Banner">
+            </div>`;
+        return;
+    }
+
+    // Firebase se aayi hui images render karna
+    sliderContainer.innerHTML = bannersData.map(banner => `
+        <div class="hero-slide">
+            <img src="${banner.img}" alt="Promo Banner" loading="lazy">
+        </div>
+    `).join('');
+}
     // --- State ---
     let currentUser = null; 
     let cart = [];
@@ -2000,78 +2022,47 @@
         contactView: document.getElementById('contactView')
     };
 
-    // --- Firebase Initialization Data Routine (Strictly RTDB) ---
     async function initFirebaseAndData() {
-        try {
-            const dbRef = ref(db);
-            const prodSnap = await get(child(dbRef, 'products'));
+    try {
+        const dbRef = ref(db);
+        const prodSnap = await get(child(dbRef, 'products'));
+        
+        if (!prodSnap.exists()) {
+            console.log("Empty RTDB detected. Seeding data...");
+            // ... (Aapka existing seed logic) ...
+        } else {
+            console.log("Fetching live data from Firebase RTDB...");
+            mockProducts = Object.values(prodSnap.val() || {});
             
-            if (!prodSnap.exists()) {
-                console.log("Empty RTDB detected. Seeding data...");
-                
-                // Hardcoded data just for seeding an empty DB
-                const seedCategories = [
-                    { id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag', items: [{ name: 'WALDENT', img: 'pro_1.jpg', prodId: 1 }, { name: '3M ESPE', img: 'pro_2.jpg', prodId: 2 }, { name: 'DENTSPLY', img: 'pro_1.jpg', prodId: 3 }, { name: 'GC', img: 'pro_2.jpg', prodId: 4 }] },
-                    { id: 'cat_endo', title: 'ENDODONTICS', icon: 'fa-syringe', items: [{ name: 'ROTARY FILES', img: 'pro_1.jpg', prodId: 1 }, { name: 'LOCATORS', img: 'pro_2.jpg', prodId: 2 }, { name: 'ENDO MOTORS', img: 'pro_1.jpg', prodId: 3 }] }
-                ];
-                const seedProducts = [
-                    { id: 1, title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', subtitle: 'Advanced digital imaging sensor for precise dental diagnostics', img: 'pro_1.jpg', priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true, variants: [{ name: 'Size 1.5 (Standard)', img: 'pro_1.jpg', price: '55,000', mrp: '210,000', priceNum: 55000 }] },
-                    { id: 2, title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', subtitle: 'Comprehensive driver kit for all major implant systems', img: 'pro_2.jpg', priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false, variants: [{ name: 'Standard Kit (8 Drivers)', img: 'pro_2.jpg', price: '3,490', mrp: '13,990', priceNum: 3490 }] },
-                    { id: 3, title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', subtitle: 'Calcium Hydroxide Paste with Barium Sulfate for root canal therapy', img: 'pro_1.jpg', priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false, variants: [{ name: 'Pack of 4 Syringes', img: 'pro_1.jpg', price: '360', mrp: '1,100', priceNum: 360 }] },
-                    { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', subtitle: 'High precision dental 3D printing resin with low shrinkage', img: 'pro_2.jpg', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false, variants: [{ name: 'Grey Shade - 1Kg', img: 'pro_1.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }, { name: 'Almond Shade - 1Kg', img: 'pro_2.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }] }
-                ];
-                const seedLiveEvents = [
-                    { id: 1, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Post+%26+Core+Restorations', title: 'Post & Core Restorations - From Fragile to Functional', date: 'Wed May 06, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-                    { id: 2, img: 'https://placehold.co/600x400/0f172a/ffffff?text=PFM+Crown+Preparation', title: 'PFM Crown Preparation for Molar (Beginners Course)', date: 'Thu May 14, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-                    { id: 3, img: 'https://placehold.co/600x400/312e81/ffffff?text=Zirconia+Tooth+Prep', title: 'Tooth Preparation Course for Zirconia - Anterior Teeth', date: 'Sat May 23, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Education' },
-                    { id: 4, img: 'https://placehold.co/600x400/9d174d/ffffff?text=Pediatric+Dentistry', title: 'Making Pediatric Dentistry Easy', date: 'Tue Jun 02, 2026 - 09:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-                    { id: 5, img: 'https://placehold.co/600x400/064e3b/ffffff?text=Dental+Photography', title: 'Dental Photography Delhi', date: 'Fri Jun 12, 2026 - 09:30 AM (IST)', type: 'In-Person', cat: 'Education' },
-                    { id: 6, img: 'https://placehold.co/600x400/7f1d1d/ffffff?text=Pediatric+Dentistry+Guwahati', title: 'Making Pediatric Dentistry Easy - Guwahati', date: 'Sun Jun 28, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' }
-                ];
-                const seedPastEvents = [
-                    { id: 101, img: 'https://placehold.co/600x400/475569/ffffff?text=Endodontics+Masterclass', title: 'Endodontics Masterclass - Single Visit RCT', date: 'Mon Mar 16, 2026 - 10:00 AM (IST)', type: 'In-Person', cat: 'Education' },
-                    { id: 102, img: 'https://placehold.co/600x400/334155/ffffff?text=Laser+Dentistry', title: 'Basics of Laser Dentistry', date: 'Thu Feb 26, 2026 - 02:00 PM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-                    { id: 103, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Clear+Aligners+Workshop', title: 'Clear Aligners Certification Workshop', date: 'Sat Jan 10, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' },
-                    { id: 104, img: 'https://placehold.co/600x400/0f172a/ffffff?text=Digital+Smile+Design', title: 'Digital Smile Design (DSD) Protocol', date: 'Wed Dec 10, 2025 - 04:00 PM (IST)', type: 'Virtual', cat: 'Education' }
-                ];
-
-                let pObj = {}; seedProducts.forEach(p => pObj[p.id] = p);
-                let cObj = {}; seedCategories.forEach(c => cObj[c.id] = c);
-                let eObj = {}; 
-                seedLiveEvents.forEach(e => eObj["live_"+e.id] = {...e, status: 'live'});
-                seedPastEvents.forEach(e => eObj["past_"+e.id] = {...e, status: 'past'});
-
-                await set(ref(db, 'products'), pObj);
-                await set(ref(db, 'categories'), cObj);
-                await set(ref(db, 'events'), eObj);
-                
-                console.log("Firebase seeded. Re-fetching data...");
-                setTimeout(initFirebaseAndData, 500); 
-                return;
-            } else {
-                console.log("Fetching live data from Firebase RTDB...");
-                mockProducts = Object.values(prodSnap.val() || {});
-                
-                const catSnap = await get(child(dbRef, 'categories'));
-                if(catSnap.exists()) categoriesData = Object.values(catSnap.val() || {});
-                
-                const eventSnap = await get(child(dbRef, 'events'));
-                if(eventSnap.exists()) {
-                    const allEvents = Object.values(eventSnap.val() || {});
-                    mockLiveEvents = allEvents.filter(e => e.status === 'live');
-                    mockPastEvents = allEvents.filter(e => e.status === 'past');
-                }
+            const catSnap = await get(child(dbRef, 'categories'));
+            if(catSnap.exists()) categoriesData = Object.values(catSnap.val() || {});
+            
+            const eventSnap = await get(child(dbRef, 'events'));
+            if(eventSnap.exists()) {
+                const allEvents = Object.values(eventSnap.val() || {});
+                mockLiveEvents = allEvents.filter(e => e.status === 'live');
+                mockPastEvents = allEvents.filter(e => e.status === 'past');
             }
-        } catch(e) {
-            console.error("Firebase connection issue. Check your Database Rules.", e);
-        }
 
-        document.getElementById('skeletonContainer').style.display = 'none';
-        document.getElementById('productGrid').style.display = 'grid';
-        renderProducts();
-        updateEventTabCounts();
-        filterEvents();
+            // 👇 NAYA CODE YAHAN ADD KARNA HAI 👇
+            const bannerSnap = await get(child(dbRef, 'banners'));
+            if(bannerSnap.exists()) {
+                bannersData = Object.values(bannerSnap.val() || {});
+            }
+        }
+    } catch(e) {
+        console.error("Firebase connection issue. Check your Database Rules.", e);
     }
+
+    document.getElementById('skeletonContainer').style.display = 'none';
+    document.getElementById('productGrid').style.display = 'grid';
+    
+    // UI update calls
+    renderBanners(); // 👈 Banner render call add kardi
+    renderProducts();
+    updateEventTabCounts();
+    filterEvents();
+}
 
     // --- View Management ---
     function switchView(targetViewId) {
