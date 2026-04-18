@@ -77,6 +77,10 @@
         .tab-skel-row { height: 60px; margin-bottom: 12px; border-radius: 8px; width: 100%; }
         .tab-skel-box { height: 120px; margin-bottom: 16px; border-radius: 8px; width: 100%; }
 
+        /* Category Shimmer Classes */
+        .skel-cat-li { height: 35px !important; min-width: 110px; padding: 0 !important; border: none !important; border-radius: var(--card-radius) !important;}
+        @media (min-width: 1024px) { .skel-cat-li { height: 44px !important; width: 100%; margin-bottom: 8px; } }
+
         /* GLOBAL HEADER STYLES */
         .sticky-header-container { position: sticky; top: 0; z-index: 500; background: white; border-bottom: 1px solid var(--border-color);}
         .header-master { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color);}
@@ -130,7 +134,7 @@
         .mm-sidebar-title { display: none; }
         .mm-cat-list { display: flex; overflow-x: auto; padding: 0 10px; gap: 8px; list-style: none; -ms-overflow-style: none; scrollbar-width: none; }
         .mm-cat-list::-webkit-scrollbar { display: none; }
-        .mm-cat-list li { padding: 8px 16px; font-size: 12px; color: var(--text-dark); font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); border-radius: 20px; white-space: nowrap; transition: var(--transition); }
+        .mm-cat-list li { padding: 8px 16px; font-size: 12px; color: var(--text-dark); font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); border-radius: var(--card-radius); white-space: nowrap; transition: var(--transition); }
         .mm-cat-list li:hover { background: #f1f5f9; }
         .mm-cat-list li.active { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
         .mm-cat-list li i.icon, .mm-cat-list li i.arrow { display: none; }
@@ -1847,7 +1851,7 @@
     let currentSelectedProduct = null;
     let eventTimeout;
     let currentEventTab = 'live'; 
-    let mmTimeout; // Timeout for megamenu shimmer
+    let mmTimeout;
 
     const views = {
         homeView: document.getElementById('homeView'),
@@ -2101,20 +2105,17 @@
 
         // Sidebar Skeleton
         catList.innerHTML = Array(5).fill(`
-            <li style="pointer-events: none;">
-                <div class="skeleton" style="height: 20px; width: 20px; border-radius: 50%; display: inline-block;"></div>
-                <div class="skeleton" style="height: 16px; width: 70%; border-radius: 4px; margin-left: 12px; display: inline-block;"></div>
-            </li>
+            <li class="skeleton skel-cat-li" style="pointer-events: none;"></li>
         `).join('');
         
         // Title Skeleton
-        contentTitle.innerHTML = '<div class="skeleton" style="height: 20px; width: 120px; border-radius: 4px;"></div>';
+        contentTitle.innerHTML = '<div class="skeleton" style="height: 20px; width: 120px; border-radius: var(--card-radius);"></div>';
         
         // Grid Skeleton
         contentGrid.innerHTML = Array(8).fill(`
-            <div class="subcat-card" style="pointer-events: none; border-color: #f1f5f9; background: white;">
-                <div class="subcat-img" style="padding: 0;"><div class="skeleton" style="height: 100%; width: 100%;"></div></div>
-                <div class="subcat-title" style="display: flex; justify-content: center; align-items: center; height: 30px;"><div class="skeleton" style="height: 12px; width: 80%; border-radius: 2px;"></div></div>
+            <div class="subcat-card" style="pointer-events: none; border-color: transparent; box-shadow: none; background: transparent;">
+                <div class="skeleton" style="height: 80px; width: 100%; border-radius: var(--card-radius);"></div>
+                <div style="padding: 10px;"><div class="skeleton" style="height: 12px; width: 80%; margin: 0 auto; border-radius: var(--card-radius);"></div></div>
             </div>
         `).join('');
 
