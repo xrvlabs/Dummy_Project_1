@@ -181,13 +181,14 @@
         }
 
         /* FULL-WIDTH WRAPPER FOR SLIDER */
-        .hero-wrapper-full { width: 100%; background-color: #f0f2f5; display: flex; justify-content: center; padding: 16px 10px; }
-        @media (min-width: 768px) { .hero-wrapper-full { padding: 24px 10px; } }
+        .hero-wrapper-full { width: 100%; background-color: transparent; display: flex; justify-content: center; padding: 0 10px; }
+        @media (min-width: 768px) { .hero-wrapper-full { padding: 0 10px; } }
 
         .hero-slider.contained {
             display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
             -ms-overflow-style: none; margin: 0; width: 100%; max-width: 1400px;
-            border-radius: var(--card-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #000;
+            border-radius: 0 0 var(--card-radius) var(--card-radius); /* Taki upar se bilkul flat touch ho */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #000;
         }
         .hero-slider.contained::-webkit-scrollbar { display: none; }
         .hero-slide { flex: 0 0 100%; scroll-snap-align: start; display: flex; position: relative; }
