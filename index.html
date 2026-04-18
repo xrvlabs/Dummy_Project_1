@@ -1758,7 +1758,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, push, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+   import { getDatabase, ref, get, set, push, child, query, orderByChild, equalTo, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -2118,7 +2118,21 @@
         eventsView: document.getElementById('eventsView'),
         contactView: document.getElementById('contactView')
     };
+function trackUniqueVisitor() {
+        const today = new Date().toISOString().split('T')[0]; // Aaj ki date: 2026-04-18
+        const storageKey = 'oraco_visit_' + today;
 
+        // Agar user ne aaj visit nahi kiya hai
+        if (!localStorage.getItem(storageKey)) {
+            const visitorRef = ref(db, 'analytics/daily_visitors/' + today);
+            
+            runTransaction(visitorRef, (currentValue) => {
+                return (currentValue || 0) + 1;
+            }).then(() => {
+                localStorage.setItem(storageKey, 'true'); // Aaj ke liye block kar do
+            });
+        }
+    }
     async function initFirebaseAndData() {
         try {
             const dbRef = ref(db);
@@ -3091,7 +3105,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('skeletonContainer').style.display = 'grid';
         document.getElementById('productGrid').style.display = 'none';
-        
+        trackUniqueVisitor();
         renderSkeletons();
         renderEventSkeletons();
         typeWriterEffect(); 
