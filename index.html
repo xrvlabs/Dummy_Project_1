@@ -187,8 +187,7 @@
     padding: 10px; 
     width: 100%;
     box-sizing: border-box;
-    /* This ensures a gap even if flex items stretch */
-    margin-bottom: 20px !important; 
+    margin-bottom: 10px !important;
 }
 
 .hero-slider-wrap { 
@@ -205,16 +204,17 @@
 @media (min-width: 1024px) {
     .home-top-container {
         flex-direction: row !important;
-        align-items: stretch;
+        /* CHANGE 1: Dono sides ki height barabar karne ke liye */
+        align-items: stretch !important; 
         justify-content: flex-start;
-        /* Forced space below the entire banner/promo block */
         margin-bottom: 25px !important; 
     }
 
     .hero-slider-wrap {
         flex: 0 0 75%;
         max-width: 1400px;
-        max-height: 450px; 
+        /* Height auto rakhenge taki stretch kaam kare */
+        max-height: none; 
     }
 
     .promo-cards-side {
@@ -225,16 +225,25 @@
         gap: 10px;
     }
 
+    /* CHANGE 2: Cards ko available height poori lene ke liye */
+    .promo-card {
+        flex: 1;
+        min-height: unset;
+    }
+
     .hero-slide {
         aspect-ratio: 3.2 / 1; 
     }
 }
 
+/* CHANGE 3: Image ko poora dikhane ke liye (Clipped look hatane ke liye) */
+.hero-slide img {
+    object-fit: contain;
+}
+
 /* Ensure the grid below doesn't collapse into the header */
 #productGrid, #skeletonContainer {
-    display: grid;
-    padding: 10px 10px 32px;
-    clear: both;
+    padding-top: 0px !important;
 }
 
 .hero-slider.contained {
