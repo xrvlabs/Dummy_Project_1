@@ -1554,7 +1554,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, setDoc, doc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getDatabase, ref, get, set, push, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -1568,7 +1568,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
     const auth = getAuth(app);
 
     // --- ZOOM LOGIC ---
@@ -1834,81 +1834,11 @@
         track.scrollBy({ left: dir * slideWidth, behavior: 'smooth' });
     }
 
-    // --- Data ---
-    let categoriesData = [
-        {
-            id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag',
-            items: [
-                { name: 'WALDENT', img: 'pro_1.jpg', prodId: 1 },
-                { name: '3M ESPE', img: 'pro_2.jpg', prodId: 2 },
-                { name: 'DENTSPLY', img: 'pro_1.jpg', prodId: 3 },
-                { name: 'GC', img: 'pro_2.jpg', prodId: 4 }
-            ]
-        },
-        {
-            id: 'cat_endo', title: 'ENDODONTICS', icon: 'fa-syringe',
-            items: [
-                { name: 'ROTARY FILES', img: 'pro_1.jpg', prodId: 1 },
-                { name: 'LOCATORS', img: 'pro_2.jpg', prodId: 2 },
-                { name: 'ENDO MOTORS', img: 'pro_1.jpg', prodId: 3 }
-            ]
-        }
-    ];
-
-    let mockProducts = [
-        { 
-            id: 1, 
-            title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', 
-            subtitle: 'Advanced digital imaging sensor for precise dental diagnostics',
-            img: 'pro_1.jpg', 
-            priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true,
-            variants: [{ name: 'Size 1.5 (Standard)', img: 'pro_1.jpg', price: '55,000', mrp: '210,000', priceNum: 55000 }]
-        },
-        { 
-            id: 2, 
-            title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', 
-            subtitle: 'Comprehensive driver kit for all major implant systems',
-            img: 'pro_2.jpg', 
-            priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false,
-            variants: [{ name: 'Standard Kit (8 Drivers)', img: 'pro_2.jpg', price: '3,490', mrp: '13,990', priceNum: 3490 }]
-        },
-        { 
-            id: 3, 
-            title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', 
-            subtitle: 'Calcium Hydroxide Paste with Barium Sulfate for root canal therapy',
-            img: 'pro_1.jpg', 
-            priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false,
-            variants: [{ name: 'Pack of 4 Syringes', img: 'pro_1.jpg', price: '360', mrp: '1,100', priceNum: 360 }]
-        },
-        { 
-            id: 4, 
-            title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', 
-            subtitle: 'High precision dental 3D printing resin with low shrinkage',
-            img: 'pro_2.jpg', 
-            priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false,
-            variants: [
-                { name: 'Grey Shade - 1Kg', img: 'pro_1.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 },
-                { name: 'Almond Shade - 1Kg', img: 'pro_2.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }
-            ]
-        }
-    ];
-
-    // --- EVENTS DATA ---
-    let mockLiveEvents = [
-        { id: 1, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Post+%26+Core+Restorations', title: 'Post & Core Restorations - From Fragile to Functional', date: 'Wed May 06, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-        { id: 2, img: 'https://placehold.co/600x400/0f172a/ffffff?text=PFM+Crown+Preparation', title: 'PFM Crown Preparation for Molar (Beginners Course)', date: 'Thu May 14, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-        { id: 3, img: 'https://placehold.co/600x400/312e81/ffffff?text=Zirconia+Tooth+Prep', title: 'Tooth Preparation Course for Zirconia - Anterior Teeth', date: 'Sat May 23, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Education' },
-        { id: 4, img: 'https://placehold.co/600x400/9d174d/ffffff?text=Pediatric+Dentistry', title: 'Making Pediatric Dentistry Easy', date: 'Tue Jun 02, 2026 - 09:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-        { id: 5, img: 'https://placehold.co/600x400/064e3b/ffffff?text=Dental+Photography', title: 'Dental Photography Delhi', date: 'Fri Jun 12, 2026 - 09:30 AM (IST)', type: 'In-Person', cat: 'Education' },
-        { id: 6, img: 'https://placehold.co/600x400/7f1d1d/ffffff?text=Pediatric+Dentistry+Guwahati', title: 'Making Pediatric Dentistry Easy - Guwahati', date: 'Sun Jun 28, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' }
-    ];
-
-    let mockPastEvents = [
-        { id: 101, img: 'https://placehold.co/600x400/475569/ffffff?text=Endodontics+Masterclass', title: 'Endodontics Masterclass - Single Visit RCT', date: 'Mon Mar 16, 2026 - 10:00 AM (IST)', type: 'In-Person', cat: 'Education' },
-        { id: 102, img: 'https://placehold.co/600x400/334155/ffffff?text=Laser+Dentistry', title: 'Basics of Laser Dentistry', date: 'Thu Feb 26, 2026 - 02:00 PM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
-        { id: 103, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Clear+Aligners+Workshop', title: 'Clear Aligners Certification Workshop', date: 'Sat Jan 10, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' },
-        { id: 104, img: 'https://placehold.co/600x400/0f172a/ffffff?text=Digital+Smile+Design', title: 'Digital Smile Design (DSD) Protocol', date: 'Wed Dec 10, 2025 - 04:00 PM (IST)', type: 'Virtual', cat: 'Education' }
-    ];
+    // --- Fallback Data Arrays (Will be overwritten by DB) ---
+    let categoriesData = [];
+    let mockProducts = [];
+    let mockLiveEvents = [];
+    let mockPastEvents = [];
 
     // --- State ---
     let currentUser = null; 
@@ -1916,7 +1846,7 @@
     let orderHistory = [];
     let currentSelectedProduct = null;
     let eventTimeout;
-    let currentEventTab = 'live'; // Tracking state for filtering
+    let currentEventTab = 'live'; 
 
     const views = {
         homeView: document.getElementById('homeView'),
@@ -1927,41 +1857,77 @@
         contactView: document.getElementById('contactView')
     };
 
-    // --- Firebase Initialization Data Routine ---
+    // --- Firebase Initialization Data Routine (Strictly RTDB) ---
     async function initFirebaseAndData() {
         try {
-            const prodSnap = await getDocs(collection(db, "products"));
+            const dbRef = ref(db);
+            const prodSnap = await get(child(dbRef, 'products'));
             
-            if (prodSnap.empty) {
-                // If DB is empty, push default dummy data
-                for (let p of mockProducts) await setDoc(doc(db, "products", p.id.toString()), p);
-                for (let c of categoriesData) await setDoc(doc(db, "categories", c.id), c);
-                for (let e of mockLiveEvents) await setDoc(doc(db, "events", "live_" + e.id), { ...e, status: 'live' });
-                for (let e of mockPastEvents) await setDoc(doc(db, "events", "past_" + e.id), { ...e, status: 'past' });
-                console.log("Firebase seeded automatically.");
+            if (!prodSnap.exists()) {
+                console.log("Empty RTDB detected. Seeding data...");
+                
+                // Hardcoded data just for seeding an empty DB
+                const seedCategories = [
+                    { id: 'cat_brands', title: 'DENTAL BRANDS', icon: 'fa-tag', items: [{ name: 'WALDENT', img: 'pro_1.jpg', prodId: 1 }, { name: '3M ESPE', img: 'pro_2.jpg', prodId: 2 }, { name: 'DENTSPLY', img: 'pro_1.jpg', prodId: 3 }, { name: 'GC', img: 'pro_2.jpg', prodId: 4 }] },
+                    { id: 'cat_endo', title: 'ENDODONTICS', icon: 'fa-syringe', items: [{ name: 'ROTARY FILES', img: 'pro_1.jpg', prodId: 1 }, { name: 'LOCATORS', img: 'pro_2.jpg', prodId: 2 }, { name: 'ENDO MOTORS', img: 'pro_1.jpg', prodId: 3 }] }
+                ];
+                const seedProducts = [
+                    { id: 1, title: 'WOODPECKER RTA INTELLI-SENSOR RVG BY WALDENT SIZE - 1.5', subtitle: 'Advanced digital imaging sensor for precise dental diagnostics', img: 'pro_1.jpg', priceNum: 55000, price: '55,000', mrp: '210,000', discount: '73.81', coins: 2000, freebie: true, variants: [{ name: 'Size 1.5 (Standard)', img: 'pro_1.jpg', price: '55,000', mrp: '210,000', priceNum: 55000 }] },
+                    { id: 2, title: 'DENTALTECH UNIVERSAL PROSTHETIC DRIVER KIT', subtitle: 'Comprehensive driver kit for all major implant systems', img: 'pro_2.jpg', priceNum: 3490, price: '3,490', mrp: '13,990', discount: '75.05', coins: 170, freebie: false, variants: [{ name: 'Standard Kit (8 Drivers)', img: 'pro_2.jpg', price: '3,490', mrp: '13,990', priceNum: 3490 }] },
+                    { id: 3, title: 'WALDENT RCTCAL ECONOMY PACK (PACK OF 4)', subtitle: 'Calcium Hydroxide Paste with Barium Sulfate for root canal therapy', img: 'pro_1.jpg', priceNum: 360, price: '360', mrp: '1,100', discount: '67.27', coins: 20, freebie: false, variants: [{ name: 'Pack of 4 Syringes', img: 'pro_1.jpg', price: '360', mrp: '1,100', priceNum: 360 }] },
+                    { id: 4, title: 'ARMA DENTAL TEMPORARY CROWN & BRIDGE 3D PRINTING RESIN', subtitle: 'High precision dental 3D printing resin with low shrinkage', img: 'pro_2.jpg', priceNum: 15000, price: '15,000', mrp: '18,000', discount: '16.66', coins: 500, freebie: false, variants: [{ name: 'Grey Shade - 1Kg', img: 'pro_1.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }, { name: 'Almond Shade - 1Kg', img: 'pro_2.jpg', price: '15,000', mrp: '18,000', priceNum: 15000 }] }
+                ];
+                const seedLiveEvents = [
+                    { id: 1, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Post+%26+Core+Restorations', title: 'Post & Core Restorations - From Fragile to Functional', date: 'Wed May 06, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+                    { id: 2, img: 'https://placehold.co/600x400/0f172a/ffffff?text=PFM+Crown+Preparation', title: 'PFM Crown Preparation for Molar (Beginners Course)', date: 'Thu May 14, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+                    { id: 3, img: 'https://placehold.co/600x400/312e81/ffffff?text=Zirconia+Tooth+Prep', title: 'Tooth Preparation Course for Zirconia - Anterior Teeth', date: 'Sat May 23, 2026 - 08:00 AM (IST)', type: 'Virtual', cat: 'Education' },
+                    { id: 4, img: 'https://placehold.co/600x400/9d174d/ffffff?text=Pediatric+Dentistry', title: 'Making Pediatric Dentistry Easy', date: 'Tue Jun 02, 2026 - 09:00 AM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+                    { id: 5, img: 'https://placehold.co/600x400/064e3b/ffffff?text=Dental+Photography', title: 'Dental Photography Delhi', date: 'Fri Jun 12, 2026 - 09:30 AM (IST)', type: 'In-Person', cat: 'Education' },
+                    { id: 6, img: 'https://placehold.co/600x400/7f1d1d/ffffff?text=Pediatric+Dentistry+Guwahati', title: 'Making Pediatric Dentistry Easy - Guwahati', date: 'Sun Jun 28, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' }
+                ];
+                const seedPastEvents = [
+                    { id: 101, img: 'https://placehold.co/600x400/475569/ffffff?text=Endodontics+Masterclass', title: 'Endodontics Masterclass - Single Visit RCT', date: 'Mon Mar 16, 2026 - 10:00 AM (IST)', type: 'In-Person', cat: 'Education' },
+                    { id: 102, img: 'https://placehold.co/600x400/334155/ffffff?text=Laser+Dentistry', title: 'Basics of Laser Dentistry', date: 'Thu Feb 26, 2026 - 02:00 PM (IST)', type: 'Virtual', cat: 'Health & Medicine' },
+                    { id: 103, img: 'https://placehold.co/600x400/1e293b/ffffff?text=Clear+Aligners+Workshop', title: 'Clear Aligners Certification Workshop', date: 'Sat Jan 10, 2026 - 09:00 AM (IST)', type: 'In-Person', cat: 'Health & Medicine' },
+                    { id: 104, img: 'https://placehold.co/600x400/0f172a/ffffff?text=Digital+Smile+Design', title: 'Digital Smile Design (DSD) Protocol', date: 'Wed Dec 10, 2025 - 04:00 PM (IST)', type: 'Virtual', cat: 'Education' }
+                ];
+
+                let pObj = {}; seedProducts.forEach(p => pObj[p.id] = p);
+                let cObj = {}; seedCategories.forEach(c => cObj[c.id] = c);
+                let eObj = {}; 
+                seedLiveEvents.forEach(e => eObj["live_"+e.id] = {...e, status: 'live'});
+                seedPastEvents.forEach(e => eObj["past_"+e.id] = {...e, status: 'past'});
+
+                await set(ref(db, 'products'), pObj);
+                await set(ref(db, 'categories'), cObj);
+                await set(ref(db, 'events'), eObj);
+                
+                console.log("Firebase seeded. Re-fetching data...");
+                setTimeout(initFirebaseAndData, 500); 
+                return;
             } else {
-                // Otherwise fetch fresh data
-                mockProducts = prodSnap.docs.map(d => d.data());
+                console.log("Fetching live data from Firebase RTDB...");
+                mockProducts = Object.values(prodSnap.val() || {});
                 
-                const catSnap = await getDocs(collection(db, "categories"));
-                if(!catSnap.empty) categoriesData = catSnap.docs.map(d => d.data());
+                const catSnap = await get(child(dbRef, 'categories'));
+                if(catSnap.exists()) categoriesData = Object.values(catSnap.val() || {});
                 
-                const eventSnap = await getDocs(collection(db, "events"));
-                if(!eventSnap.empty) {
-                    const allEvents = eventSnap.docs.map(d => d.data());
+                const eventSnap = await get(child(dbRef, 'events'));
+                if(eventSnap.exists()) {
+                    const allEvents = Object.values(eventSnap.val() || {});
                     mockLiveEvents = allEvents.filter(e => e.status === 'live');
                     mockPastEvents = allEvents.filter(e => e.status === 'past');
                 }
             }
         } catch(e) {
-            console.error("Firebase connection issue. Using local mock data.", e);
+            console.error("Firebase connection issue. Check your Database Rules.", e);
         }
 
-        // Render UI
         document.getElementById('skeletonContainer').style.display = 'none';
         document.getElementById('productGrid').style.display = 'grid';
         renderCategories();
         renderProducts();
+        filterEvents();
     }
 
     // --- View Management ---
@@ -1975,7 +1941,6 @@
         Object.values(views).forEach(view => { if(view) view.classList.remove('active'); });
         if(views[targetViewId]) views[targetViewId].classList.add('active');
         
-        // Handle Header & Footer Visibility dynamically based on View
         const header = document.getElementById('globalHeader');
         const headerMaster = document.querySelector('.header-master'); 
         const footer = document.getElementById('globalFooter');
@@ -1984,7 +1949,6 @@
             header.style.display = 'block';
             footer.style.display = 'block';
             
-            // SPECIFIC PAGES PAR SEARCH/LOGO AREA HIDE KARO
             if (targetViewId === 'eventsView' || targetViewId === 'contactView' || targetViewId === 'offersView') {
                 headerMaster.style.display = 'none';
             } else {
@@ -2007,7 +1971,6 @@
         }
         
         if(targetViewId === 'eventsView') {
-            // Reset filters when entering Events View
             document.getElementById('eventSearchInput').value = '';
             document.getElementById('eventCatFilter').value = 'ALL';
             document.getElementById('eventTypeFilter').value = 'ALL';
@@ -2034,8 +1997,8 @@
             eventTimeout = setTimeout(() => {
                 skel.style.display = 'none';
                 grid.style.display = 'grid';
-                filterEvents(); // Uses active filters to render current tab
-            }, 1000); // 1 second shimmer delay on tab switch
+                filterEvents(); 
+            }, 1000);
         }
     }
 
@@ -2126,7 +2089,7 @@
                 <i class="fa-solid fa-chevron-right arrow"></i>
             </li>
         `).join('');
-        renderSubcategories(categoriesData[0]);
+        if(categoriesData.length > 0) renderSubcategories(categoriesData[0]);
     }
 
     function handleCatInteraction(catId, element) {
@@ -2286,7 +2249,7 @@
         
         let thumbs = document.querySelectorAll('.pd-thumb');
         thumbs[0].src = currentSelectedProduct.img;
-        if(currentSelectedProduct.variants.length > 1) {
+        if(currentSelectedProduct.variants && currentSelectedProduct.variants.length > 1) {
              thumbs[1].src = currentSelectedProduct.variants[1].img;
              thumbs[1].style.display = 'block';
         } else {
@@ -2296,7 +2259,7 @@
         thumbs[0].click(); 
         
         document.getElementById('pd-title').innerText = currentSelectedProduct.title;
-        document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle;
+        document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle || "";
         
         document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
 
@@ -2311,114 +2274,116 @@
         let leftColHTML = `<div class="pd-masonry-col">`;
         let rightColHTML = `<div class="pd-masonry-col">`;
         
-        currentSelectedProduct.variants.forEach((variant) => {
-            leftColHTML += `
-                <div class="pd-variant-card">
-                    <div class="pd-vc-top">
-                        <div class="pd-vc-img-wrapper">
-                            <img src="${variant.img}" class="pd-vc-img" alt="${variant.name}">
-                            <div class="variant-preview-popup">
-                                <img src="${variant.img}" alt="${variant.name}">
-                                <div class="vp-title">${currentSelectedProduct.title} - ${variant.name}</div>
-                                <div class="vp-price">₹${variant.price} <span class="vp-mrp">₹${variant.mrp}</span></div>
-                            </div>
-                        </div>
-                        <div class="pd-vc-details">
-                            <div class="pd-vc-title">${currentSelectedProduct.title} - ${variant.name}</div>
-                            <div class="pd-vc-delivery">
-                                ${deliveryHtml}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="pd-vc-bottom">
-                        <div class="pd-vc-price-box">
-                            <span class="pd-vc-price">₹${variant.price}</span>
-                            <span class="pd-vc-mrp">₹${variant.mrp}</span>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <div class="pd-qty-control">
-                                <button class="qty-btn" onclick="updateVariantQty(event, this, -1)"><i class="fa-solid fa-minus"></i></button>
-                                <input type="number" class="qty-input" value="1" min="1" readonly>
-                                <button class="qty-btn" onclick="updateVariantQty(event, this, 1)"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-                            <button class="pd-vc-add-btn" onclick="addToCart(${currentSelectedProduct.id})">ADD</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        if(currentSelectedProduct.variants.length === 1) {
-            rightColHTML += `
-                <div class="pd-discount-card">
-                    <table class="pd-discount-table">
-                        <thead>
-                            <tr><th>Quantity</th><th>Unit discount</th><th>You Save</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>2</td><td>41%</td><td>Up to ₹2,731.97</td></tr>
-                            <tr><td>5</td><td>42%</td><td>Up to ₹6,996.50</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            leftColHTML += `
-                <div class="pd-review-slider-card">
-                    <div class="pd-rs-header">
-                        <span>Customer Reviews</span>
-                        <div class="pd-rs-nav">
-                            <i class="fa-solid fa-chevron-left" onclick="scrollReviews(-1)"></i>
-                            <i class="fa-solid fa-chevron-right" onclick="scrollReviews(1)"></i>
-                        </div>
-                    </div>
-                    <div class="pd-rs-track" id="pdReviewsTrack">
-                        ${mockReviews.map(r => `
-                            <div class="pd-rs-slide">
-                                <div class="pd-rs-left">
-                                    <div class="pd-rs-stars">${generateReviewStars(r.stars)}</div>
-                                    <div class="pd-rs-date">${r.date}</div>
-                                    <div class="pd-rs-author">By ${r.author}</div>
+        if (currentSelectedProduct.variants) {
+            currentSelectedProduct.variants.forEach((variant) => {
+                leftColHTML += `
+                    <div class="pd-variant-card">
+                        <div class="pd-vc-top">
+                            <div class="pd-vc-img-wrapper">
+                                <img src="${variant.img}" class="pd-vc-img" alt="${variant.name}">
+                                <div class="variant-preview-popup">
+                                    <img src="${variant.img}" alt="${variant.name}">
+                                    <div class="vp-title">${currentSelectedProduct.title} - ${variant.name}</div>
+                                    <div class="vp-price">₹${variant.price} <span class="vp-mrp">₹${variant.mrp}</span></div>
                                 </div>
-                                <div class="pd-rs-right">
-                                    <div class="pd-rs-title">${r.title}</div>
-                                    <div class="pd-rs-desc">${r.desc}</div>
-                                    <div class="pd-rs-actions">
-                                        <i class="fa-solid fa-thumbs-up"></i> ${r.likes}
-                                        <i class="fa-solid fa-thumbs-down"></i> ${r.dislikes}
-                                        <i class="fa-solid fa-flag"></i>
+                            </div>
+                            <div class="pd-vc-details">
+                                <div class="pd-vc-title">${currentSelectedProduct.title} - ${variant.name}</div>
+                                <div class="pd-vc-delivery">
+                                    ${deliveryHtml}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pd-vc-bottom">
+                            <div class="pd-vc-price-box">
+                                <span class="pd-vc-price">₹${variant.price}</span>
+                                <span class="pd-vc-mrp">₹${variant.mrp}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <div class="pd-qty-control">
+                                    <button class="qty-btn" onclick="updateVariantQty(event, this, -1)"><i class="fa-solid fa-minus"></i></button>
+                                    <input type="number" class="qty-input" value="1" min="1" readonly>
+                                    <button class="qty-btn" onclick="updateVariantQty(event, this, 1)"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <button class="pd-vc-add-btn" onclick="addToCart(${currentSelectedProduct.id})">ADD</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if(currentSelectedProduct.variants.length === 1) {
+                rightColHTML += `
+                    <div class="pd-discount-card">
+                        <table class="pd-discount-table">
+                            <thead>
+                                <tr><th>Quantity</th><th>Unit discount</th><th>You Save</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2</td><td>41%</td><td>Up to ₹2,731.97</td></tr>
+                                <tr><td>5</td><td>42%</td><td>Up to ₹6,996.50</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                leftColHTML += `
+                    <div class="pd-review-slider-card">
+                        <div class="pd-rs-header">
+                            <span>Customer Reviews</span>
+                            <div class="pd-rs-nav">
+                                <i class="fa-solid fa-chevron-left" onclick="scrollReviews(-1)"></i>
+                                <i class="fa-solid fa-chevron-right" onclick="scrollReviews(1)"></i>
+                            </div>
+                        </div>
+                        <div class="pd-rs-track" id="pdReviewsTrack">
+                            ${mockReviews.map(r => `
+                                <div class="pd-rs-slide">
+                                    <div class="pd-rs-left">
+                                        <div class="pd-rs-stars">${generateReviewStars(r.stars)}</div>
+                                        <div class="pd-rs-date">${r.date}</div>
+                                        <div class="pd-rs-author">By ${r.author}</div>
+                                    </div>
+                                    <div class="pd-rs-right">
+                                        <div class="pd-rs-title">${r.title}</div>
+                                        <div class="pd-rs-desc">${r.desc}</div>
+                                        <div class="pd-rs-actions">
+                                            <i class="fa-solid fa-thumbs-up"></i> ${r.likes}
+                                            <i class="fa-solid fa-thumbs-down"></i> ${r.dislikes}
+                                            <i class="fa-solid fa-flag"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            rightColHTML += `
-                <div class="pd-benefits-card">
-                    <div class="pd-benefits-header">ORACO BENEFITS</div>
-                    <div class="pd-benefits-grid">
-                        <div class="pd-benefit-box">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            <span>Free Shipping over order of 3000</span>
-                        </div>
-                        <div class="pd-benefit-box">
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
-                            <span>Hassle Free Cancellation</span>
-                        </div>
-                        <div class="pd-benefit-box">
-                            <i class="fa-solid fa-arrows-rotate"></i>
-                            <span>10 Days Replacement</span>
-                        </div>
-                        <div class="pd-benefit-box">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <span>100% Genuine Products</span>
+                rightColHTML += `
+                    <div class="pd-benefits-card">
+                        <div class="pd-benefits-header">ORACO BENEFITS</div>
+                        <div class="pd-benefits-grid">
+                            <div class="pd-benefit-box">
+                                <i class="fa-solid fa-truck-fast"></i>
+                                <span>Free Shipping over order of 3000</span>
+                            </div>
+                            <div class="pd-benefit-box">
+                                <i class="fa-solid fa-indian-rupee-sign"></i>
+                                <span>Hassle Free Cancellation</span>
+                            </div>
+                            <div class="pd-benefit-box">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                                <span>10 Days Replacement</span>
+                            </div>
+                            <div class="pd-benefit-box">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>100% Genuine Products</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         leftColHTML += `</div>`;
@@ -2513,10 +2478,11 @@
         };
 
         try {
-            const docRef = await addDoc(collection(db, "orders"), newOrder);
+            const newOrderRef = push(ref(db, 'orders'));
+            await set(newOrderRef, newOrder);
             
             orderHistory.unshift({
-                id: 'ORD-' + docRef.id.substring(0, 6).toUpperCase(),
+                id: 'ORD-' + newOrderRef.key.substring(1, 7).toUpperCase(),
                 ...newOrder
             });
 
@@ -2547,13 +2513,16 @@
     async function fetchUserOrders() {
         if(!currentUser) return;
         try {
-            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
-            const snap = await getDocs(q);
-            orderHistory = snap.docs.map(d => ({
-                id: 'ORD-' + d.id.substring(0, 6).toUpperCase(),
-                ...d.data()
-            }));
-            renderProfileOrders();
+            const ordersQuery = query(ref(db, 'orders'), orderByChild('userId'), equalTo(currentUser.uid));
+            const snap = await get(ordersQuery);
+            if(snap.exists()) {
+                const ordersMap = snap.val();
+                orderHistory = Object.keys(ordersMap).map(key => ({
+                    id: 'ORD-' + key.substring(1, 7).toUpperCase(),
+                    ...ordersMap[key]
+                })).reverse(); 
+                renderProfileOrders();
+            }
         } catch(e) {
             console.error("Error fetching orders:", e);
         }
@@ -2587,9 +2556,11 @@
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const userDoc = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
+                const userRef = ref(db, 'users/' + user.uid);
+                const userSnap = await get(userRef);
+                
                 let userData = { name: "Dr. User", phone: "Update in Profile" };
-                if(!userDoc.empty) userData = userDoc.docs[0].data();
+                if(userSnap.exists()) userData = userSnap.val();
                 
                 currentUser = { uid: user.uid, email: user.email, name: userData.name, phone: userData.phone };
                 fetchUserOrders();
@@ -2658,7 +2629,7 @@
         try {
             if (isSignup) {
                 const cred = await createUserWithEmailAndPassword(auth, email, password);
-                await setDoc(doc(db, "users", cred.user.uid), {
+                await set(ref(db, 'users/' + cred.user.uid), {
                     email: email,
                     name: "Dr. " + email.split('@')[0],
                     phone: "Update in Profile",
@@ -2785,12 +2756,11 @@
         typeWriterEffect(); 
         setupZoom();
         
-        // Fetch from Firebase and load data
+        // Fetch from Firebase RTDB and load data
         initFirebaseAndData();
     });
 
     // --- ATTACH ALL FUNCTIONS TO GLOBAL WINDOW ---
-    // This allows your HTML onclick="" to access these module-scoped functions
     window.switchView = switchView;
     window.openLocationModal = openLocationModal;
     window.closeLocationModal = closeLocationModal;
