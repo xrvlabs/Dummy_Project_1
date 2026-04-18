@@ -1121,6 +1121,22 @@
         .faq-a { font-size: 13px; color: var(--text-muted); margin-top: 10px; display: none; line-height: 1.6; }
         .faq-item.active .faq-a { display: block; }
         .faq-item.active .faq-q i { transform: rotate(180deg); }
+/* Sabhi cards se hover lift aur shadow effect hatane ke liye */
+.product-card:hover, 
+.promo-card:hover, 
+.subcat-card:hover, 
+.event-card:hover, 
+.contact-info-card:hover, 
+.dash-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Product card ke andar jo ADD button lift hota tha, use bhi disable karne ke liye */
+.product-card:hover .add-btn {
+    transform: none !important;
+}
     </style>
 </head>
 <body>
