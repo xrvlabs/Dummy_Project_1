@@ -1847,6 +1847,7 @@
     let currentSelectedProduct = null;
     let eventTimeout;
     let currentEventTab = 'live'; 
+    let mmTimeout; // Timeout for megamenu shimmer
 
     const views = {
         homeView: document.getElementById('homeView'),
@@ -1925,7 +1926,6 @@
 
         document.getElementById('skeletonContainer').style.display = 'none';
         document.getElementById('productGrid').style.display = 'grid';
-        renderCategories();
         renderProducts();
         filterEvents();
     }
@@ -2077,7 +2077,53 @@
         type();
     }
 
-    // --- Mega Menu ---
+    // --- Mega Menu Shimmer & Rendering Logic ---
+    function toggleMegamenu(e) {
+        if(e) e.stopPropagation();
+        const megamenu = document.getElementById('megamenu');
+        if (megamenu.classList.contains('active')) {
+            closeMegamenu();
+        } else {
+            megamenu.classList.add('active');
+            document.getElementById('catDropdownBtn').classList.add('active');
+            if (window.innerWidth >= 1024) {
+                document.getElementById('megamenuOverlay').classList.add('active');
+                document.body.classList.add('no-scroll'); 
+            }
+            showMegamenuShimmer();
+        }
+    }
+
+    function showMegamenuShimmer() {
+        const catList = document.getElementById('mmCatList');
+        const contentGrid = document.getElementById('mmContentGrid');
+        const contentTitle = document.getElementById('mmContentTitle');
+
+        // Sidebar Skeleton
+        catList.innerHTML = Array(5).fill(`
+            <li style="pointer-events: none;">
+                <div class="skeleton" style="height: 20px; width: 20px; border-radius: 50%; display: inline-block;"></div>
+                <div class="skeleton" style="height: 16px; width: 70%; border-radius: 4px; margin-left: 12px; display: inline-block;"></div>
+            </li>
+        `).join('');
+        
+        // Title Skeleton
+        contentTitle.innerHTML = '<div class="skeleton" style="height: 20px; width: 120px; border-radius: 4px;"></div>';
+        
+        // Grid Skeleton
+        contentGrid.innerHTML = Array(8).fill(`
+            <div class="subcat-card" style="pointer-events: none; border-color: #f1f5f9; background: white;">
+                <div class="subcat-img" style="padding: 0;"><div class="skeleton" style="height: 100%; width: 100%;"></div></div>
+                <div class="subcat-title" style="display: flex; justify-content: center; align-items: center; height: 30px;"><div class="skeleton" style="height: 12px; width: 80%; border-radius: 2px;"></div></div>
+            </div>
+        `).join('');
+
+        if(mmTimeout) clearTimeout(mmTimeout);
+        mmTimeout = setTimeout(() => {
+            renderCategories();
+        }, 1000);
+    }
+
     function renderCategories() {
         const catList = document.getElementById('mmCatList');
         if(!catList) return;
@@ -2108,21 +2154,8 @@
                     <div class="subcat-title">${item.name}</div>
                 </div>
             `).join('');
-        }
-    }
-
-    function toggleMegamenu(e) {
-        if(e) e.stopPropagation();
-        const megamenu = document.getElementById('megamenu');
-        if (megamenu.classList.contains('active')) {
-            closeMegamenu();
         } else {
-            megamenu.classList.add('active');
-            document.getElementById('catDropdownBtn').classList.add('active');
-            if (window.innerWidth >= 1024) {
-                document.getElementById('megamenuOverlay').classList.add('active');
-                document.body.classList.add('no-scroll'); 
-            }
+            document.getElementById('mmContentGrid').innerHTML = '<div style="padding: 10px; color: var(--text-muted);">No items found.</div>';
         }
     }
 
