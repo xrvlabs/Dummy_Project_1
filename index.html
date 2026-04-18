@@ -50,7 +50,7 @@
             * { scrollbar-width: thin; scrollbar-color: #c1c1c1 #f8f9fa; }
         }
 
-        .view-section { display: none; flex-direction: column; padding-bottom: 90px; animation: fadeIn 0.3s ease-in-out; will-change: opacity, transform; min-height: 100vh; background: var(--primary-bg); }
+        .view-section { display: none; flex-direction: column; padding-bottom: 10px; animation: fadeIn 0.3s ease-in-out; will-change: opacity, transform; min-height: 100vh; background: var(--primary-bg); }
         .view-section.active { display: flex; }
         #authView { padding-bottom: 0; background: white;}
 
@@ -187,7 +187,7 @@
     padding: 10px; 
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 10px !important;
+    margin-bottom: 0px !important;
 }
 
 .hero-slider-wrap { 
@@ -207,7 +207,7 @@
         /* CHANGE 1: Dono sides ki height barabar karne ke liye */
         align-items: stretch !important; 
         justify-content: flex-start;
-        margin-bottom: 25px !important; 
+        margin-bottom: 0px !important; 
     }
 
     .hero-slider-wrap {
@@ -350,7 +350,7 @@
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
     gap: 10px; 
-    padding: 0 10px 10px; /* Top: 0, Sides: 10px, Bottom: 10px */
+    padding: 10px; /* Top: 0, Sides: 10px, Bottom: 10px */
 }
 @media (min-width: 768px) { 
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } 
