@@ -2745,7 +2745,7 @@
         }
     }
 
-    async function addToCart(productId) {
+   async function addToCart(productId) {
         if (!currentUser) {
             switchView('authView');
             return;
@@ -2754,7 +2754,23 @@
         const product = mockProducts.find(p => p.id === productId);
         
         if(product) {
-            cart.push(product);
+            let priceNum = product.priceNum || parseInt(product.price.replace(/,/g, ''));
+            // Check agar ye item pehle se cart mein hai
+            let existingItem = cart.find(item => item.id === product.id && item.title === product.title);
+            
+            if (existingItem) {
+                existingItem.qty = (existingItem.qty || 1) + 1; // Quantity badha do
+            } else {
+                cart.push({
+                    id: product.id,
+                    title: product.title,
+                    img: product.img,
+                    price: product.price,
+                    priceNum: priceNum,
+                    qty: 1 // Naya item with qty 1
+                });
+            }
+            
             updateCartBadges();
             alert(`${product.title} added to cart!`);
             await syncCartToFirebase();
@@ -2772,20 +2788,39 @@
         if(product) {
             const qtyInput = btnElement.parentElement.querySelector('.qty-input');
             const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+            
+            // DOM se specific variant ki info nikalna
+            const vcCard = btnElement.closest('.pd-variant-card');
+            const variantTitle = vcCard.querySelector('.pd-vc-title').innerText;
+            const variantPriceStr = vcCard.querySelector('.pd-vc-price').innerText.replace('₹', '');
+            const variantPriceNum = parseInt(variantPriceStr.replace(/,/g, ''));
+            const variantImg = vcCard.querySelector('.pd-vc-img').src;
 
-            // Push multiple items to array based on selected quantity
-            for(let i=0; i<qty; i++) {
-                cart.push(product);
+            // Check agar ye variant pehle se cart mein hai
+            let existingItem = cart.find(item => item.id === product.id && item.title === variantTitle);
+            
+            if (existingItem) {
+                existingItem.qty = (existingItem.qty || 1) + qty;
+            } else {
+                cart.push({
+                    id: product.id,
+                    title: variantTitle,
+                    img: variantImg,
+                    price: variantPriceStr,
+                    priceNum: variantPriceNum,
+                    qty: qty
+                });
             }
             
             updateCartBadges();
-            alert(`${qty} x ${product.title} added to cart!`);
+            alert(`${qty} x ${variantTitle} added to cart!`);
             await syncCartToFirebase();
         }
     }
 
     function updateCartBadges() {
-        const count = cart.length;
+        let count = 0;
+        cart.forEach(item => { count += (item.qty || 1); });
         document.getElementById('mainCartBadge').innerText = count;
         const pdBadge = document.getElementById('pdCartBadge');
         if (pdBadge) pdBadge.innerText = count;
@@ -2843,14 +2878,19 @@
         let html = '';
         let subtotal = 0;
         cart.forEach((item, index) => {
+            let qty = item.qty || 1; // Purane items jisme qty nahi hai unhe 1 manega
             let itemPrice = item.priceNum || parseInt(item.price.replace(/,/g, ''));
-            subtotal += itemPrice;
+            subtotal += (itemPrice * qty); // Quantity ke hisab se price
+            
             html += `
                 <div class="cart-item">
                     <div class="cart-item-img"><img src="${item.img}"></div>
                     <div class="cart-item-info">
                         <div class="cart-item-title">${item.title}</div>
-                        <div class="cart-item-price">₹${item.price}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <div class="cart-item-price">₹${item.price}</div>
+                            <div style="font-size:11px; font-weight:800; color:var(--text-dark); background:var(--primary-bg); padding:4px 8px; border-radius:4px; border:1px solid var(--border-light);">QTY: ${qty}</div>
+                        </div>
                     </div>
                     <i class="fa-solid fa-trash remove-btn" onclick="removeFromCart(${index})"></i>
                 </div>
@@ -2896,6 +2936,7 @@
         } else {
             totalEl.innerText = `₹${finalTotal.toLocaleString('en-IN')}`;
         }
+        
         const waContainer = document.getElementById('whatsappInputContainer');
         if (waContainer) {
             if (currentUser && (!currentUser.phone || currentUser.phone === "Update in Profile" || currentUser.phone === "Undefined" || currentUser.phone === "")) {
@@ -2928,7 +2969,9 @@
 
         let subtotal = 0;
         cart.forEach(item => {
-            subtotal += item.priceNum || parseInt(item.price.replace(/,/g, ''));
+            let itemPrice = item.priceNum || parseInt(item.price.replace(/,/g, ''));
+            let qty = item.qty || 1;
+            subtotal += (itemPrice * qty); // Multiply by quantity
         });
 
         let userCoins = currentUser.coins || 0;
