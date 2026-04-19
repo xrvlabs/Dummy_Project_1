@@ -383,8 +383,7 @@
         .product-price { display: flex; align-items: baseline; gap: 8px; margin-top: auto; }
         .current-price { font-size: 16px; font-weight: 700; color: var(--text-dark); }
         .mrp-price { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
-        .coin-reward { font-size: 11px; color: #d97706; display: flex; align-items: center; gap: 4px; margin-top: 6px; font-weight: 700; text-transform: uppercase;}
-        .coin-icon { background: #fef3c7; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #d97706; font-weight: 700;}
+        /* coin-reward class removed from CSS as it's no longer used, or left here as it causes no harm */
 
        /* -------------------------------------------
            CLEAN, ALIGNED & UNIFORM PRODUCT DETAIL UI 
@@ -415,7 +414,7 @@
         /* Left/Right Columns */
         .pd-image-col { display: flex; flex-direction: column; gap: 10px; width: 100%; z-index: 950;}
         
-        .pd-main-img-box { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 20px; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; box-sizing: border-box; cursor: crosshair;}
+        .pd-main-img-box { background: white; border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: 20px; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; box-sizing: border-box; cursor: zoom-in;}
         
         .pd-main-img-box .wishlist-btn-large { position: absolute; top: 12px; right: 12px; font-size: 22px; color: #cbd5e1; cursor: pointer; transition: color 0.2s; z-index: 15;}
         .pd-main-img-box .wishlist-btn-large:hover { color: var(--red-accent); }
@@ -450,21 +449,8 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
         }
         
-        /* Blue Overlay for Content Column */
-        .right-col-blue-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(51, 102, 136, 0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 900;
-            display: none;
-            border-radius: var(--card-radius);
-            pointer-events: none; 
-        }
-        
         @media (max-width: 1023px) {
-            .zoom-result, .zoom-lens, .right-col-blue-overlay { display: none !important; }
+            .zoom-result, .zoom-lens { display: none !important; }
             .pd-main-img-box { cursor: default; }
         }
         
@@ -1329,7 +1315,6 @@
                 </div>
 
                 <div class="pd-content-col" id="rightContentCol">
-                    <div class="right-col-blue-overlay" id="rightBlueOverlay"></div>
                     
                     <div class="pd-title-box">
                         <h1 id="pd-title">Labodent DentWERK HD Model Resin</h1>
@@ -1844,26 +1829,31 @@
         const img = document.getElementById('pd-hero-img');
         const result = document.getElementById('zoomResult');
         const lens = document.getElementById('zoomLens');
-        const rightOverlay = document.getElementById('rightBlueOverlay');
 
-        if (!imgBox || !result || !lens || !rightOverlay) return;
+        if (!imgBox || !result || !lens) return;
 
-        imgBox.addEventListener('mouseenter', function() {
+        let isZoomActive = false;
+
+        imgBox.addEventListener('click', function(e) {
             if(window.innerWidth < 1024) return;
-            result.style.display = 'block';
-            lens.style.display = 'block';
-            rightOverlay.style.display = 'block';
-            result.style.backgroundImage = `url(${img.src})`;
-        });
 
-        imgBox.addEventListener('mouseleave', function() {
-            result.style.display = 'none';
-            lens.style.display = 'none';
-            rightOverlay.style.display = 'none';
+            isZoomActive = !isZoomActive;
+
+            if (isZoomActive) {
+                result.style.display = 'block';
+                lens.style.display = 'block';
+                result.style.backgroundImage = `url(${img.src})`;
+                imgBox.style.cursor = 'zoom-out';
+            } else {
+                result.style.display = 'none';
+                lens.style.display = 'none';
+                imgBox.style.cursor = 'zoom-in';
+            }
         });
 
         imgBox.addEventListener('mousemove', function(e) {
-            if(window.innerWidth < 1024) return;
+            if(!isZoomActive || window.innerWidth < 1024) return;
+
             const rect = imgBox.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -1874,7 +1864,6 @@
             let lensX = x - (lensW / 2);
             let lensY = y - (lensH / 2);
 
-            // Boundary collision
             if (lensX < 0) lensX = 0;
             if (lensY < 0) lensY = 0;
             if (lensX > rect.width - lensW) lensX = rect.width - lensW;
@@ -1883,20 +1872,28 @@
             lens.style.left = lensX + 'px';
             lens.style.top = lensY + 'px';
 
-            // Calc zoom position
             const cx = result.offsetWidth / lensW;
             const cy = result.offsetHeight / lensH;
 
             result.style.backgroundSize = `${rect.width * cx}px ${rect.height * cy}px`;
             result.style.backgroundPosition = `-${lensX * cx}px -${lensY * cy}px`;
         });
+
+        imgBox.addEventListener('mouseleave', function() {
+            isZoomActive = false;
+            result.style.display = 'none';
+            lens.style.display = 'none';
+            imgBox.style.cursor = 'zoom-in';
+        });
     }
+
     function updateEventTabCounts() {
         const liveTab = document.getElementById('tabLiveEvents');
         const pastTab = document.getElementById('tabPastEvents');
         if(liveTab) liveTab.innerText = `Live Events (${mockLiveEvents.length})`;
         if(pastTab) pastTab.innerText = `Past Events (${mockPastEvents.length})`;
     }
+
     // --- LOCATION LOGIC ---
     function openLocationModal() {
         document.getElementById('locationOverlay').style.display = 'block';
@@ -2113,7 +2110,6 @@
     let mockPastEvents = [];
     let bannersData = [];
 
-    // Auto slider ka variable global rakhein
     let autoSlideInterval;
 
    function renderBanners() {
@@ -2131,7 +2127,7 @@
             <div class="hero-slide">
                 <div class="skeleton banner-skeleton"></div>
                 <img src="${banner.img}" 
-     onload="this.classList.add('loaded'); this.parentElement.querySelector('.banner-skeleton').style.display='none';">
+         onload="this.classList.add('loaded'); this.parentElement.querySelector('.banner-skeleton').style.display='none';">
             </div>
         `).join('');
     }
@@ -2143,37 +2139,31 @@
         const slider = document.getElementById('heroSliderContainer');
         if (!slider) return;
 
-        // Purana interval clear karo
         if (autoSlideInterval) clearInterval(autoSlideInterval);
 
         autoSlideInterval = setInterval(() => {
-            // Ab slide width puri container ki width hogi (kyunki 1 image = 100%)
             const slideWidth = slider.clientWidth;
-            
-            // Pata lagao ki maximum kitna scroll ho sakta hai
             const maxScroll = slider.scrollWidth - slider.clientWidth;
 
-            // Agar aakhri image par pahunch gaye hain, toh wapas first par jao
             if (slider.scrollLeft >= maxScroll - 5) {
                 slider.scrollTo({ left: 0, behavior: 'smooth' });
             } else {
-                // Warna ek slide aage badhao
                 slider.scrollBy({ left: slideWidth, behavior: 'smooth' });
             }
-        }, 3000); // Har 3 second mein slide change hoga
+        }, 3000);
     }
 
     // --- State ---
     let currentUser = null; 
     let cart = [];
-    window.userWishlist = {}; // Global Wishlist Object
+    window.userWishlist = {};
     let orderHistory = [];
     let currentSelectedProduct = null;
     let eventTimeout;
     let currentEventTab = 'live'; 
     let mmTimeout;
     let isCoinsApplied = false;
-    let previousCartTotal = 0; // For animation tracking
+    let previousCartTotal = 0; 
 
     const views = {
         homeView: document.getElementById('homeView'),
@@ -2183,17 +2173,16 @@
         contactView: document.getElementById('contactView')
     };
     function trackUniqueVisitor() {
-        const today = new Date().toISOString().split('T')[0]; // Aaj ki date: 2026-04-18
+        const today = new Date().toISOString().split('T')[0]; 
         const storageKey = 'oraco_visit_' + today;
 
-        // Agar user ne aaj visit nahi kiya hai
         if (!localStorage.getItem(storageKey)) {
             const visitorRef = ref(db, 'analytics/daily_visitors/' + today);
             
             runTransaction(visitorRef, (currentValue) => {
                 return (currentValue || 0) + 1;
             }).then(() => {
-                localStorage.setItem(storageKey, 'true'); // Aaj ke liye block kar do
+                localStorage.setItem(storageKey, 'true'); 
             });
         }
     }
@@ -2204,7 +2193,6 @@
             
             if (!prodSnap.exists()) {
                 console.log("Empty RTDB detected. Seeding data...");
-                // ... (Aapka existing seed logic) ...
             } else {
                 console.log("Fetching live data from Firebase RTDB...");
                 mockProducts = Object.values(prodSnap.val() || {});
@@ -2479,6 +2467,8 @@
 
     function renderProducts() {
         let prodHTML = '';
+        if (!mockProducts || mockProducts.length === 0) return;
+
         mockProducts.forEach(prod => {
             let isWished = window.userWishlist && window.userWishlist[prod.id] ? true : false;
             let heartClass = isWished ? 'fa-solid active' : 'fa-regular';
@@ -2495,7 +2485,6 @@
                             <span class="current-price">₹${prod.price}</span>
                             <span class="mrp-price">₹${prod.mrp}</span>
                         </div>
-                        <div class="coin-reward"><span class="coin-icon">D</span> ${prod.coins}</div>
                     </div>
                 </div>
             `;
@@ -2606,7 +2595,6 @@
         let newQty = currentQty + change;
 
         if (newQty < 1) {
-            // Agar 1 se kam karta hai, toh item remove karne ka poochega
             if(confirm("Remove this item from cart?")) {
                 removeFromCart(index);
             }
@@ -2618,71 +2606,134 @@
             return;
         }
 
-        // QTY update karo, badges update karo, UI render karo aur Firebase sync karo
         cart[index].qty = newQty;
         updateCartBadges();
-        renderCart(false); // Animate false rakha hai taaki smooth feel ho
+        renderCart(false);
         await syncCartToFirebase();
     };
 
     function openProduct(id) {
-        currentSelectedProduct = mockProducts.find(p => p.id === id);
-        if(!currentSelectedProduct) return;
-        
-        // Update Wishlist Heart state for this specific product
-        let isWished = window.userWishlist && window.userWishlist[id] ? true : false;
-        const pdWishBtn = document.getElementById('pdWishlistBtn');
-        if (pdWishBtn) {
-            pdWishBtn.className = isWished ? 'fa-solid fa-heart wishlist-btn-large active' : 'fa-regular fa-heart wishlist-btn-large';
-        }
+    currentSelectedProduct = mockProducts.find(p => p.id === id);
+    if(!currentSelectedProduct) return;
+    
+    // Update Wishlist Heart state for this specific product
+    let isWished = window.userWishlist && window.userWishlist[id] ? true : false;
+    const pdWishBtn = document.getElementById('pdWishlistBtn');
+    if (pdWishBtn) {
+        pdWishBtn.className = isWished ? 'fa-solid fa-heart wishlist-btn-large active' : 'fa-regular fa-heart wishlist-btn-large';
+    }
 
-        document.getElementById('pd-hero-img').src = currentSelectedProduct.img;
-        
-        let thumbs = document.querySelectorAll('.pd-thumb');
-        thumbs[0].src = currentSelectedProduct.img;
-        if(currentSelectedProduct.variants && currentSelectedProduct.variants.length > 1) {
-             thumbs[1].src = currentSelectedProduct.variants[1].img;
-             thumbs[1].style.display = 'block';
+    document.getElementById('pd-hero-img').src = currentSelectedProduct.img;
+    
+    let thumbs = document.querySelectorAll('.pd-thumb');
+    thumbs[0].src = currentSelectedProduct.img;
+    if(currentSelectedProduct.variants && currentSelectedProduct.variants.length > 1) {
+         thumbs[1].src = currentSelectedProduct.variants[1].img;
+         thumbs[1].style.display = 'block';
+    } else {
+         thumbs[1].style.display = 'none';
+    }
+    thumbs[2].style.display = 'none';
+    thumbs[0].click(); 
+    
+    document.getElementById('pd-title').innerText = currentSelectedProduct.title;
+    document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle || "";
+    
+    document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
+
+    let currentPin = document.getElementById('pdPincodeInput').value;
+    let deliveryHtml = `<span class="dynamic-delivery-date" style="display:none;"></span>`;
+    if (currentPin && currentPin.length === 6) {
+        let dateStr = getExpectedDeliveryDate(currentPin);
+        deliveryHtml = `<span class="dynamic-delivery-date" style="color: var(--text-dark); display: inline-block;"><i class="fa-solid fa-truck"></i> Arrives By ${dateStr}</span>`;
+    }
+
+    const masonryContainer = document.getElementById('pd-masonry-container');
+    const isSingleVariant = currentSelectedProduct.variants && currentSelectedProduct.variants.length === 1;
+
+    // Yahan humne sirf ek container rakha hai taaki extra khali column ka issue na aaye
+    let contentHTML = `<div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">`;
+
+    // Reviews Component Generator
+    const getReviewsHTML = (extraStyle = "") => `
+        <div class="pd-review-slider-card" style="width: 100%; box-sizing: border-box; ${extraStyle}">
+            <div class="pd-rs-header">
+                <span>Customer Reviews</span>
+                <div class="pd-rs-nav">
+                    <i class="fa-solid fa-chevron-left" onclick="scrollReviews(-1)"></i>
+                    <i class="fa-solid fa-chevron-right" onclick="scrollReviews(1)"></i>
+                </div>
+            </div>
+            <div class="pd-rs-track" id="pdReviewsTrack">
+                ${mockReviews.map(r => `
+                    <div class="pd-rs-slide">
+                        <div class="pd-rs-left">
+                            <div class="pd-rs-stars">${generateReviewStars(r.stars)}</div>
+                            <div class="pd-rs-date">${r.date}</div>
+                            <div class="pd-rs-author">By ${r.author}</div>
+                        </div>
+                        <div class="pd-rs-right">
+                            <div class="pd-rs-title">${r.title}</div>
+                            <div class="pd-rs-desc">${r.desc}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    if (currentSelectedProduct.variants) {
+        if (isSingleVariant) {
+            // DESKTOP: 1 Variant + 1 Ratings Section (50/50 Grid Layout)
+            contentHTML += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; width: 100%;">`;
+            
+            const variant = currentSelectedProduct.variants[0];
+            contentHTML += `
+                <div class="pd-variant-card" style="width: 100%; height: 100%;">
+                    <div class="pd-vc-top">
+                        <div class="pd-vc-img-wrapper">
+                            <img src="${variant.img}" class="pd-vc-img" alt="${variant.name}">
+                        </div>
+                        <div class="pd-vc-details">
+                            <div class="pd-vc-title">${currentSelectedProduct.title} - ${variant.name}</div>
+                            <div class="pd-vc-delivery">${deliveryHtml}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="pd-vc-bottom">
+                        <div class="pd-vc-price-box">
+                            <span class="pd-vc-price">₹${variant.price}</span>
+                            <span class="pd-vc-mrp">₹${variant.mrp}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <div class="pd-qty-control">
+                                <button class="qty-btn" onclick="updateVariantQty(event, this, -1)"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" class="qty-input" value="1" min="1" readonly>
+                                <button class="qty-btn" onclick="updateVariantQty(event, this, 1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <button class="pd-vc-add-btn" onclick="addToCartVariant(event, ${currentSelectedProduct.id}, this)">ADD</button>
+                        </div>
+                    </div>
+                </div>
+                ${getReviewsHTML("height: 100%;")}
+            </div>`;
+
+            // DISCOUNT TABLE HAS BEEN COMPLETELY REMOVED FROM HERE
+
         } else {
-             thumbs[1].style.display = 'none';
-        }
-        thumbs[2].style.display = 'none';
-        thumbs[0].click(); 
-        
-        document.getElementById('pd-title').innerText = currentSelectedProduct.title;
-        document.getElementById('pd-subtitle').innerText = currentSelectedProduct.subtitle || "";
-        
-        document.getElementById('bottom-price-mobile').innerText = `₹${currentSelectedProduct.price}`;
+            // MULTIPLE VARIANTS: Variants grid (2 per row), Reviews niche aayenge
+            contentHTML += `<div class="pd-variants-area" style="width: 100%; max-width: none;">`;
 
-        let currentPin = document.getElementById('pdPincodeInput').value;
-        let deliveryHtml = `<span class="dynamic-delivery-date" style="display:none;"></span>`;
-        if (currentPin && currentPin.length === 6) {
-            let dateStr = getExpectedDeliveryDate(currentPin);
-            deliveryHtml = `<span class="dynamic-delivery-date" style="color: var(--text-dark); display: inline-block;"><i class="fa-solid fa-truck"></i> Arrives By ${dateStr}</span>`;
-        }
-
-        const masonryContainer = document.getElementById('pd-masonry-container');
-        let leftColHTML = `<div class="pd-masonry-col">`;
-        let rightColHTML = `<div class="pd-masonry-col">`;
-        
-        if (currentSelectedProduct.variants) {
             currentSelectedProduct.variants.forEach((variant) => {
-                leftColHTML += `
-                    <div class="pd-variant-card">
+                contentHTML += `
+                    <div class="pd-variant-card" style="width: 100%;">
                         <div class="pd-vc-top">
                             <div class="pd-vc-img-wrapper">
                                 <img src="${variant.img}" class="pd-vc-img" alt="${variant.name}">
-                                <div class="variant-preview-popup">
-                                    <img src="${variant.img}" alt="${variant.name}">
-                                    <div class="vp-title">${currentSelectedProduct.title} - ${variant.name}</div>
-                                    <div class="vp-price">₹${variant.price} <span class="vp-mrp">₹${variant.mrp}</span></div>
-                                </div>
                             </div>
                             <div class="pd-vc-details">
                                 <div class="pd-vc-title">${currentSelectedProduct.title} - ${variant.name}</div>
-                                <div class="pd-vc-delivery">
-                                    ${deliveryHtml}
-                                </div>
+                                <div class="pd-vc-delivery">${deliveryHtml}</div>
                             </div>
                         </div>
                         
@@ -2704,68 +2755,23 @@
                 `;
             });
 
-            if(currentSelectedProduct.variants.length === 1) {
-                rightColHTML += `
-                    <div class="pd-discount-card">
-                        <table class="pd-discount-table">
-                            <thead>
-                                <tr><th>Quantity</th><th>Unit discount</th><th>You Save</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>2</td><td>41%</td><td>Up to ₹2,731.97</td></tr>
-                                <tr><td>5</td><td>42%</td><td>Up to ₹6,996.50</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-                leftColHTML += `
-                    <div class="pd-review-slider-card">
-                        <div class="pd-rs-header">
-                            <span>Customer Reviews</span>
-                            <div class="pd-rs-nav">
-                                <i class="fa-solid fa-chevron-left" onclick="scrollReviews(-1)"></i>
-                                <i class="fa-solid fa-chevron-right" onclick="scrollReviews(1)"></i>
-                            </div>
-                        </div>
-                        <div class="pd-rs-track" id="pdReviewsTrack">
-                            ${mockReviews.map(r => `
-                                <div class="pd-rs-slide">
-                                    <div class="pd-rs-left">
-                                        <div class="pd-rs-stars">${generateReviewStars(r.stars)}</div>
-                                        <div class="pd-rs-date">${r.date}</div>
-                                        <div class="pd-rs-author">By ${r.author}</div>
-                                    </div>
-                                    <div class="pd-rs-right">
-                                        <div class="pd-rs-title">${r.title}</div>
-                                        <div class="pd-rs-desc">${r.desc}</div>
-                                        <div class="pd-rs-actions">
-                                            <i class="fa-solid fa-thumbs-up"></i> ${r.likes}
-                                            <i class="fa-solid fa-thumbs-down"></i> ${r.dislikes}
-                                            <i class="fa-solid fa-flag"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
+            contentHTML += `</div>`; // Variants Grid close
+            contentHTML += getReviewsHTML("margin-top: 10px;"); // Reviews full width
         }
-
-        leftColHTML += `</div>`;
-        rightColHTML += `</div>`;
-
-        masonryContainer.innerHTML = leftColHTML + rightColHTML;
-
-        const pinInput = document.getElementById('pdPincodeInput').value;
-        if(pinInput && pinInput.length === 6) {
-            checkPincode();
-        }
-
-        switchView('productView');
-        setTimeout(evaluateTabHeights, 100);
     }
+
+    contentHTML += `</div>`; 
+
+    masonryContainer.innerHTML = contentHTML;
+
+    const pinInput = document.getElementById('pdPincodeInput').value;
+    if(pinInput && pinInput.length === 6) {
+        checkPincode();
+    }
+
+    switchView('productView');
+    setTimeout(evaluateTabHeights, 100);
+}
 
     // --- Cart Firebase Sync & Orders Logic ---
     async function syncCartToFirebase() {
