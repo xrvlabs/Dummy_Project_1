@@ -1183,9 +1183,16 @@
 }
 
 .loader-logo {
-    width: 150px; /* Image ko chota karne ke liye size (apne hisaab se adjust kar lein) */
+    width: 150px; /* Desktop ke liye size */
     height: auto;
     animation: blinkLogo 1.5s infinite ease-in-out;
+}
+
+/* Mobile aur Tablet (1024px se choti screen) ke liye chota size */
+@media (max-width: 1024px) {
+    .loader-logo {
+        width: 90px; 
+    }
 }
 
 /* Blinking & Pulsing Animation */
@@ -2415,14 +2422,20 @@
             showMegamenuShimmer();
         }
     }
-// --- PAGE LOADER LOGIC ---
+const loaderStartTime = Date.now();
+
 window.addEventListener('load', function() {
     const loader = document.getElementById('pageLoader');
     if (loader) {
-        // Page puri tarah load hone ke aadha second baad fade out hoga
+        const elapsedTime = Date.now() - loaderStartTime;
+        const minLoadingTime = 2800; // 2 Seconds (2000 ms)
+        
+        // Agar page 2 second se pehle load ho gaya, toh bacha hua time wait karega
+        const delay = Math.max(0, minLoadingTime - elapsedTime);
+
         setTimeout(() => {
             loader.classList.add('hidden');
-        }, 500); 
+        }, delay); 
     }
 });
     function showMegamenuShimmer() {
