@@ -2434,8 +2434,11 @@
 
     function renderSubcategories(cat) {
         document.getElementById('mmContentTitle').innerHTML = cat.title;
-        if(cat.items) {
-            document.getElementById('mmContentGrid').innerHTML = cat.items.map(item => `
+        let subcatKey = "subcat_" + cat.id.replace("cat_", "");
+        let items = cat[subcatKey];
+
+        if(items && items.length > 0) {
+            document.getElementById('mmContentGrid').innerHTML = items.map(item =>`
                 <div class="subcat-card" onclick="openProduct(${item.prodId || 1})">
                     <div class="subcat-img"><img src="${item.img}" alt="${item.name}"></div>
                     <div class="subcat-title">${item.name}</div>
