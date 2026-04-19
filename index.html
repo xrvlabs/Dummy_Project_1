@@ -2586,16 +2586,45 @@
         document.getElementById(tabId).style.display = 'block';
     }
 
-    // --- Update Variant Quantity ---
-    function updateVariantQty(event, btnElement, change) {
+   // --- Update Variant Quantity ---
+    window.updateVariantQty = function(event, btnElement, change) {
         if(event) event.stopPropagation();
         const inputField = btnElement.parentElement.querySelector('.qty-input');
         let currentQty = parseInt(inputField.value) || 1;
         let newQty = currentQty + change;
-        if (newQty >= 1) {
+        
+        // Min 1 and Max 10 Logic
+        if (newQty >= 1 && newQty <= 10) {
             inputField.value = newQty;
+        } else if (newQty > 10) {
+            alert("Maximum quantity limit is 10.");
         }
-    }
+    };
+
+    // --- Update Cart Item Quantity ---
+    window.updateCartItemQty = async function(index, change) {
+        let currentQty = cart[index].qty || 1;
+        let newQty = currentQty + change;
+
+        if (newQty < 1) {
+            // Agar 1 se kam karta hai, toh item remove karne ka poochega
+            if(confirm("Remove this item from cart?")) {
+                removeFromCart(index);
+            }
+            return;
+        }
+
+        if (newQty > 10) {
+            alert("Maximum quantity limit is 10 per item.");
+            return;
+        }
+
+        // QTY update karo, badges update karo, UI render karo aur Firebase sync karo
+        cart[index].qty = newQty;
+        updateCartBadges();
+        renderCart(false); // Animate false rakha hai taaki smooth feel ho
+        await syncCartToFirebase();
+    };
 
     function openProduct(id) {
         currentSelectedProduct = mockProducts.find(p => p.id === id);
@@ -2749,7 +2778,7 @@
         }
     }
 
-   async function addToCart(productId) {
+  async function addToCart(productId) {
         if (!currentUser) {
             switchView('authView');
             return;
@@ -2759,11 +2788,14 @@
         
         if(product) {
             let priceNum = product.priceNum || parseInt(product.price.replace(/,/g, ''));
-            // Check agar ye item pehle se cart mein hai
             let existingItem = cart.find(item => item.id === product.id && item.title === product.title);
             
             if (existingItem) {
-                existingItem.qty = (existingItem.qty || 1) + 1; // Quantity badha do
+                if (existingItem.qty >= 10) {
+                    alert(`You cannot add more than 10 units of ${product.title}.`);
+                    return;
+                }
+                existingItem.qty += 1;
             } else {
                 cart.push({
                     id: product.id,
@@ -2771,7 +2803,7 @@
                     img: product.img,
                     price: product.price,
                     priceNum: priceNum,
-                    qty: 1 // Naya item with qty 1
+                    qty: 1
                 });
             }
             
@@ -2781,7 +2813,7 @@
         }
     }
 
-    async function addToCartVariant(event, productId, btnElement) {
+  async function addToCartVariant(event, productId, btnElement) {
         if(event) event.stopPropagation();
         if (!currentUser) {
             switchView('authView');
@@ -2791,20 +2823,24 @@
         const product = mockProducts.find(p => p.id === productId);
         if(product) {
             const qtyInput = btnElement.parentElement.querySelector('.qty-input');
-            const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+            const qtyToAdd = qtyInput ? parseInt(qtyInput.value) : 1;
             
-            // DOM se specific variant ki info nikalna
             const vcCard = btnElement.closest('.pd-variant-card');
             const variantTitle = vcCard.querySelector('.pd-vc-title').innerText;
             const variantPriceStr = vcCard.querySelector('.pd-vc-price').innerText.replace('₹', '');
             const variantPriceNum = parseInt(variantPriceStr.replace(/,/g, ''));
             const variantImg = vcCard.querySelector('.pd-vc-img').src;
 
-            // Check agar ye variant pehle se cart mein hai
             let existingItem = cart.find(item => item.id === product.id && item.title === variantTitle);
+            let currentQty = existingItem ? (existingItem.qty || 1) : 0;
             
+            if (currentQty + qtyToAdd > 10) {
+                alert(`You can only add a maximum of 10 units. You already have ${currentQty} in your cart.`);
+                return;
+            }
+
             if (existingItem) {
-                existingItem.qty = (existingItem.qty || 1) + qty;
+                existingItem.qty += qtyToAdd;
             } else {
                 cart.push({
                     id: product.id,
@@ -2812,12 +2848,12 @@
                     img: variantImg,
                     price: variantPriceStr,
                     priceNum: variantPriceNum,
-                    qty: qty
+                    qty: qtyToAdd
                 });
             }
             
             updateCartBadges();
-            alert(`${qty} x ${variantTitle} added to cart!`);
+            alert(`${qtyToAdd} x ${variantTitle} added to cart!`);
             await syncCartToFirebase();
         }
     }
@@ -2881,13 +2917,14 @@
 
         let html = '';
         let subtotal = 0;
-       cart.forEach((item, index) => {
-            let qty = item.qty || 1; // Purane items jisme qty nahi hai unhe 1 manega
+        cart.forEach((item, index) => {
+            let qty = item.qty || 1; 
             let itemPrice = item.priceNum || parseInt(item.price.replace(/,/g, ''));
-            subtotal += (itemPrice * qty); // Quantity ke hisab se price
+            subtotal += (itemPrice * qty); 
             
+            // YAHAN NAYA QTY CONTROLLER ADD KIYA HAI
             html += `
-                <div class="cart-item" style="position: relative; display: flex; align-items: stretch; padding: 14px 10px; gap: 12px; border: 1px solid var(--border-light); border-radius: var(--card-radius); margin-bottom: 12px; background: white;">
+                <div class="cart-item" style="position: relative; display: flex; align-items: stretch; padding: 16px; gap: 16px; border: 1px solid var(--border-light); border-radius: var(--card-radius); margin-bottom: 12px; background: white;">
                     
                     <div class="cart-item-img" style="flex-shrink: 0; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;">
                         <img src="${item.img}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
@@ -2900,9 +2937,16 @@
                         <div class="cart-item-price" style="font-size: 18px; font-weight: 800; color: var(--blue-accent); line-height: 1;">₹${item.price}</div>
                     </div>
                     
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0; margin-right: -2px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0;">
                         <i class="fa-regular fa-trash-can" onclick="removeFromCart(${index})" style="color: var(--text-muted); cursor: pointer; font-size: 16px; transition: 0.2s;" onmouseover="this.style.color='var(--red-accent)'" onmouseout="this.style.color='var(--text-muted)'"></i>
-                        <div style="font-size: 11px; font-weight: 800; color: var(--text-dark); background: #f8fafc; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-light); line-height: 1;">QTY: ${qty}</div>
+                        
+                        <div style="display: flex; align-items: center; border: 1px solid var(--border-light); border-radius: 4px; height: 26px; overflow: hidden; background: #f8fafc;">
+                            <button onclick="updateCartItemQty(${index}, -1)" style="background:transparent; border:none; width:24px; height:100%; cursor:pointer; color:var(--text-dark); display:flex; justify-content:center; align-items:center; transition:0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-minus" style="font-size:8px;"></i></button>
+                            
+                            <div style="width:28px; text-align:center; font-size:11px; font-weight:800; color:var(--text-dark); border-left:1px solid var(--border-light); border-right:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; height:100%;">${qty}</div>
+                            
+                            <button onclick="updateCartItemQty(${index}, 1)" style="background:transparent; border:none; width:24px; height:100%; cursor:pointer; color:var(--text-dark); display:flex; justify-content:center; align-items:center; transition:0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='transparent'"><i class="fa-solid fa-plus" style="font-size:8px;"></i></button>
+                        </div>
                     </div>
                 </div>
             `;
