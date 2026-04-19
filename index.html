@@ -2984,39 +2984,66 @@
             if (btn) btn.innerText = "MAKE PAYMENT";
         }
     };
-
-    function renderProfileOrders() {
+function renderProfileOrders() {
         const container = document.getElementById('profileOrderHistoryList');
-        if(orderHistory.length === 0) return; 
+        if(!container) return;
+
+        if(orderHistory.length === 0) {
+            container.innerHTML = '<div style="padding:16px; text-align:center; font-size:12px; color:var(--text-muted);">No Recent Orders</div>';
+            return; 
+        }
 
         let html = '';
-        orderHistory.forEach(order => {
+        // Sirf top 3 recent orders dashboard par dikhayenge
+        orderHistory.slice(0, 3).forEach(order => {
             let coinText = order.earnedCoins ? `<br><small style="color:#d97706;">+${order.earnedCoins} Coins Earned</small>` : '';
+            
+            // Dynamic Color for Status
+            let statusColor = 'var(--text-muted)'; // default Processing
+            if(order.status === 'Shipped') statusColor = 'var(--blue-accent)';
+            if(order.status === 'Delivered') statusColor = 'var(--green-accent)';
+
             html += `
                 <div class="order-row">
-                    <div><strong>#${order.id}</strong><br><small>${order.date}</small>${coinText}</div>
-                    <div style="text-align:right; color:var(--text-muted);"><strong>${order.status}</strong><br>₹${order.total.toLocaleString()}</div>
+                    <div><strong>#${order.orderId || order.id}</strong><br><small>${order.date}</small>${coinText}</div>
+                    <div style="text-align:right; color:${statusColor};">
+                        <strong>${order.status.toUpperCase()}</strong><br>
+                        <span style="color:var(--text-dark);">₹${(order.total||0).toLocaleString()}</span>
+                    </div>
                 </div>
             `;
         });
         container.innerHTML = html;
     }
     
-   async function fetchUserOrders() {
+   function fetchUserOrders() {
         if(!currentUser) return;
         try {
             const ordersQuery = query(ref(db, 'orders'), orderByChild('userId'), equalTo(currentUser.uid));
-            const snap = await get(ordersQuery);
-            if(snap.exists()) {
-                const ordersMap = snap.val();
-                orderHistory = Object.keys(ordersMap).map(key => ({
-                    firebaseKey: key,
-                    ...ordersMap[key]
-                })).reverse(); 
+            
+            // 'get' ki jagah 'onValue' use kiya taaki live sunta rahe
+            onValue(ordersQuery, (snap) => {
+                if(snap.exists()) {
+                    const ordersMap = snap.val();
+                    orderHistory = Object.keys(ordersMap).map(key => ({
+                        firebaseKey: key,
+                        orderId: ordersMap[key].orderId || ('ORD-' + key.substring(1, 7).toUpperCase()),
+                        ...ordersMap[key]
+                    })).reverse(); 
+                } else {
+                    orderHistory = [];
+                }
+                
+                // 1. Dashboard par recent orders update karein
                 renderProfileOrders();
-            } else {
-                orderHistory = [];
-            }
+
+                // 2. Agar user current "Orders" tab ke andar hai, toh usko bhi live refresh karein
+                const activeTabTitle = document.getElementById('profileModalTitle');
+                const actualContent = document.getElementById('profileActualContent');
+                if (activeTabTitle && activeTabTitle.innerText === 'Orders' && actualContent) {
+                    actualContent.innerHTML = getTabContentHTML('Orders');
+                }
+            });
         } catch(e) {
             console.error("Error fetching orders:", e);
         }
